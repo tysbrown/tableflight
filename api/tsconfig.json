@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "*": ["node_modules/*"],
+      "@/*": ["../*"]
+    }
+  },
+  "lib": ["ESNext"],
+  "files": ["../common/types.ts"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
