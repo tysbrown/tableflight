@@ -13,11 +13,11 @@ services:
   ui:
     env_file: "./ui/.env.dev"
     build:
-      context: ./ui
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: ./ui/Dockerfile
       target: dev
     ports:
-      - "3000:3000"
+      - "5173:5173"
     depends_on:
       - api
     restart: always
@@ -25,11 +25,13 @@ services:
     stdin_open: true
     env_file: "./api/.env.dev"
     build:
-      context: ./api
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: ./api/Dockerfile
       target: dev
     ports:
       - "1337:1337"
+    depends_on:
+      - postgres
     restart: always
-
-  version: "3.8"
+volumes:
+  postgres:

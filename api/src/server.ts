@@ -9,7 +9,7 @@ const server = new ApolloServer({
 })
 
 server
-  .listen({ port: 1337 })
+  .listen({ port: 1337, host: "0.0.0.0" })
   .then(({ url }) => {
     console.log(`🚀 Server ready at ${url}`)
   })
