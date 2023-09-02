@@ -12,6 +12,9 @@ services:
     depends_on:
       - api
     restart: always
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
   api:
     stdin_open: true
     env_file:
@@ -23,3 +26,6 @@ services:
     ports:
       - "1337:1337"
     restart: always
+    volumes:
+      - ./api:/app
+      - /app/node_modules
