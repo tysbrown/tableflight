@@ -11,7 +11,8 @@ services:
     ports:
       - '5432:5432'
   ui:
-    env_file: "./ui/.env.dev"
+    env_file:
+      - "./ui/.env"
     build:
       context: .
       dockerfile: ./ui/Dockerfile
@@ -23,7 +24,8 @@ services:
     restart: always
   api:
     stdin_open: true
-    env_file: "./api/.env.dev"
+    env_file:
+      - "./api/.env"
     build:
       context: .
       dockerfile: ./api/Dockerfile

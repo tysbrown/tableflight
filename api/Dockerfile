@@ -5,9 +5,9 @@ COPY ./api/prisma ./prisma/
 RUN npm i
 COPY ./api .
 COPY ./common/ /common
-RUN npx prisma generate --data-proxy
 EXPOSE 1337
 CMD ["npm", "run", "dev"]
+RUN npx prisma migrate dev
 
 FROM node as prod-builder
 WORKDIR /app
