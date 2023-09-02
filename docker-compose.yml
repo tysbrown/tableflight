@@ -1,15 +1,5 @@
 version: '3.8'
 services:
-  postgres:
-    image: postgres:14
-    restart: always
-    environment:
-      - POSTGRES_USER=tyler
-      - POSTGRES_PASSWORD=apollo
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
   ui:
     env_file:
       - "./ui/.env"
@@ -32,8 +22,4 @@ services:
       target: dev
     ports:
       - "1337:1337"
-    depends_on:
-      - postgres
     restart: always
-volumes:
-  postgres:

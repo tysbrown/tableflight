@@ -2,13 +2,14 @@
     "name": "tableflight-api",
     "version": "1.0.0",
     "description": "GraphQL API for TableFlight",
-    "main": "./dist/server.js",
+    "main": "./dist/api/src/server.js",
     "scripts": {
         "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\" \"npx prisma generate --data-proxy\"",
         "build": "tsc",
         "test": "jest"
     },
     "author": "Tyler Brown",
+    "type": "module",
     "dependencies": {
         "@prisma/client": "^4.8.1",
         "apollo-server": "^3.10.3",
