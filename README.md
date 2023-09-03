@@ -21,7 +21,7 @@ If you don't want to use Prisma's database proxy:
 Once you have plugged in your database strings...
 
 1. If you don't already have it, [download Docker](https://docs.docker.com/get-docker/) and ensure it's running.
-2. Run `npm i` in both /api and /ui directories.
-3. Run `docker-compose up` in the root directory.
+2. Run `docker-compose up` in the root directory.
+3. Connect to the containers with VSCode's Dev Containers extension.
 
 IMPORTANT: If you're using your own databse, you'll need to run `npx prisma migrate dev --name init` from the /api directory.
