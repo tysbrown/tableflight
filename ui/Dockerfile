@@ -1,4 +1,4 @@
-FROM node as dev
+FROM node:lts as dev
 WORKDIR /app
 COPY ./ui/package.json .
 RUN npm i
