@@ -13,8 +13,9 @@ import {
   getUser,
   setRefreshTokenCookie,
 } from "./auth.js"
-import { verify } from "jsonwebtoken"
+import pkg from "jsonwebtoken"
 import cookieParser from "cookie-parser"
+const { verify } = pkg
 
 type ApolloServerContext = {
   token?: string
