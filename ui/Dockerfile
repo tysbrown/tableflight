@@ -3,6 +3,7 @@ WORKDIR /app
 COPY ./ui/package.json .
 RUN npm i
 COPY ./ui .
+COPY ./types.d.ts ./types.d.ts
 EXPOSE 5173
 CMD ["npm", "run", "dev"]
 

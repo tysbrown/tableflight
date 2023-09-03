@@ -1,4 +1,4 @@
-import type { Game } from "@/common/types"
+import type { Game } from "@/types"
 import type { Context } from "../context"
 
 export const editGame = async (

@@ -10,11 +10,10 @@
     "skipLibCheck": true,
     "paths": {
       "*": ["node_modules/*"],
-      "@/*": ["../*"]
+      "@/types": ["../types.d.ts"]
     }
   },
   "lib": ["ESNext"],
-  "files": ["../common/types.ts"],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../types.d.ts"],
   "exclude": ["node_modules"]
 }

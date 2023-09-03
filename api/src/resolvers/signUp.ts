@@ -1,4 +1,4 @@
-import type { User } from "@/common/types"
+import type { User } from "@/types"
 import type { Context } from "../context"
 import { genSalt, hash } from "bcrypt"
 

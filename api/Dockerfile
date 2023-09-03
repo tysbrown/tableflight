@@ -5,7 +5,7 @@ COPY ./api/package.json ./api/package-lock.json* ./
 COPY ./api/prisma ./prisma/
 RUN npm ci
 COPY ./api .
-COPY ./common/ /common
+COPY ./types.d.ts ./types.d.ts
 EXPOSE 1337
 CMD ["npm", "run", "dev"]
 

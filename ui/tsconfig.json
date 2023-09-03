@@ -30,8 +30,13 @@
     "checkJs": true,
 
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+  
+    "baseUrl": ".",
+    "paths": {
+      "@/types": ["../types.d.ts"]
+    }
   },
-  "include": ["src"],
+  "include": ["src", "../types.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

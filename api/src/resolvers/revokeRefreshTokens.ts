@@ -1,4 +1,4 @@
-import { User } from "@/common/types"
+import type { User } from "@/types"
 import { Context } from "../context"
 
 export const revokeRefreshTokens = async (

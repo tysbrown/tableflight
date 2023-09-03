@@ -1,4 +1,4 @@
-import type { User } from "@/common/types"
+import type { User } from "@/types"
 import { compare } from "bcrypt"
 import { GraphQLError } from "graphql"
 import {
