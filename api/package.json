@@ -2,7 +2,7 @@
     "name": "tableflight-api",
     "version": "1.0.0",
     "description": "GraphQL API for TableFlight",
-    "main": "./dist/src/server.js",
+    "main": "./dist/server.js",
     "scripts": {
         "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\"",
         "build": "tsc",

@@ -1,13 +1,12 @@
 # Development stage
 FROM node:lts as dev
-WORKDIR /app
-COPY ./api/package.json ./api/package-lock.json* ./
-COPY ./api/prisma ./prisma/
-RUN npm ci
+WORKDIR /app/api
 COPY ./api .
-COPY ./types.d.ts ./types.d.ts
+COPY ../types.d.ts ../types.d.ts
+RUN npm install
 EXPOSE 1337
 CMD ["npm", "run", "dev"]
+
 
 # Production build stage
 FROM node:lts as prod-builder

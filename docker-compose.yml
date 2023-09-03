@@ -26,6 +26,5 @@ services:
     ports:
       - "1337:1337"
     restart: always
-    volumes:
-      - ./api:/app
-      - /app/node_modules
+    # volumes:
+      # - ./api:/app/api

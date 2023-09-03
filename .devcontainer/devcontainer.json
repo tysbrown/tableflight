@@ -1,0 +1,26 @@
+{
+  "name": "TableFlight Dev Container",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "api", // This is the primary service you'll be connecting to, but you can switch to 'ui' when needed.
+  "workspaceFolder": "/app",
+  "forwardPorts": [1337, 5173],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/zsh"
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "emmanuelbeziat.vscode-great-icons",
+        "github.copilot",
+        "eamodio.gitlens",
+        "graphql.vscode-graphql-syntax",
+        "firsttris.vscode-jest-runner",
+        "ms-vsliveshare.vsliveshare",
+        "prisma.prisma",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
+}
