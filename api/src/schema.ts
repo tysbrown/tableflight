@@ -1,67 +1,74 @@
-import { Post } from "@prisma/client"
-import { gql } from "apollo-server"
-import { Context } from "./context"
+import {
+  signUp,
+  login,
+  logout,
+  revokeRefreshTokens,
+  changePassword,
+  games,
+  createGame,
+  deleteGame,
+  editGame,
+} from "./resolvers"
 
-export const typeDefs = gql`
-  type Post {
+export const typeDefs = `#graphql
+  type Game {
     id: ID!
-    body: String
-    createdAt: String
-    updatedAt: String
+    name: string
+    description: string
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  type SignUp {
+    email: String
+  }
+
+  type Login {
+    accessToken: String
+    user: User
+  }
+
+  type Logout {
+    message: String
+  }
+
+  type revokeRefreshTokens {
+    message: String
   }
 
   type Query {
-    posts: [Post]
+    games: [Game]
   }
 
   type Mutation {
-    addPost(body: String!): Post
-    deletePost(id: ID!): Post
-    editPost(id: ID!, body: String): Post
+    createGame(name: String!, description: String): Game
+    deleteGame(id: ID!): Game
+    editGame(id: ID!, name: String, description: String): Game
+    signUp(
+      email: String!
+      password: String!
+      firstName: String!
+      lastName: String!
+    ): User
+    login(email: String!, password: String!): Login
+    logout: Logout
+    revokeRefreshTokens(id: ID!): revokeRefreshTokens
+    changePassword(currentPassword: String!, newPassword: String!): User
   }
 `
 
 export const resolvers = {
   Query: {
-    posts: (_: unknown, __: unknown, context: Context) => {
-      return context.prisma.post.findMany({
-        orderBy: {
-          updatedAt: "desc",
-        },
-      })
-    },
+    games: games,
   },
   Mutation: {
-    addPost: async (_: unknown, { body }: Partial<Post>, context: Context) => {
-      const post = await context.prisma.post.create({
-        data: {
-          body,
-        },
-      })
-      return post
-    },
-    deletePost: (_: unknown, { id }: Partial<Post>, context: Context) => {
-      const post = context.prisma.post.delete({
-        where: {
-          id: Number(id),
-        },
-      })
-      return post
-    },
-    editPost: async (
-      _: unknown,
-      { id, body }: Partial<Post>,
-      context: Context
-    ) => {
-      const post = await context.prisma.post.update({
-        where: {
-          id: Number(id),
-        },
-        data: {
-          body,
-        },
-      })
-      return post
-    },
+    createGame,
+    deleteGame,
+    editGame,
+    signUp,
+    login,
+    logout,
+    revokeRefreshTokens,
+    changePassword,
   },
 }
