@@ -8,15 +8,25 @@ import {
   createGame,
   deleteGame,
   editGame,
-} from "./resolvers"
+} from "./resolvers/index.js"
 
 export const typeDefs = `#graphql
+  type User {
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String!
+    createdAt: String!
+    updatedAt: String!
+    games: [Game]
+  }
+
   type Game {
     id: ID!
-    name: string
-    description: string
-    createdAt: Date
-    updatedAt: Date
+    name: String!
+    description: String
+    createdAt: String!
+    updatedAt: String!
   }
 
   type SignUp {
