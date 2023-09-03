@@ -1,7 +1,7 @@
 {
   "name": "TableFlight Dev Container",
   "dockerComposeFile": "../docker-compose.yml",
-  "service": "api", // This is the primary service you'll be connecting to, but you can switch to 'ui' when needed.
+  "service": "ui", // This is the primary service you'll be connecting to, but you can switch to 'ui' when needed.
   "workspaceFolder": "/app",
   "forwardPorts": [1337, 5173],
   "customizations": {
