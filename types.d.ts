@@ -1,1 +1,1 @@
-export type { User, Game } from './api/node_modules/@prisma/client';
+export type { User, Game } from './server/node_modules/@prisma/client';

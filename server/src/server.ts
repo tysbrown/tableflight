@@ -50,7 +50,7 @@ app.use(
       "https://sandbox.embed.apollographql.com",
     ],
     credentials: true,
-  })
+  }),
 )
 
 app.use(
@@ -78,7 +78,7 @@ app.use(
         res,
       }
     },
-  })
+  }),
 )
 
 app.post("/refresh_token", async (req, res) => {
@@ -107,8 +107,8 @@ app.post("/refresh_token", async (req, res) => {
   return res.send({ ok: true, accessToken: newToken, user })
 })
 
-await new Promise<void>((resolve) =>
-  httpServer.listen({ port: 1337, host: "0.0.0.0" }, resolve)
-)
+await new Promise<void>((resolve) => httpServer.listen({ port: 1337 }, resolve))
 
 console.log(`🚀 Server ready at http://localhost:1337/`)
+console.log("⚛️ UI ready at http://localhost:5137/")
+console.log("🔮 GraphQL Playground ready at http://localhost:1337/graphql")

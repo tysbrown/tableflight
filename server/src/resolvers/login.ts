@@ -6,7 +6,7 @@ import {
   createRefreshToken,
   setRefreshTokenCookie,
 } from "../auth.js"
-import { Context } from "../context"
+import { Context } from "../context.js"
 
 export const login = async (
   _: unknown,
