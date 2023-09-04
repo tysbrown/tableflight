@@ -1,9 +1,9 @@
 FROM node:lts as dev
-WORKDIR /app
-COPY ./ui/package.json .
+WORKDIR /app/ui
+COPY ui/package.json ui/package-lock.json* ./
 RUN npm i
 COPY ./ui .
-COPY ./types.d.ts ./types.d.ts
+COPY common/types.d.ts ../types.d.ts
 EXPOSE 5173
 CMD ["npm", "run", "dev"]
 

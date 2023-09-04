@@ -1,4 +1,9 @@
 version: '3.8'
+
+volumes:
+  ui-node-modules:
+
+
 services:
   ui:
     env_file:
@@ -12,6 +17,11 @@ services:
     depends_on:
       - api
     restart: always
+    volumes:
+      - ./ui:/app/ui
+      - ui-node-modules:/app/ui/node_modules
+      - ./common:/app/common
+
   api:
     stdin_open: true
     env_file:
@@ -23,3 +33,5 @@ services:
     ports:
       - "1337:1337"
     restart: always
+    volumes:
+      - ./common:/app/common

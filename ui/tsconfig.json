@@ -34,7 +34,7 @@
   
     "baseUrl": ".",
     "paths": {
-      "@/types": ["../types.d.ts"]
+      "@/types": ["../common/types.d.ts"]
     }
   },
   "include": ["src", "../types.d.ts"],

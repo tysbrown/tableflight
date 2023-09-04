@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "paths": {
       "*": ["node_modules/*"],
-      "@/types": ["../types.d.ts"]
+      "@/types": ["../common/types.d.ts"]
     }
   },
   "lib": ["ESNext"],

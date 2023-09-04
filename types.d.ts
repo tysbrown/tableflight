@@ -1,1 +1,0 @@
-export type { User, Game } from './api/node_modules/@prisma/client';
