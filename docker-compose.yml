@@ -20,7 +20,6 @@ services:
     volumes:
       - ./ui:/app/ui
       - ui-node-modules:/app/ui/node_modules
-      - ./common:/app/common
 
   api:
     stdin_open: true
@@ -33,5 +32,3 @@ services:
     ports:
       - "1337:1337"
     restart: always
-    volumes:
-      - ./common:/app/common
