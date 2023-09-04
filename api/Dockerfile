@@ -2,7 +2,7 @@
 FROM node:lts as dev
 WORKDIR /app/api
 COPY ./api .
-COPY common/types.d.ts ../types.d.ts
+COPY ./types.d.ts ../types.d.ts
 RUN npm install
 EXPOSE 1337
 CMD ["npm", "run", "dev"]

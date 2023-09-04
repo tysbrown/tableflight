@@ -3,7 +3,7 @@ WORKDIR /app/ui
 COPY ui/package.json ui/package-lock.json* ./
 RUN npm i
 COPY ./ui .
-COPY common/types.d.ts ../types.d.ts
+COPY ./types.d.ts ../types.d.ts
 EXPOSE 5173
 CMD ["npm", "run", "dev"]
 
