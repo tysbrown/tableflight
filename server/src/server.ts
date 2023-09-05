@@ -109,6 +109,5 @@ app.post("/refresh_token", async (req, res) => {
 
 await new Promise<void>((resolve) => httpServer.listen({ port: 1337 }, resolve))
 
-console.log(`🚀 Server ready at http://localhost:1337/`)
-console.log("⚛️ UI ready at http://localhost:5173/")
-console.log("🔮 GraphQL Playground ready at http://localhost:1337/graphql")
+console.log("✨ UI ready at http://localhost:5173/")
+console.log("✨ GraphQL Playground ready at http://localhost:1337/graphql")
