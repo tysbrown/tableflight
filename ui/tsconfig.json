@@ -25,7 +25,6 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noImplicitAny": true,
-    "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
 
     "checkJs": true,
