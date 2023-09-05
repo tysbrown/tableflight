@@ -6,8 +6,9 @@
   ],
   "private": true,
   "scripts": {
-    "dev": "lerna run dev --parallel",
+    "dev": "prisma generate --schema=server/prisma/schema.prisma && lerna run dev --parallel",
     "prisma:generate": "prisma generate --schema=server/prisma/schema.prisma",
+    "prisma:migrate:dev": "prisma migrate dev --name init --schema=server/prisma/schema.prisma",
     "clean": "lerna clean",
     "build": "lerna run build",
     "test": "lerna run test",
