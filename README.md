@@ -25,5 +25,7 @@ If you don't want to use Prisma's database proxy:
 
 1. Fill in the environment variables in /server and /ui. Remove `.template` from the filenames.
 2. From the root directory, run `npm i` to install dependencies for both /server and /ui.
-3. From the root directory, run `npm run dev` to start the development servers. UI will be at localhost:5173, server at localhost:1337.
+3. From the root directory, run `npm run dev` to start the development servers.
+ - UI: http://localhost:5173
+ - Server: http://localhost:1337
 4. (Optional) If you're using your own databse, you'll also need to run `npm run prisma:migrate:dev` from the root directory.
