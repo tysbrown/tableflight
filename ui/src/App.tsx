@@ -4,10 +4,11 @@ const App = () => {
     firstName: "John Doe",
     email: "",
   };
+  
   return (
     <>
       <div className="text-center text-6xl mt-6">
-        Hello, world! {user.firstName} asdfasdf fff aaa
+        Hello, world! {user.firstName}
       </div>
     </>
   );

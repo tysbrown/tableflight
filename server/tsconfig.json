@@ -8,6 +8,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "skipLibCheck": true,
+    "noImplicitAny": true,
     "paths": {
       "*": ["node_modules/*"],
       "@/types": ["../types.d.ts"]
