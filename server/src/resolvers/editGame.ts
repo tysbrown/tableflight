@@ -2,7 +2,7 @@ import type { Game } from "@/types"
 import type { Context } from "../context"
 
 export const editGame = async (
-  _: unknown,
+  _: never,
   { id, name, description }: Partial<Game>,
   context: Context
 ) => {

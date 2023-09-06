@@ -3,7 +3,7 @@ import type { Context } from "../context"
 import { genSalt, hash } from "bcrypt"
 
 export const signUp = async (
-  _: unknown,
+  _: never,
   { firstName, lastName, email, password }: Partial<User>,
   context: Context
 ) => {

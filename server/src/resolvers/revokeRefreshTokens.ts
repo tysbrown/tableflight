@@ -2,7 +2,7 @@ import type { User } from "@/types"
 import { Context } from "../context"
 
 export const revokeRefreshTokens = async (
-  _: unknown,
+  _: never,
   { id }: Partial<User>,
   context: Context
 ) => {

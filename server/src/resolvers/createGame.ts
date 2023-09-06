@@ -2,7 +2,7 @@ import type { Game } from "@/types"
 import type { Context } from "../context"
 
 export const createGame = async (
-  _: unknown,
+  _: never,
   { name, description }: Partial<Game>,
   { prisma, user }: Context
 ) => {

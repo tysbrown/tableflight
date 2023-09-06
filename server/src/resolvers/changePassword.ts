@@ -3,7 +3,7 @@ import type { Context } from "../context"
 import { compare, hash, genSalt } from "bcrypt"
 
 export const changePassword = async (
-  _: unknown,
+  _: never,
   args: { oldPassword: string; newPassword: string },
   context: Context
 ) => {

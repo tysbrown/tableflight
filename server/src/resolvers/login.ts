@@ -9,7 +9,7 @@ import {
 import { Context } from "../context.js"
 
 export const login = async (
-  _: unknown,
+  _: never,
   { email, password }: Partial<User>,
   context: Context
 ) => {

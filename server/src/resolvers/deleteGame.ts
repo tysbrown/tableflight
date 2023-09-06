@@ -2,7 +2,7 @@ import type { Game } from "@/types"
 import type { Context } from "../context"
 
 export const deleteGame = (
-  _: unknown,
+  _: never,
   { id }: Partial<Game>,
   context: Context
 ) => {

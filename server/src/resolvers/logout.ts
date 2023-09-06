@@ -1,7 +1,7 @@
 import { clearRefreshTokenCookie } from "../auth.js"
 import type { Context } from "../context.js"
 
-export const logout = async (_: unknown, __: unknown, context: Context) => {
+export const logout = async (_: never, __: never, context: Context) => {
   const { res, prisma, user } = context
 
   if (!user) {
