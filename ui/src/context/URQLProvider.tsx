@@ -13,44 +13,42 @@ export default function URQLProvider({
   const { state, setState } = useGlobalStateContext()
   const { isLoggedIn, accessToken } = state || {}
 
-  const client = useMemo(() => {
-    if (!isLoggedIn) return null
-    return new Client({
-      url: import.meta.env.VITE_API_URL,
-      exchanges: [
-        cacheExchange,
-        authExchange(async (utils: AuthUtilities): Promise<AuthConfig> => {
-          return {
-            addAuthToOperation(operation: Operation) {
-              if (!accessToken) return operation
-              return utils.appendHeaders(operation, {
-                Authorization: `Bearer ${accessToken}`,
-              })
-            },
-            didAuthError: (error) => {
-              return error.graphQLErrors.some(
-                (e) => e.extensions?.code === "FORBIDDEN",
-              )
-            },
-            refreshAuth: async () => {
-              const response = await fetch(
-                import.meta.env.VITE_API_URL + "/refresh_token",
-                {
-                  method: "POST",
-                  credentials: "include",
-                },
-              )
-              const { accessToken, user } = await response.json()
-              setState({ ...state, accessToken, user, isLoggedIn: true })
-            },
-          }
-        }),
-        fetchExchange,
-      ],
-    })
-  }, [isLoggedIn])
+  const client = new Client({
+    url: import.meta.env.VITE_API_URL,
+    exchanges: [
+      cacheExchange,
+      authExchange(async (utils: AuthUtilities): Promise<AuthConfig> => {
+        return {
+          addAuthToOperation(operation: Operation) {
+            if (!accessToken) return operation
+            return utils.appendHeaders(operation, {
+              Authorization: `Bearer ${accessToken}`,
+            })
+          },
+          didAuthError: (error) => {
+            return error.graphQLErrors.some(
+              (e) => e.extensions?.code === "FORBIDDEN",
+            )
+          },
+          refreshAuth: async () => {
+            const response = await fetch(
+              import.meta.env.VITE_API_URL + "/refresh_token",
+              {
+                method: "POST",
+                credentials: "include",
+              },
+            )
+            const { accessToken, user } = await response.json()
+            setState({ ...state, accessToken, user, isLoggedIn: true })
+          },
+        }
+      }),
+      fetchExchange,
+    ],
+  })
 
-  if (!client) return null
+  // If user is not logged in, clear the urql cache/reset it manually
+
 
   return <Provider value={client}>{children}</Provider>
 }
