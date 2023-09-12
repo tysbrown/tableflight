@@ -1,75 +1,48 @@
 import type { Operation } from "urql"
 import type { AuthConfig, AuthUtilities } from "@urql/exchange-auth"
-import { useState } from "react"
-import { useGlobalStateContext } from "./useGlobalContext"
+import type { ReactNode } from "react"
 import { Provider, createClient, fetchExchange } from "urql"
 import { authExchange } from "@urql/exchange-auth"
 import { cacheExchange } from "@urql/exchange-graphcache"
-import { ClientContext } from "./ClientContext"
-import { useClient } from "../hooks/useClient"
+import { useRefreshToken } from "../hooks/useRefreshToken"
+import { useGlobalStateContext } from "./useGlobalContext"
 
-export default function URQLProvider({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const { resetClient } = useClient()
-  const { state, setState } = useGlobalStateContext()
+export default function URQLProvider({ children }: { children: ReactNode }) {
+  const refreshToken = useRefreshToken()
+  const { state } = useGlobalStateContext()
   const { accessToken } = state || {}
 
-  const makeClient = () =>
-    createClient({
-      url: import.meta.env.VITE_API_URL,
-      exchanges: [
-        cacheExchange({}),
-        authExchange(async (utils: AuthUtilities): Promise<AuthConfig> => {
-          return {
-            addAuthToOperation(operation: Operation) {
-              if (!accessToken) return operation
+  const client = createClient({
+    url: `/graphql`,
+    exchanges: [
+      cacheExchange({}),
+      authExchange(async (utils: AuthUtilities): Promise<AuthConfig> => {
+        return {
+          addAuthToOperation(operation: Operation) {
+            console.log("addAuthToOperation")
+            console.log("accessToken?", accessToken)
+
+            if (accessToken)
               return utils.appendHeaders(operation, {
                 Authorization: `Bearer ${accessToken}`,
+                "Apollo-Require-Preflight": "true",
               })
-            },
-            didAuthError: (error) => {
-              return error.graphQLErrors.some(
-                (e) => e.extensions?.code === "FORBIDDEN",
-              )
-            },
-            refreshAuth: async () => {
-              const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/refresh_token`,
-                {
-                  method: "POST",
-                  credentials: "include",
-                },
-              )
-              const { accessToken, user } = await response.json()
+            return operation
+          },
+          didAuthError: (error) => {
+            console.log("didAuthError")
+            return error.graphQLErrors.some(
+              (e) => e.extensions?.code === "UNAUTHORIZED",
+            )
+          },
+          refreshAuth: async () => {
+            await refreshToken()
+          },
+        }
+      }),
+      fetchExchange,
+    ],
+  })
 
-              // If the refresh token is invalid, log the user out
-              if (!accessToken) {
-                setState({ ...state, isLoggedIn: false })
-
-                resetClient()
-                return
-              }
-
-              setState({ ...state, accessToken, user, isLoggedIn: true })
-            },
-          }
-        }),
-        fetchExchange,
-      ],
-    })
-
-  const [client, setClient] = useState(makeClient())
-
-  return (
-    <ClientContext.Provider
-      value={{
-        resetClient: () => setClient(makeClient()),
-      }}
-    >
-      <Provider value={client}>{children}</Provider>
-    </ClientContext.Provider>
-  )
+  return <Provider value={client}>{children}</Provider>
 }

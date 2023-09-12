@@ -16,7 +16,7 @@ export const createRefreshToken = (user: User) => {
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: "7d",
-    }
+    },
   )
 }
 
@@ -36,8 +36,8 @@ export const setRefreshTokenCookie = (res: Response, token: string) => {
   res.cookie("jid", token, {
     httpOnly: true,
     path: "/",
-    secure: true,
-    sameSite: "none",
+    // secure: true,
+    // sameSite: "none",
   })
 }
 

@@ -1,5 +1,5 @@
 import type { User } from "@/types"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import Modal from "../atoms/Modal"
 import { useMutation, gql } from "urql"
@@ -38,11 +38,9 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
     reset,
     formState: { errors },
   } = useForm()
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccessView, setShowSuccessView] = useState(false)
 
-  const [{ fetching, error }, signUp] = useMutation(signUpMutation)
+  const [{ fetching }, signUp] = useMutation(signUpMutation)
 
   const onSubmit = async ({
     firstName,
@@ -50,22 +48,14 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
     email,
     password,
   }: Partial<User>) => {
-    setIsSubmitting(true)
-    try {
-      await signUp({ email, password, firstName, lastName })
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  useEffect(() => {
-    if (!fetching && !error) {
+    const resp = await signUp({ email, password, firstName, lastName })
+    if (resp.error) {
+      console.error(resp.error)
+    } else {
       setShowSuccessView(true)
       reset()
     }
-  }, [error, fetching, reset])
+  }
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen} heading="Sign Up">
@@ -128,10 +118,10 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
           {errors.confirmPassword && <span>This field is required</span>}
 
           <button
-            disabled={isSubmitting}
+            disabled={fetching}
             className="w-full p-2 rounded-md bg-green-500 text-white"
           >
-            Sign Up
+            {fetching ? "Loading..." : "Sign Up"}
           </button>
         </form>
       )}

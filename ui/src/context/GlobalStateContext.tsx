@@ -1,13 +1,13 @@
 import { createContext, useEffect, useState } from "react"
 import { User } from "@/types"
 
-type UserState = {
+export type UserState = {
   accessToken?: string
   user?: Partial<User>
   isLoggedIn: boolean
 }
 
-type GlobalContextType = {
+export type GlobalContextType = {
   state?: UserState
   setState: React.Dispatch<React.SetStateAction<UserState>>
 }

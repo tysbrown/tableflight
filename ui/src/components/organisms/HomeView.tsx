@@ -1,4 +1,5 @@
 import type { Game } from "@/types"
+import { useGlobalStateContext } from "../../context/useGlobalContext"
 import { gql, useQuery } from "urql"
 
 const gamesQuery = gql`
@@ -12,8 +13,14 @@ const gamesQuery = gql`
 `
 
 const HomeView = () => {
+  const { state } = useGlobalStateContext()
+  const { accessToken } = state || {}
+
+  console.log("access token in homeview: ", accessToken)
+
   const [{ data, fetching, error }] = useQuery({
     query: gamesQuery,
+    // pause: accessToken === undefined,
   })
 
   if (fetching) return <p>Loading...</p>
@@ -23,9 +30,7 @@ const HomeView = () => {
     <section>
       <h1>Games:</h1>
       <ul>
-        {data.games.map((game: Game) => (
-          <li key={game.id}>{game.name}</li>
-        ))}
+        {data?.games?.map((game: Game) => <li key={game.id}>{game.name}</li>)}
       </ul>
     </section>
   )

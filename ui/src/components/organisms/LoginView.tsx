@@ -1,5 +1,11 @@
+import LoginBox from "../molecules/LoginBox"
+
 const LoginView = () => {
-  return <div>Login view!</div>
+  return (
+    <main className="flex justify-center items-center min-h-screen">
+      <LoginBox />
+    </main>
+  )
 }
 
 export default LoginView

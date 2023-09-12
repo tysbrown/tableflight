@@ -58,7 +58,8 @@ app.use(
   bodyParser.json(),
   expressMiddleware(server, {
     context: async ({ req, res }) => {
-      const authorization = req.headers.authorization
+      const { authorization } = req.headers
+
       if (authorization) {
         const token = authorization?.split(" ")[1]
 
@@ -83,7 +84,7 @@ app.use(
 
 app.post("/refresh_token", async (req, res) => {
   const token = req.cookies.jid
-
+  console.log("refresh token endpoint hit")
   if (!token) {
     return res.send({ ok: false, accessToken: "" })
   }
