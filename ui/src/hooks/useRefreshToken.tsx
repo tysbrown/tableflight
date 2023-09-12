@@ -1,27 +1,29 @@
 import { useGlobalStateContext } from "../context/useGlobalContext"
 
-export function useRefreshToken() {
+export const useRefreshToken = () => {
   const { state, setState } = useGlobalStateContext()
 
-  async function refresh() {
-    console.log("refreshAuth")
+  const refresh = async () => {
+    console.log("refreshing token...")
+
     try {
       const response = await fetch(`http://localhost:1337/refresh_token`, {
         method: "POST",
         credentials: "include",
       })
+
       const { accessToken, user } = await response.json()
-      // If the refresh token is invalid, log the user out
+
       if (!accessToken) {
         setState({ ...state, isLoggedIn: false })
-        // Optionally handle other stuff here
-        return false // indicate refresh failed
+        return false
       }
+
       setState({ ...state, accessToken, user, isLoggedIn: true })
-      return true // indicate refresh was successful
+      return true
     } catch (error) {
       console.error("Error refreshing token:", error)
-      return false // indicate refresh failed due to an error
+      return false
     }
   }
 
