@@ -1,7 +1,7 @@
 import type { Operation } from "urql"
 import type { AuthConfig, AuthUtilities } from "@urql/exchange-auth"
 import type { ReactNode } from "react"
-import { Provider, createClient, fetchExchange } from "urql"
+import { Client, Provider, fetchExchange } from "urql"
 import { authExchange } from "@urql/exchange-auth"
 import { cacheExchange } from "@urql/exchange-graphcache"
 import { useRefreshToken } from "../hooks/useRefreshToken"
@@ -12,7 +12,7 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
   const { state } = useGlobalStateContext()
   const { accessToken } = state || {}
 
-  const client = createClient({
+  const client = new Client({
     url: `/graphql`,
     exchanges: [
       cacheExchange({}),
