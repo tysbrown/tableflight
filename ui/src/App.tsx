@@ -24,7 +24,7 @@ const App = () => {
     callRefreshToken()
   }, [])
 
-  if (initializing) <div>Initializing the UI...</div>
+  if (initializing) return <div>Initializing the UI...</div>
 
   if (isLoggedIn === false) return <LoginView />
 
