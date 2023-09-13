@@ -121,5 +121,28 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    ({ addUtilities, theme, e }) => {
+      const colors = theme("colors")
+      const newUtilities = {}
+
+      Object.keys(colors).forEach((colorName) => {
+        const colorValue = colors[colorName]
+        const className = `.input-bg-${e(colorName)}`
+
+        newUtilities[
+          `
+          ${className}:-webkit-autofill,
+          ${className}:-webkit-autofill:hover,
+          ${className}:-webkit-autofill:focus,
+          ${className}:-webkit-autofill:active`
+        ] = {
+          "-webkit-box-shadow": `0 0 0 30px ${colorValue} inset`,
+          "-webkit-text-fill-color": "#C9C5CA",
+        }
+      })
+
+      addUtilities(newUtilities, ["responsive", "hover"])
+    },
+  ],
 }
