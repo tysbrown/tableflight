@@ -1,5 +1,4 @@
 import type { Game } from "@/types"
-import { useGlobalStateContext } from "../../context/useGlobalContext"
 import { gql, useQuery } from "urql"
 
 const gamesQuery = gql`
@@ -13,14 +12,8 @@ const gamesQuery = gql`
 `
 
 const HomeView = () => {
-  const { state } = useGlobalStateContext()
-  const { accessToken } = state || {}
-
-  console.log("access token in homeview: ", accessToken)
-
   const [{ data, fetching, error }] = useQuery({
     query: gamesQuery,
-    // pause: accessToken === undefined,
   })
 
   if (fetching) return <p>Loading...</p>

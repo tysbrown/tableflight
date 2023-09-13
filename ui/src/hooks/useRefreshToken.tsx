@@ -4,8 +4,6 @@ export const useRefreshToken = () => {
   const { state, setState } = useGlobalStateContext()
 
   const refresh = async () => {
-    console.log("refreshing token...")
-
     try {
       const response = await fetch(`http://localhost:1337/refresh_token`, {
         method: "POST",

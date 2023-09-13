@@ -7,6 +7,12 @@ import { cacheExchange } from "@urql/exchange-graphcache"
 import { useRefreshToken } from "../hooks/useRefreshToken"
 import { useGlobalStateContext } from "./useGlobalContext"
 
+/**
+ * Provider for the URQL GraphQL client
+ *
+ * @todo - Configure normalized caching in the cacheExchange
+ */
+
 export default function URQLProvider({ children }: { children: ReactNode }) {
   const refreshToken = useRefreshToken()
   const { state } = useGlobalStateContext()
@@ -19,9 +25,6 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
       authExchange(async (utils: AuthUtilities): Promise<AuthConfig> => {
         return {
           addAuthToOperation(operation: Operation) {
-            console.log("addAuthToOperation")
-            console.log("accessToken?", accessToken)
-
             if (accessToken)
               return utils.appendHeaders(operation, {
                 Authorization: `Bearer ${accessToken}`,
@@ -30,7 +33,6 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
             return operation
           },
           didAuthError: (error) => {
-            console.log("didAuthError")
             return error.graphQLErrors.some(
               (e) => e.extensions?.code === "UNAUTHORIZED",
             )
