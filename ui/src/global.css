@@ -4,4 +4,5 @@
 
 body {
   @apply bg-surface;
+  @apply text-onSurface;
 }
