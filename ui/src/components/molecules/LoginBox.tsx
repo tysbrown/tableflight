@@ -4,6 +4,8 @@ import SignUpModal from "./SignUpModal"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { useGlobalStateContext } from "../../context/useGlobalContext"
+import Button from "../atoms/Button"
+import TextInput from "../atoms/TextInput"
 
 const loginMutation = gql`
   mutation Login($email: String!, $password: String!) {
@@ -54,44 +56,53 @@ const LoginBox = () => {
     <section className="max-w-lg w-full mx-auto mt-8">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid bg-white shadow-md p-4 pb-6 rounded-lg"
+        className="grid bg-surfaceContainer shadow-md p-4 pb-6 rounded-xl"
       >
-        <input
+        <TextInput
           type="email"
+          name="email"
           placeholder="Email"
-          className="w-full p-2 rounded-md border mb-3"
-          {...register("email", { required: true })}
+          required
+          register={register}
         />
         {errors.email && <span>This field is required</span>}
 
-        <input
+        <TextInput
           type="password"
+          name="password"
           placeholder="Password"
-          className="w-full p-2 rounded-md border mb-3"
-          {...register("password", { required: true })}
+          required
+          register={register}
         />
         {errors.password && <span>This field is required</span>}
-        <button
-          type="submit"
-          disabled={fetching}
-          className="w-full p-2 rounded-md bg-blue-500 text-white"
-        >
-          {fetching ? "Loading..." : "Login"}
-        </button>
+        <div className="ml-auto">
+          <Button
+            style="primary"
+            type="submit"
+            disabled={fetching}
+            className="mr-2"
+          >
+            {fetching ? "Loading..." : "Login"}
+          </Button>
 
-        <button
-          onClick={() => console.log("Handle this button.")}
-          className="mt-4 text-center text-sm text-blue-500"
-        >
-          Forgot password?
-        </button>
-        <hr className="my-5" />
-        <button
+          <Button
+            style="outline"
+            type="button"
+            onClick={() => console.log("Handle this button.")}
+          >
+            Forgot password?
+          </Button>
+        </div>
+
+        <hr className="mt-8 mb-6 border-outlineVariant" />
+        <Button
+          type="button"
+          style="secondary"
           onClick={() => setModalIsOpen(true)}
-          className="bg-green-500 px-4 py-2 rounded-md text-white font-bold justify-self-center"
+          className="mx-auto"
         >
           Create new account
-        </button>
+        </Button>
       </form>
       <SignUpModal isOpen={modalIsOpen} setIsOpen={setModalIsOpen} />
     </section>
