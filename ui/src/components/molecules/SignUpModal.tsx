@@ -2,7 +2,9 @@ import type { User } from "@/types"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import Modal from "../atoms/Modal"
+import TextInput from "../atoms/TextInput"
 import { useMutation, gql } from "urql"
+import Button from "../atoms/Button"
 
 const signUpMutation = gql`
   mutation SignUp(
@@ -58,7 +60,12 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
   }
 
   return (
-    <Modal isOpen={isOpen} setIsOpen={setIsOpen} heading="Sign Up">
+    <Modal
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      heading="Sign Up"
+      className="bg-surfaceContainerHigh"
+    >
       {showSuccessView ? (
         <article className="flex flex-col items-center justify-center p-9">
           <h1 className="text-2xl font-bold">Success!</h1>
@@ -75,54 +82,59 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
       ) : (
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="grid bg-white shadow-md p-4 pb-6 rounded-lg"
+          autoComplete="off"
+          className="grid bg-surfaceContainerHigh p-4 pb-6 rounded-lg"
         >
-          <input
+          <TextInput
             type="text"
-            placeholder="First Name"
-            className="w-full p-2 rounded-md border mb-3"
-            {...register("firstName", { required: true })}
+            name="firstName"
+            label="First Name"
+            required
+            register={register}
+            hasError={errors.firstName}
+            className="mb-4"
           />
-          {errors.firstName && <span>This field is required</span>}
-
-          <input
+          <TextInput
             type="text"
-            placeholder="Last Name"
-            className="w-full p-2 rounded-md border mb-3"
-            {...register("lastName", { required: true })}
+            name="lastName"
+            label="Last Name"
+            required
+            register={register}
+            hasError={errors.lastName}
+            className="mb-4"
           />
-          {errors.lastName && <span>This field is required</span>}
-
-          <input
+          <TextInput
             type="email"
-            placeholder="Email"
-            className="w-full p-2 rounded-md border mb-3"
-            {...register("email", { required: true })}
+            name="email"
+            label="Email"
+            required
+            noAutoComplete
+            register={register}
+            hasError={errors.email}
+            className="mb-4"
           />
-          {errors.email && <span>This field is required</span>}
-
-          <input
+          <TextInput
             type="password"
-            placeholder="Password"
-            className="w-full p-2 rounded-md border mb-3"
-            {...register("password", { required: true })}
+            name="password"
+            label="Password"
+            required
+            noAutoComplete
+            register={register}
+            hasError={errors.password}
+            className="mb-4"
           />
-          {errors.password && <span>This field is required</span>}
-
-          <input
+          <TextInput
             type="password"
-            placeholder="Confirm Password"
-            className="w-full p-2 rounded-md border mb-3"
-            {...register("confirmPassword", { required: true })}
+            name="confirmPassword"
+            label="Confirm Password"
+            required
+            register={register}
+            hasError={errors.confirmPassword}
+            className="mb-4"
           />
-          {errors.confirmPassword && <span>This field is required</span>}
-
-          <button
-            disabled={fetching}
-            className="w-full p-2 rounded-md bg-green-500 text-white"
-          >
+          <Button style="primary" type="submit" disabled={fetching}>
             {fetching ? "Loading..." : "Sign Up"}
-          </button>
+          </Button>
         </form>
       )}
     </Modal>
