@@ -61,7 +61,7 @@ const LoginBox = () => {
         <TextInput
           type="email"
           name="email"
-          placeholder="Email"
+          label="Email"
           required
           register={register}
         />
@@ -70,7 +70,7 @@ const LoginBox = () => {
         <TextInput
           type="password"
           name="password"
-          placeholder="Password"
+          label="Password"
           required
           register={register}
         />
