@@ -51,8 +51,11 @@ const LoginBox = () => {
   }
 
   return (
-    <section className="max-w-lg w-full mx-auto mt-8 bg-surfaceContainer shadow-md p-4 pb-6 rounded-xl">
-      <h1 className="text-5xl font-bold mb-4 text-center">TableFlight</h1>
+    <section className="max-w-lg w-full mx-auto mt-8 bg-surfaceContainer shadow-md py-6 px-4 rounded-xl">
+      <h1 className="text-5xl font-bold mb-6 text-center">TableFlight</h1>
+
+      <hr className="mb-8 border-outlineVariant" />
+
       <form onSubmit={handleSubmit(onSubmit)} className="grid">
         <TextInput
           type="email"
@@ -91,7 +94,7 @@ const LoginBox = () => {
           </Button>
         </div>
 
-        <hr className="mt-8 mb-6 border-outlineVariant" />
+        <hr className="mt-8 mb-4 border-outlineVariant" />
 
         <Button
           type="button"
