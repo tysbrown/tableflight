@@ -1,3 +1,4 @@
+@import '../public/fonts/fonts.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,4 +6,5 @@
 body {
   @apply bg-surface;
   @apply text-onSurface;
+  @apply font-roboto;
 }
