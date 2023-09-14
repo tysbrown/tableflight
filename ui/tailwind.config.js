@@ -119,18 +119,30 @@ export default {
         white: "#FFFFFF",
         black: "#000000",
       },
+      backgroundColor: {
+        hoverOverlay: "rgba(0, 0, 0, 0.08)",
+        focusOverlay: "rgba(0, 0, 0, 0.12)",
+        dragOverlay: "rgba(0, 0, 0, 0.16)",
+      },
+    },
+    boxShadow: {
+      1: "0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)",
+      2: "0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)",
+      3: "0px 1px 3px 0px rgba(0, 0, 0, 0.30), 0px 4px 8px 3px rgba(0, 0, 0, 0.15)",
+      4: "0px 2px 3px 0px rgba(0, 0, 0, 0.30), 0px 6px 10px 4px rgba(0, 0, 0, 0.15)",
+      5: "0px 4px 4px 0px rgba(0, 0, 0, 0.30), 0px 8px 12px 6px rgba(0, 0, 0, 0.15)",
     },
   },
   plugins: [
     ({ addUtilities, theme, e }) => {
       const colors = theme("colors")
-      const newUtilities = {}
+      const removeAutofillStylesUtilities = {}
 
       Object.keys(colors).forEach((colorName) => {
         const colorValue = colors[colorName]
         const className = `.input-bg-${e(colorName)}`
 
-        newUtilities[
+        removeAutofillStylesUtilities[
           `
           ${className}:-webkit-autofill,
           ${className}:-webkit-autofill:hover,
@@ -144,7 +156,39 @@ export default {
         }
       })
 
-      addUtilities(newUtilities, ["responsive", "hover"])
+      addUtilities(removeAutofillStylesUtilities, ["responsive", "hover"])
+
+      addUtilities(
+        {
+          ".primaryHoverOverlay": {
+            position: "relative",
+          },
+          ".primaryHoverOverlay:hover::after": {
+            content: '""',
+            borderRadius: "9999px",
+            backgroundColor: "rgba(39, 35, 119, 0.08)",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            bottom: "0",
+            right: "0",
+          },
+          ".primaryFocusOverlay": {
+            position: "relative",
+          },
+          ".primaryFocusOverlay:hover::after": {
+            content: '""',
+            borderRadius: "9999px",
+            backgroundColor: "rgba(39, 35, 119, 0.12)",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            bottom: "0",
+            right: "0",
+          },
+        },
+        ["responsive", "hover", "focus", "active"],
+      )
     },
   ],
 }
