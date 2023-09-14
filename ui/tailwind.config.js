@@ -139,6 +139,8 @@ export default {
         ] = {
           "-webkit-box-shadow": `0 0 0 30px ${colorValue} inset`,
           "-webkit-text-fill-color": "#C9C5CA",
+          "-webkit-mask-image": "-webkit-radial-gradient(white, black)",
+          "-webkit-mask-composite": "destination-out",
         }
       })
 
