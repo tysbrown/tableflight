@@ -12,6 +12,7 @@ type TextInputProps = {
   label: string
   className?: string
   required?: boolean
+  noAutoComplete?: boolean
   register: (arg1: string, arg2: object) => UseFormRegisterReturn
   hasError:
     | FieldError
@@ -36,6 +37,7 @@ const TextInput = ({
   label,
   className,
   required = false,
+  noAutoComplete = false,
   register,
   hasError,
   ...remaining
@@ -44,6 +46,7 @@ const TextInput = ({
     <div className={`${className} group relative w-full h-14`} {...remaining}>
       <input
         type={type}
+        autoComplete={noAutoComplete ? "new-password" : ""}
         placeholder=" "
         className={`
           peer w-full h-full px-4 pb-0 py-5 rounded-t-md caret-onSurface border-b
@@ -63,7 +66,8 @@ const TextInput = ({
           peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:scale-75 
           peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-primary 
           ${
-            hasError && "text-error peer-focus:text-error translate-y-0 top-2 scale-75"
+            hasError &&
+            "text-error peer-focus:text-error translate-y-0 top-2 scale-75"
           }
         `}
       >
