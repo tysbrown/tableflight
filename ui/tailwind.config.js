@@ -176,10 +176,36 @@ export default {
           ".primaryFocusOverlay": {
             position: "relative",
           },
-          ".primaryFocusOverlay:hover::after": {
+          ".primaryFocusOverlay:focus::after": {
             content: '""',
             borderRadius: "9999px",
             backgroundColor: "rgba(39, 35, 119, 0.12)",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            bottom: "0",
+            right: "0",
+          },
+          ".outlineHoverOverlay": {
+            position: "relative",
+          },
+          ".outlineHoverOverlay:hover::after": {
+            content: '""',
+            borderRadius: "9999px",
+            backgroundColor: "rgba(53, 52, 56, 0.2)",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            bottom: "0",
+            right: "0",
+          },
+          ".focusHoverOverlay": {
+            position: "relative",
+          },
+          ".focusHoverOverlay:focus::after": {
+            content: '""',
+            borderRadius: "9999px",
+            backgroundColor: "rgba(53, 52, 56, 0.3)",
             position: "absolute",
             top: "0",
             left: "0",
