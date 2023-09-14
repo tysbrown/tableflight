@@ -5,6 +5,7 @@ import {
   Merge,
   UseFormRegisterReturn,
 } from "react-hook-form"
+import { SignUpFormValues } from "../molecules/SignUpModal"
 
 type TextInputProps = {
   name: string
@@ -14,6 +15,7 @@ type TextInputProps = {
   required?: boolean
   noAutoComplete?: boolean
   register: (arg1: string, arg2: object) => UseFormRegisterReturn
+  validate?: (arg1: string, arg2: SignUpFormValues) => boolean
   hasError:
     | FieldError
     | Merge<FieldError, FieldErrorsImpl<FieldValues>>
@@ -39,6 +41,7 @@ const TextInput = ({
   required = false,
   noAutoComplete = false,
   register,
+  validate,
   hasError,
   ...remaining
 }: TextInputProps) => {
@@ -54,7 +57,7 @@ const TextInput = ({
           focus:outline-none 
           group-hover:border-white group-hover:bg-surfaceContainer
         `}
-        {...register(name, { required })}
+        {...register(name, { validate: validate, required })}
       />
       <label
         htmlFor={name}
