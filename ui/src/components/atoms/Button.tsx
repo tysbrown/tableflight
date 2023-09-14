@@ -35,7 +35,7 @@ const Button = ({
     outline:
       "bg-none border border-outline text-primary outlineHoverOverlay outlineFocusOverlay",
     tertiary: "bg-tertiary border border-tertiary text-onTertiary",
-    link: "bg-none text-sm",
+    link: "bg-none text-sm p-0 rounded-none text-primary underline",
   }
 
   return (
