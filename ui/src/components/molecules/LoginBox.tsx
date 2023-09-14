@@ -51,11 +51,9 @@ const LoginBox = () => {
   }
 
   return (
-    <section className="max-w-lg w-full mx-auto mt-8">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="grid bg-surfaceContainer shadow-md p-4 pb-6 rounded-xl"
-      >
+    <section className="max-w-lg w-full mx-auto mt-8 bg-surfaceContainer shadow-md p-4 pb-6 rounded-xl">
+      <h1 className="text-5xl font-bold mb-4 text-center">TableFlight</h1>
+      <form onSubmit={handleSubmit(onSubmit)} className="grid">
         <TextInput
           type="email"
           name="email"
@@ -94,11 +92,12 @@ const LoginBox = () => {
         </div>
 
         <hr className="mt-8 mb-6 border-outlineVariant" />
+
         <Button
           type="button"
           style="link"
           onClick={() => setModalIsOpen(true)}
-          className="mx-auto"
+          className="justify-self-center"
         >
           Create new account
         </Button>
