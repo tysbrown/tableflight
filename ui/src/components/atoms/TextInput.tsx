@@ -10,7 +10,7 @@ type TextInputProps = {
 }
 
 /**
- * A text input field with a floating label
+ * A text input field with a floating label and animated bottom border.
  *
  * @param {string} name - The name of the input field
  * @param {string} type - The type of the input field
