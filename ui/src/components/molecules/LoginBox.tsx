@@ -34,18 +34,16 @@ const LoginBox = () => {
 
   const onSubmit = async (fields: Partial<User>) => {
     const { email, password } = fields || {}
-
     const loginResp = await login({
       email,
       password,
     })
+    const { accessToken, user } = loginResp?.data?.login || {}
 
     if (loginResp.error) {
       console.error(loginResp.error)
       return
     }
-
-    const { accessToken, user } = loginResp?.data?.login || {}
 
     if (accessToken && user) {
       setState({ accessToken, user, isLoggedIn: true })
@@ -64,18 +62,19 @@ const LoginBox = () => {
           label="Email"
           required
           register={register}
+          hasError={errors.email}
+          className="mb-4"
         />
-        {errors.email && <span>This field is required</span>}
-
         <TextInput
           type="password"
           name="password"
           label="Password"
           required
           register={register}
+          hasError={errors.password}
+          className="mb-6"
         />
-        {errors.password && <span>This field is required</span>}
-        <div className="ml-auto">
+        <div>
           <Button
             style="primary"
             type="submit"
@@ -97,7 +96,7 @@ const LoginBox = () => {
         <hr className="mt-8 mb-6 border-outlineVariant" />
         <Button
           type="button"
-          style="secondary"
+          style="link"
           onClick={() => setModalIsOpen(true)}
           className="mx-auto"
         >
