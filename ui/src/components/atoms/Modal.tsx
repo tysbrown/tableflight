@@ -20,7 +20,7 @@ const Modal = ({ isOpen, setIsOpen, heading, className, children }: Props) => {
           onClick={() => setIsOpen(false)}
         />
         <article
-          className={`absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 w-[500px] shadow-lg bg-white rounded-lg z-[9999] ${className}`}
+          className={`absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 w-[500px] shadow-lg bg-surfaceContainer rounded-lg z-[9999] ${className}`}
         >
           <section className="grid items-center h-[60px] border-b-gray-300 border-b">
             <h2 className="text-xl font-bold col-start-1 col-end-2 row-start-1 row-end-2 justify-self-center">

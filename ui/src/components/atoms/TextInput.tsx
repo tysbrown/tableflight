@@ -31,6 +31,9 @@ type TextInputProps = {
  * @param {string} className - Any styles passed from the component declaration
  * @param {boolean} required - For validation
  * @param {function} register - The register function from react-hook-form
+ * @param {function} validate - A function to validate the input field
+ * @param {boolean} hasError - For validation
+ * @param {boolean} noAutoComplete - For disabling autocomplete
  */
 
 const TextInput = ({
@@ -62,15 +65,16 @@ const TextInput = ({
       <label
         htmlFor={name}
         className={`
-          absolute top-1/2 -translate-y-1/2 left-4 text-onSurface transition-all transform 
-          origin-top-left ease-in-out duration-200 cursor-text
-          peer-focus:translate-y-0 peer-focus:top-2 peer-focus:scale-75 peer-focus:text-primary 
+          absolute top-1/2 -translate-y-1/2 left-4 transition-all transform origin-top-left ease-in-out 
+          duration-200 cursor-text
+          peer-focus:translate-y-0 peer-focus:top-2 peer-focus:scale-75 
           peer-autofill:translate-y-0 peer-autofill:top-2 peer-autofill:scale-75 peer-autofill:text-primary 
           peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:scale-75 
-          peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-primary 
+          peer-[:not(:placeholder-shown)]:top-2
           ${
-            hasError &&
-            "text-error peer-focus:text-error translate-y-0 top-2 scale-75"
+            hasError
+              ? "text-error peer-focus:text-error translate-y-0 top-2 scale-75"
+              : "text-onSurface peer-focus:text-primary peer-[:not(:placeholder-shown)]:text-primary "
           }
         `}
       >
@@ -78,10 +82,14 @@ const TextInput = ({
       </label>
       <div
         className={`
-          absolute bottom-0 left-1/2 -translate-x-1/2 bg-primary w-0 h-0.5 transition-all
+          absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 transition-all
           duration-200 ease-in-out peer-focus:w-full peer-autofill:w-full 
           peer-[:not(:placeholder-shown)]:w-full 
-          ${hasError && "bg-error w-full"}
+          ${
+            hasError
+              ? "bg-error peer-focus:bg-error peer-autofill:bg-error w-full"
+              : "bg-primary"
+          }
         `}
       />
     </div>

@@ -28,6 +28,14 @@ const signUpMutation = gql`
   }
 `
 
+export type SignUpFormValues = {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
 type SignUpModalProps = {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -129,6 +137,7 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
             label="Confirm Password"
             required
             register={register}
+            validate={(value, formValues) => value === formValues.password}
             hasError={errors.confirmPassword}
             className="mb-4"
           />
