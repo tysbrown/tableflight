@@ -1,5 +1,6 @@
 import type { Game } from "@/types"
 import { gql, useQuery } from "urql"
+import Grid from "../atoms/Grid"
 
 const gamesQuery = gql`
   query Games {
@@ -20,12 +21,15 @@ const HomeView = () => {
   if (error) return <p>Oh no... {error.message}</p>
 
   return (
-    <section>
-      <h1>Games:</h1>
-      <ul>
-        {data?.games?.map((game: Game) => <li key={game.id}>{game.name}</li>)}
-      </ul>
-    </section>
+    <>
+      <Grid width={60} height={60} cellSize={5} />
+      <section>
+        <h1>Games:</h1>
+        <ul>
+          {data?.games?.map((game: Game) => <li key={game.id}>{game.name}</li>)}
+        </ul>
+      </section>
+    </>
   )
 }
 
