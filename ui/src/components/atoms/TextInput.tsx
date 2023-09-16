@@ -13,9 +13,29 @@ type TextInputProps = {
   label: string
   className?: string
   required?: boolean
+  /**
+   * Disables autocomplete for the input field.
+   *
+   * @default false
+   */
   noAutoComplete?: boolean
+  /**
+   *
+   * @param arg1 - The name of the input field
+   * @param arg2 - Options object
+   * @returns
+   */
   register: (arg1: string, arg2: object) => UseFormRegisterReturn
+  /**
+   *
+   * @param arg1 - The value of the input field
+   * @param arg2 - The entire form values object
+   * @returns - A boolean indicating whether the input field is valid
+   */
   validate?: (arg1: string, arg2: SignUpFormValues) => boolean
+  /**
+   * The error object returned by react-hook-form's `errors` object.
+   */
   hasError:
     | FieldError
     | Merge<FieldError, FieldErrorsImpl<FieldValues>>
@@ -25,17 +45,7 @@ type TextInputProps = {
 /**
  * A text input field with a floating label and animated bottom border.
  *
- * @param {string} name - The name of the input field
- * @param {string} type - The type of the input field
- * @param {string} label - The label of the input field
- * @param {string} className - Any styles passed from the component declaration
- * @param {boolean} required - For validation
- * @param {function} register - The register function from react-hook-form
- * @param {function} validate - A function to validate the input field
- * @param {boolean} hasError - For validation
- * @param {boolean} noAutoComplete - For disabling autocomplete
  */
-
 const TextInput = ({
   name,
   type,
