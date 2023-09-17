@@ -1,6 +1,9 @@
+import React from "react"
 import type { Game } from "@/types"
 import { gql, useQuery } from "urql"
 import Grid from "../atoms/Grid"
+import LoadingView from "../molecules/LoadingView"
+import tw from "twin.macro"
 
 const gamesQuery = gql`
   query Games {
@@ -17,19 +20,20 @@ const HomeView = () => {
     query: gamesQuery,
   })
 
-  if (fetching) return <p>Loading...</p>
+  if (fetching) return <LoadingView />
   if (error) return <p>Oh no... {error.message}</p>
 
   return (
-    <>
-      <Grid width={60} height={60} cellSize={5} />
+    <main css={[tw`relative w-full h-screen`]}>
+      <Grid cellSize={40} />
+
       <section>
         <h1>Games:</h1>
         <ul>
           {data?.games?.map((game: Game) => <li key={game.id}>{game.name}</li>)}
         </ul>
       </section>
-    </>
+    </main>
   )
 }
 

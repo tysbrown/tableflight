@@ -1,28 +1,73 @@
+import React, { useState, useEffect, useRef } from "react"
 import tw from "twin.macro"
 
 type GridProps = {
-  width: number
-  height: number
   cellSize: number
 }
 
-const Grid = ({ width, height, cellSize }: GridProps) => {
-  const horizontalLines = []
-  const verticalLines = []
+const Grid = ({ cellSize }: GridProps) => {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
-  for (let i = 0; i < height; i += cellSize) {
-    horizontalLines.push(<line x1="0" y1={i} x2={width} y2={i} stroke="grey" />)
-  }
+  useEffect(() => {
+    if (!containerRef.current) return
 
-  for (let i = 0; i < width; i += cellSize) {
-    verticalLines.push(<line x1={i} y1="0" x2={i} y2={height} stroke="grey" />)
-  }
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth
+        const height = containerRef.current.offsetHeight
+        setDimensions({ width, height })
+      }
+    }
+
+    // Track changes to the container's dimensions
+    const resizeObserver = new ResizeObserver(() => {
+      updateDimensions()
+    })
+
+    resizeObserver.observe(containerRef.current)
+
+    updateDimensions() // Initial dimensions setting
+
+    // Cleanup observers on component unmount
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [containerRef, cellSize])
+
+  const horizontalLines = Array.from({
+    length: Math.ceil(dimensions.height / cellSize),
+  }).map((_, index) => (
+    <line
+      key={`h-${index}`}
+      x1="0"
+      y1={index * cellSize}
+      x2={dimensions.width}
+      y2={index * cellSize}
+      stroke="grey"
+    />
+  ))
+
+  const verticalLines = Array.from({
+    length: Math.ceil(dimensions.width / cellSize),
+  }).map((_, index) => (
+    <line
+      key={`v-${index}`}
+      x1={index * cellSize}
+      y1="0"
+      x2={index * cellSize}
+      y2={dimensions.height}
+      stroke="grey"
+    />
+  ))
 
   return (
-    <svg width={width} height={height} css={[tw`absolute top-0 left-0`]}>
-      {horizontalLines}
-      {verticalLines}
-    </svg>
+    <div ref={containerRef} css={[tw`absolute top-0 left-0 w-full h-full`]}>
+      <svg css={[tw`w-full h-full`]}>
+        {horizontalLines}
+        {verticalLines}
+      </svg>
+    </div>
   )
 }
 
