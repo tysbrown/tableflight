@@ -5,6 +5,7 @@ import Modal from "../atoms/Modal"
 import TextInput from "../atoms/TextInput"
 import { useMutation, gql } from "urql"
 import Button from "../atoms/Button"
+import tw from "twin.macro"
 
 const signUpMutation = gql`
   mutation SignUp(
@@ -72,17 +73,19 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       heading="Sign Up"
-      className="bg-surfaceContainerHigh"
+      css={[tw`bg-surfaceContainerHigh`]}
     >
       {showSuccessView ? (
-        <article className="flex flex-col items-center justify-center p-9">
-          <h1 className="text-2xl font-bold">Success!</h1>
-          <p className="text-sm text-gray-500">
+        <article css={[tw`flex flex-col items-center justify-center p-9`]}>
+          <h1 css={[tw`text-2xl font-bold`]}>Success!</h1>
+          <p css={[tw`text-sm text-gray-500`]}>
             You have successfully signed up!
           </p>
           <button
             onClick={() => setIsOpen(false)}
-            className="px-4 py-2 mt-10 rounded-md text-white font-bold justify-self-center"
+            css={[
+              tw`px-4 py-2 mt-10 rounded-md text-white font-bold justify-self-center`,
+            ]}
           >
             Close
           </button>
@@ -91,7 +94,7 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
         <form
           onSubmit={handleSubmit(onSubmit)}
           autoComplete="off"
-          className="grid bg-surfaceContainerHigh p-4 pb-6 rounded-lg"
+          css={[tw`grid bg-surfaceContainerHigh p-4 pb-6 rounded-lg`]}
         >
           <TextInput
             type="text"
@@ -100,7 +103,7 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
             required
             register={register}
             hasError={errors.firstName}
-            className="mb-4"
+            css={[tw`mb-4`]}
           />
           <TextInput
             type="text"
@@ -109,7 +112,7 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
             required
             register={register}
             hasError={errors.lastName}
-            className="mb-4"
+            css={[tw`mb-4`]}
           />
           <TextInput
             type="email"
@@ -119,7 +122,7 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
             noAutoComplete
             register={register}
             hasError={errors.email}
-            className="mb-4"
+            css={[tw`mb-4`]}
           />
           <TextInput
             type="password"
@@ -129,7 +132,7 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
             noAutoComplete
             register={register}
             hasError={errors.password}
-            className="mb-4"
+            css={[tw`mb-4`]}
           />
           <TextInput
             type="password"
@@ -139,7 +142,7 @@ const SignUpModal = ({ isOpen, setIsOpen }: SignUpModalProps) => {
             register={register}
             validate={(value, formValues) => value === formValues.password}
             hasError={errors.confirmPassword}
-            className="mb-4"
+            css={[tw`mb-4`]}
           />
           <Button style="primary" type="submit" disabled={fetching}>
             {fetching ? "Loading..." : "Sign Up"}

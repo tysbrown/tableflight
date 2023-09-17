@@ -1,37 +1,56 @@
 import React from "react"
 import { useDisableScroll } from "../../hooks/useDisableScroll"
+import tw from "twin.macro"
 
 type Props = {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   heading: string
-  className?: string
   children: React.ReactNode
 }
 
-const Modal = ({ isOpen, setIsOpen, heading, className, children }: Props) => {
+const Modal = ({
+  isOpen,
+  setIsOpen,
+  heading,
+  children,
+  ...remainingProps
+}: Props) => {
   useDisableScroll(isOpen)
 
   if (isOpen)
     return (
       <>
         <div
-          className={`fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 z-[999]`}
+          css={[
+            tw`fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 z-[999]`,
+          ]}
           onClick={() => setIsOpen(false)}
         />
         <article
-          className={`absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 w-[500px] shadow-lg bg-surfaceContainer rounded-lg z-[9999] ${className}`}
+          css={[
+            tw`absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 w-[500px] shadow-1 bg-surfaceContainer rounded-lg z-[9999]`,
+          ]}
+          {...remainingProps}
         >
-          <section className="grid items-center h-[60px] border-b-gray-300 border-b">
-            <h2 className="text-xl font-bold col-start-1 col-end-2 row-start-1 row-end-2 justify-self-center">
+          <section
+            css={[tw`grid items-center h-[60px] border-b-gray-300 border-b`]}
+          >
+            <h2
+              css={[
+                tw`text-xl font-bold col-start-1 col-end-2 row-start-1 row-end-2 justify-self-center`,
+              ]}
+            >
               {heading}
             </h2>
             <button
               onClick={() => setIsOpen(false)}
-              className="w-9 h-9 mr-4 rounded-full bg-gray-200 col-start-1 col-end-2 row-start-1 row-end-2 justify-self-end flex justify-center items-center"
+              css={[
+                tw`w-9 h-9 mr-4 rounded-full bg-gray-200 col-start-1 col-end-2 row-start-1 row-end-2 justify-self-end flex justify-center items-center`,
+              ]}
             >
               <svg
-                className="w-5 h-5 text-gray-500"
+                css={[tw`w-5 h-5 text-gray-500`]}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >

@@ -6,6 +6,7 @@ import { useState } from "react"
 import { useGlobalStateContext } from "../../context/useGlobalContext"
 import Button from "../atoms/Button"
 import TextInput from "../atoms/TextInput"
+import tw from "twin.macro"
 
 const loginMutation = gql`
   mutation Login($email: String!, $password: String!) {
@@ -51,12 +52,18 @@ const LoginBox = () => {
   }
 
   return (
-    <section className="max-w-lg w-full mx-auto mt-8 bg-surfaceContainer shadow-md py-6 px-4 rounded-xl">
-      <h1 className="text-5xl font-bold mb-6 text-center tracking-tighter">TableFlight</h1>
+    <section
+      css={[
+        tw`max-w-lg w-full mx-auto mt-8 bg-surfaceContainer shadow-1 py-6 px-4 rounded-xl`,
+      ]}
+    >
+      <h1 css={[tw`text-5xl font-bold mb-6 text-center tracking-tighter`]}>
+        TableFlight
+      </h1>
 
-      <hr className="mb-8 border-outlineVariant" />
+      <hr css={[tw`mb-8 border-outlineVariant`]} />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid">
+      <form onSubmit={handleSubmit(onSubmit)} css={[tw`grid`]}>
         <TextInput
           type="email"
           name="email"
@@ -64,7 +71,7 @@ const LoginBox = () => {
           required
           register={register}
           hasError={errors.email}
-          className="mb-4"
+          css={[tw`mb-4`]}
         />
         <TextInput
           type="password"
@@ -73,14 +80,14 @@ const LoginBox = () => {
           required
           register={register}
           hasError={errors.password}
-          className="mb-6"
+          css={[tw`mb-6`]}
         />
         <div>
           <Button
             style="primary"
             type="submit"
             disabled={fetching}
-            className="mr-2"
+            css={[tw`mr-2`]}
           >
             {fetching ? "Loading..." : "Login"}
           </Button>
@@ -94,13 +101,13 @@ const LoginBox = () => {
           </Button>
         </div>
 
-        <hr className="mt-8 mb-4 border-outlineVariant" />
+        <hr css={[tw`mt-8 mb-4 border-outlineVariant`]} />
 
         <Button
           type="button"
           style="link"
           onClick={() => setModalIsOpen(true)}
-          className="justify-self-center"
+          css={[tw`justify-self-center`]}
         >
           Create new account
         </Button>

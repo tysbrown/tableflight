@@ -1,3 +1,5 @@
+/// <reference types="@emotion/react/types/css-prop" />
+
 export type User = {
   id: number
   tokenVersion: number

@@ -203,10 +203,10 @@ export default {
             bottom: "0",
             right: "0",
           },
-          ".focusHoverOverlay": {
+          ".outlineFocusOverlay": {
             position: "relative",
           },
-          ".focusHoverOverlay:focus::after": {
+          ".outlineFocusOverlay:focus::after": {
             content: '""',
             borderRadius: "9999px",
             backgroundColor: "rgba(53, 52, 56, 0.3)",
