@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App.tsx"
-import { GlobalStateProvider } from "./context/GlobalStateContext.tsx"
+import { GlobalStateProvider } from "./context/GlobalStateProvider.tsx"
 import URQLProvider from "./context/URQLProvider"
 import GlobalStyles from "./styles/GlobalStyles.tsx"
 

@@ -27,7 +27,7 @@ export const GlobalStateProvider = ({
   const [state, setState] = useState({ isLoggedIn: false })
 
   /**
-    * @todo - Remove this useFfect when finished debugging
+   * @todo - Remove this useFfect when finished debugging
    */
   useEffect(() => {
     console.log("Global state changed to: ", state)

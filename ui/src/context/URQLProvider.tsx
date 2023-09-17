@@ -5,7 +5,7 @@ import { Client, Provider, fetchExchange } from "urql"
 import { authExchange } from "@urql/exchange-auth"
 import { cacheExchange } from "@urql/exchange-graphcache"
 import { useRefreshToken } from "../hooks/useRefreshToken"
-import { useGlobalStateContext } from "./useGlobalContext"
+import { useGlobalState } from "../hooks/useGlobalState"
 
 /**
  * Provider for the URQL GraphQL client
@@ -15,7 +15,7 @@ import { useGlobalStateContext } from "./useGlobalContext"
 
 export default function URQLProvider({ children }: { children: ReactNode }) {
   const refreshToken = useRefreshToken()
-  const { state } = useGlobalStateContext()
+  const { state } = useGlobalState()
   const { accessToken } = state || {}
 
   const client = new Client({

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
-import { useGlobalStateContext } from "../context/useGlobalContext"
+import { useGlobalState } from "./useGlobalState"
 import { useRefreshToken } from "./useRefreshToken"
 
 const useInitializeAuth = () => {
   const [isInitialized, setIsInitialized] = useState(false)
-  const { setState } = useGlobalStateContext()
+  const { setState } = useGlobalState()
   const refreshToken = useRefreshToken()
 
   useEffect(() => {

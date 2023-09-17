@@ -3,7 +3,7 @@ import { gql, useMutation } from "urql"
 import SignUpModal from "./SignUpModal"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
-import { useGlobalStateContext } from "../../context/useGlobalContext"
+import { useGlobalState } from "../../hooks/useGlobalState"
 import Button from "../atoms/Button"
 import TextInput from "../atoms/TextInput"
 import tw from "twin.macro"
@@ -30,7 +30,7 @@ const LoginBox = () => {
     handleSubmit,
     formState: { errors },
   } = useForm()
-  const { setState } = useGlobalStateContext()
+  const { setState } = useGlobalState()
   const [modalIsOpen, setModalIsOpen] = useState(false)
 
   const onSubmit = async (fields: Partial<User>) => {

@@ -1,7 +1,7 @@
-import { useGlobalStateContext } from "../context/useGlobalContext"
+import { useGlobalState } from "./useGlobalState"
 
 export const useRefreshToken = () => {
-  const { state, setState } = useGlobalStateContext()
+  const { state, setState } = useGlobalState()
 
   const refresh = async () => {
     try {
