@@ -23,7 +23,7 @@ type TextInputProps = {
    *
    * @param arg1 - The name of the input field
    * @param arg2 - Options object
-   * @returns
+   * @returns - The return value of react-hook-form's `register` function
    */
   register: (arg1: string, arg2: object) => UseFormRegisterReturn
   /**
