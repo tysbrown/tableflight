@@ -8,7 +8,7 @@ const Menu = ({ children }: MenuProps) => {
   return (
     <nav
       css={[
-        tw`w-[300px] fixed right-2 top-2 bottom-2 bg-surfaceContainer rounded-md`,
+        tw`fixed right-2 top-2 bottom-2 w-80 bg-surfaceContainer rounded-md px-6 py-4`,
       ]}
     >
       {children}
