@@ -3,9 +3,10 @@ import tw from "twin.macro"
 
 type GridProps = {
   cellSize: number
+  lineWidth?: number
 }
 
-const Grid = ({ cellSize }: GridProps) => {
+const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
@@ -45,6 +46,7 @@ const Grid = ({ cellSize }: GridProps) => {
       x2={dimensions.width}
       y2={index * cellSize}
       stroke="grey"
+      stroke-width={lineWidth}
     />
   ))
 
@@ -58,6 +60,7 @@ const Grid = ({ cellSize }: GridProps) => {
       x2={index * cellSize}
       y2={dimensions.height}
       stroke="grey"
+      stroke-width={lineWidth}
     />
   ))
 
