@@ -21,16 +21,14 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
       }
     }
 
-    // Track changes to the container's dimensions
     const resizeObserver = new ResizeObserver(() => {
       updateDimensions()
     })
 
     resizeObserver.observe(containerRef.current)
 
-    updateDimensions() // Initial dimensions setting
+    updateDimensions()
 
-    // Cleanup observers on component unmount
     return () => {
       resizeObserver.disconnect()
     }
