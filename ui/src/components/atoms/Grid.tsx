@@ -46,7 +46,7 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
       x2={dimensions.width}
       y2={index * cellSize}
       stroke="grey"
-      stroke-width={lineWidth}
+      strokeWidth={lineWidth}
     />
   ))
 
@@ -60,7 +60,7 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
       x2={index * cellSize}
       y2={dimensions.height}
       stroke="grey"
-      stroke-width={lineWidth}
+      strokeWidth={lineWidth}
     />
   ))
 
