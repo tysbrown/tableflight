@@ -145,8 +145,7 @@ const SliderInput = ({
       {/* Value Label */}
       <div
         css={[
-          tw`flex justify-center items-center absolute bottom-6 w-7 h-7 -translate-x-1/2 bg-primary 
-            rounded-full text-onPrimary text-xs leading-5 z-20 transition transform scale-0 origin-bottom ease-in-out duration-200`,
+          tw`flex justify-center items-center absolute bottom-6 w-7 h-7 -translate-x-1/2 bg-primary rounded-full text-onPrimary text-xs leading-5 z-20 transition transform scale-0 origin-bottom ease-in-out duration-200`,
           tw`peer-hover:peer-not-disabled:scale-100`,
           tw`peer-focus:peer-not-disabled:(scale-100)`,
           tw`after:(content-[""] font-medium absolute bottom-[-7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] 
