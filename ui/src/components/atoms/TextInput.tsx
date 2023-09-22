@@ -44,7 +44,8 @@ type TextInputProps = {
 
 /**
  * A text input field with a floating label and animated bottom border.
- *
+ * @todo - Add support for textarea
+ * @todo - Add disable prop and style
  */
 const TextInput = ({
   name,
