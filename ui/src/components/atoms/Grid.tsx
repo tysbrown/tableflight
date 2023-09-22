@@ -6,9 +6,47 @@ type GridProps = {
   lineWidth?: number
 }
 
+type TokenProps = {
+  x: number
+  y: number
+  cellSize: number
+  token: Token
+}
+
+type Token = {
+  id: string
+  type: "player" | "enemy" | "npc" | "item"
+}
+
+type GridType = (Token | null)[][]
+
 const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+
+  const rows = Math.ceil(dimensions.height / cellSize)
+  const cols = Math.ceil(dimensions.width / cellSize)
+
+  const initialGrid = Array.from({ length: rows }, () => Array(cols).fill(null))
+  const [grid, setGrid] = useState<GridType>(initialGrid)
+
+  const addTokenToGrid = (x: number, y: number, token: Token) => {
+    setGrid((prevGrid) => {
+      const newGrid: GridType = [...prevGrid]
+      if (!newGrid[y]) newGrid[y] = Array(cols).fill(null)
+      newGrid[y]![x] = token
+      return newGrid
+    })
+  }
+
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const newGrid = Array.from({ length: rows }, () => Array(cols).fill(null))
+    setGrid(newGrid)
+
+    addTokenToGrid(1, 3, { id: "1", type: "player" })
+  }, [rows, cols])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -35,7 +73,7 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
   }, [containerRef, cellSize])
 
   const horizontalLines = Array.from({
-    length: Math.ceil(dimensions.height / cellSize),
+    length: rows,
   }).map((_, index) => (
     <line
       key={`h-${index}`}
@@ -49,7 +87,7 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
   ))
 
   const verticalLines = Array.from({
-    length: Math.ceil(dimensions.width / cellSize),
+    length: cols,
   }).map((_, index) => (
     <line
       key={`v-${index}`}
@@ -67,8 +105,52 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
       <svg css={[tw`w-full h-full`]}>
         {horizontalLines}
         {verticalLines}
+        {grid?.map(
+          (row, rowIndex) =>
+            row?.map((cell, colIndex) => {
+              if (!cell) return null
+
+              return (
+                <TokenComponent
+                  token={cell}
+                  x={colIndex * cellSize}
+                  y={rowIndex * cellSize}
+                  cellSize={cellSize}
+                />
+              )
+            }),
+        )}
       </svg>
     </div>
+  )
+}
+
+const TokenComponent = ({ x, y, cellSize, token }: TokenProps) => {
+  const { id, type } = token || {}
+
+  const isPlayer = type === "player"
+  const isEnemy = type === "enemy"
+  const isNpc = type === "npc"
+  const isItem = type === "item"
+
+  return (
+    <circle
+      id={id}
+      cx={x + cellSize / 2}
+      cy={y + cellSize / 2}
+      r={cellSize / 2 - 5}
+      fill={
+        isPlayer
+          ? "green"
+          : isEnemy
+          ? "red"
+          : isNpc
+          ? "blue"
+          : isItem
+          ? "grey"
+          : "white"
+      }
+    />
   )
 }
 
