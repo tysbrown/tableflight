@@ -63,6 +63,8 @@ const TextInput = ({
       <input
         type={type}
         autoComplete={noAutoComplete ? "new-password" : ""}
+        aria-invalid={hasError ? "true" : "false"}
+        aria-required={required}
         placeholder=" "
         css={[
           tw`w-full h-full px-4 pb-0 py-5 rounded-t-md caret-onSurface border-b border-onSurface bg-surfaceContainerLow input-bg-surfaceContainerLow`,
