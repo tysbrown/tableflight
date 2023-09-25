@@ -32,20 +32,17 @@ const HomeView = () => {
   const [grid, setGrid] = useState<GridType>(initialGrid)
 
   const addTokenToGrid = (x: number, y: number, token: Token) => {
-    setGrid((prevGrid) => {
-      const newGrid: GridType = [...prevGrid]
-      if (!newGrid[y]) newGrid[y] = Array(cols).fill(null)
-      newGrid[y]![x] = token
-      return newGrid
+    setGrid(([...grid]) => {
+      if (!grid[y]) grid[y] = Array(cols).fill(null)
+      grid[y]![x] = token
+      return grid
     })
   }
 
   const removeTokenFromGrid = (x: number, y: number) => {
-    setGrid((prevGrid) => {
-      const newGrid: GridType = [...prevGrid]
-      if (!newGrid[y]) newGrid[y] = Array(cols).fill(null)
-      newGrid[y]![x] = null
-      return newGrid
+    setGrid(([...grid]) => {
+      grid[y]![x] = null
+      return grid
     })
   }
 
@@ -69,7 +66,6 @@ const HomeView = () => {
       <Grid
         dimensions={dimensions}
         grid={grid}
-        setGrid={setGrid}
         setDimensions={setDimensions}
         addTokenToGrid={addTokenToGrid}
         removeTokenFromGrid={removeTokenFromGrid}

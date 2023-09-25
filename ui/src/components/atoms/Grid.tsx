@@ -6,7 +6,6 @@ import TokenComponent from "./Token"
 type GridProps = {
   dimensions: { width: number; height: number }
   grid: GridType
-  setGrid: React.Dispatch<React.SetStateAction<GridType>>
   setDimensions: React.Dispatch<
     React.SetStateAction<{ width: number; height: number }>
   >
@@ -22,7 +21,6 @@ type GridProps = {
 const Grid = ({
   dimensions,
   grid,
-  setGrid,
   setDimensions,
   addTokenToGrid,
   removeTokenFromGrid,
@@ -32,25 +30,9 @@ const Grid = ({
   lineWidth = 0.5,
 }: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const gridHasNotInitialized = !grid
-  const rowsNotSynced = grid.length !== rows
-  const colsNotSynced = grid[0] && grid[0].length !== cols
 
   useEffect(() => {
     if (!containerRef.current) return
-
-    const shouldUpdateGrid =
-      gridHasNotInitialized || rowsNotSynced || colsNotSynced
-
-    if (shouldUpdateGrid) {
-      const newGrid = Array.from({ length: rows }, (_, y) =>
-        Array.from({ length: cols }, (_, x) =>
-          grid[y] && grid[y]![x] ? grid[y]![x] : null,
-        ),
-      )
-
-      setGrid(newGrid)
-    }
 
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -101,25 +83,21 @@ const Grid = ({
   ))
 
   const handleDrop = (event: React.DragEvent<SVGElement>) => {
+    const { currentTarget, clientX, clientY, dataTransfer } = event
     event.preventDefault()
 
-    const data = event.dataTransfer.getData("application/json")
-    const parsedData = JSON.parse(data)
+    const { newToken, token, row, col } = JSON.parse(
+      dataTransfer.getData("application/json"),
+    )
 
-    console.log(parsedData)
+    const rect = currentTarget.getBoundingClientRect()
+    const droppedX = clientX - rect.left
+    const droppedY = clientY - rect.top
+    const newCol = Math.floor(droppedX / cellSize)
+    const newRow = Math.floor(droppedY / cellSize)
 
-    const { newToken, token, row: origRow, col: origCol } = parsedData
-
-    const rect = event.currentTarget.getBoundingClientRect()
-    const droppedX = event.clientX - rect.left
-    const droppedY = event.clientY - rect.top
-
-    const col = Math.floor(droppedX / cellSize)
-    const row = Math.floor(droppedY / cellSize)
-
-    if (!newToken) removeTokenFromGrid(origCol, origRow)
-
-    addTokenToGrid(col, row, token)
+    if (!newToken) removeTokenFromGrid(col, row)
+    addTokenToGrid(newCol, newRow, token)
   }
 
   const handleDragOver = (event: React.DragEvent<SVGElement>) => {
