@@ -2,7 +2,7 @@ import type { Game, GridType, Token } from "@/types"
 import { useState } from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
-import Grid from "../atoms/Grid"
+import Grid from "../molecules/Grid"
 import SliderInput from "../atoms/SliderInput"
 import LoadingView from "../molecules/LoadingView"
 import Menu from "../molecules/Menu"
@@ -69,7 +69,6 @@ const HomeView = () => {
         setDimensions={setDimensions}
         addTokenToGrid={addTokenToGrid}
         removeTokenFromGrid={removeTokenFromGrid}
-        initialGrid={initialGrid}
         rows={rows}
         cols={cols}
         cellSize={cellSize}

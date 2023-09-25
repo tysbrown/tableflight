@@ -1,7 +1,7 @@
 import type { GridType, Token } from "@/types"
 import React, { useEffect, useRef } from "react"
 import tw from "twin.macro"
-import TokenComponent from "./Token"
+import TokenComponent from "../atoms/Token"
 
 type GridProps = {
   dimensions: { width: number; height: number }
@@ -11,13 +11,18 @@ type GridProps = {
   >
   addTokenToGrid: (x: number, y: number, token: Token) => void
   removeTokenFromGrid: (x: number, y: number) => void
-  initialGrid: GridType
   rows: number
   cols: number
   cellSize: number
   lineWidth?: number
 }
-
+/**
+ * Dynamic SVG grid component that renders a grid of cells based on the dimensions
+ * of its parent container and the provided cell size.
+ *
+ * @remarks
+ * The entire grid is a drop zone, and the Drag and Drop API is used to add and remove tokens.
+ */
 const Grid = ({
   dimensions,
   grid,
