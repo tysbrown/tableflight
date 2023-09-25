@@ -28,13 +28,13 @@ const TokenComponent = ({ row, col, token, cellSize }: TokenComponentProps) => {
   }
 
   const tokenColor = isPlayer
-    ? tw`bg-green-500`
+    ? tw`bg-primaryContainer`
     : isEnemy
-    ? tw`bg-red-500`
+    ? tw`bg-errorContainer`
     : isNpc
-    ? tw`bg-blue-500`
+    ? tw`bg-tertiaryContainer`
     : isItem
-    ? tw`bg-yellow-500`
+    ? tw`bg-secondaryContainer`
     : tw`bg-gray-500`
 
   const tokenSize = cellSize * 0.8

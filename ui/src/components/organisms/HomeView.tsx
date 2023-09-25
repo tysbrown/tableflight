@@ -6,6 +6,7 @@ import Grid from "../molecules/Grid"
 import SliderInput from "../atoms/SliderInput"
 import LoadingView from "../molecules/LoadingView"
 import Menu from "../molecules/Menu"
+import NewTokenPanel from "../molecules/NewTokenPanel"
 
 const gamesQuery = gql`
   query Games {
@@ -46,18 +47,6 @@ const HomeView = () => {
     })
   }
 
-  const handleDragStart = (
-    event: React.DragEvent<HTMLDivElement>,
-    token: Token,
-  ) => {
-    const data = JSON.stringify({
-      newToken: true,
-      token,
-    })
-
-    event.dataTransfer.setData("application/json", data)
-  }
-
   if (fetching) return <LoadingView />
   if (error) return <p>Oh no... {error.message}</p>
 
@@ -84,48 +73,8 @@ const HomeView = () => {
           max={100}
           onChange={(e) => setCellSize(parseInt(e.target.value))}
         />
-        <section>
-          <div css={[tw`flex items-center mt-7`]}>
-            <div
-              draggable
-              onDragStart={(event: React.DragEvent<HTMLDivElement>) =>
-                handleDragStart(event, { id: "2", type: "player" })
-              }
-              css={[tw`w-4 h-4 rounded-full bg-green-500 cursor-grab`]}
-            />
-            <p css={[tw`ml-2`]}>Player</p>
-          </div>
-          <div css={[tw`flex items-center mt-7`]}>
-            <div
-              draggable
-              onDragStart={(event: React.DragEvent<HTMLDivElement>) =>
-                handleDragStart(event, { id: "3", type: "enemy" })
-              }
-              css={[tw`w-4 h-4 rounded-full bg-red-500 cursor-grab`]}
-            />
-            <p css={[tw`ml-2`]}>Enemy</p>
-          </div>
-          <div css={[tw`flex items-center mt-7`]}>
-            <div
-              draggable
-              onDragStart={(event: React.DragEvent<HTMLDivElement>) =>
-                handleDragStart(event, { id: "4", type: "npc" })
-              }
-              css={[tw`w-4 h-4 rounded-full bg-blue-500 cursor-grab`]}
-            />
-            <p css={[tw`ml-2`]}>NPC</p>
-          </div>
-          <div css={[tw`flex items-center mt-7`]}>
-            <div
-              draggable
-              onDragStart={(event: React.DragEvent<HTMLDivElement>) =>
-                handleDragStart(event, { id: "5", type: "item" })
-              }
-              css={[tw`w-4 h-4 rounded-full bg-yellow-500 cursor-grab`]}
-            />
-            <p css={[tw`ml-2`]}>Item</p>
-          </div>
-        </section>
+        <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
+        <NewTokenPanel />
       </Menu>
       <section css={[tw`absolute bottom-0 left-0`]}>
         <h1>Games:</h1>
