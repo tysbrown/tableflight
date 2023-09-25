@@ -17,3 +17,10 @@ export type Game = {
   createdBy: User
   createdById: number
 }
+
+export type Token = {
+  id: string
+  type: "player" | "enemy" | "npc" | "item"
+}
+
+export type GridType = (Token | null | undefined)[][]

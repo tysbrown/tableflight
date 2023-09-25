@@ -1,55 +1,56 @@
-import { useState, useEffect, useRef } from "react"
+import type { GridType, Token } from "@/types"
+import React, { useEffect, useRef } from "react"
 import tw from "twin.macro"
+import TokenComponent from "./Token"
 
 type GridProps = {
+  dimensions: { width: number; height: number }
+  grid: GridType
+  setGrid: React.Dispatch<React.SetStateAction<GridType>>
+  setDimensions: React.Dispatch<
+    React.SetStateAction<{ width: number; height: number }>
+  >
+  addTokenToGrid: (x: number, y: number, token: Token) => void
+  removeTokenFromGrid: (x: number, y: number) => void
+  initialGrid: GridType
+  rows: number
+  cols: number
   cellSize: number
   lineWidth?: number
 }
 
-type TokenProps = {
-  x: number
-  y: number
-  cellSize: number
-  token: Token
-}
-
-type Token = {
-  id: string
-  type: "player" | "enemy" | "npc" | "item"
-}
-
-type GridType = (Token | null)[][]
-
-const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
+const Grid = ({
+  dimensions,
+  grid,
+  setGrid,
+  setDimensions,
+  addTokenToGrid,
+  removeTokenFromGrid,
+  rows,
+  cols,
+  cellSize,
+  lineWidth = 0.5,
+}: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
-
-  const rows = Math.ceil(dimensions.height / cellSize)
-  const cols = Math.ceil(dimensions.width / cellSize)
-
-  const initialGrid = Array.from({ length: rows }, () => Array(cols).fill(null))
-  const [grid, setGrid] = useState<GridType>(initialGrid)
-
-  const addTokenToGrid = (x: number, y: number, token: Token) => {
-    setGrid((prevGrid) => {
-      const newGrid: GridType = [...prevGrid]
-      if (!newGrid[y]) newGrid[y] = Array(cols).fill(null)
-      newGrid[y]![x] = token
-      return newGrid
-    })
-  }
+  const gridHasNotInitialized = !grid
+  const rowsNotSynced = grid.length !== rows
+  const colsNotSynced = grid[0] && grid[0].length !== cols
 
   useEffect(() => {
     if (!containerRef.current) return
 
-    const newGrid = Array.from({ length: rows }, () => Array(cols).fill(null))
-    setGrid(newGrid)
+    const shouldUpdateGrid =
+      gridHasNotInitialized || rowsNotSynced || colsNotSynced
 
-    addTokenToGrid(1, 3, { id: "1", type: "player" })
-  }, [rows, cols])
+    if (shouldUpdateGrid) {
+      const newGrid = Array.from({ length: rows }, (_, y) =>
+        Array.from({ length: cols }, (_, x) =>
+          grid[y] && grid[y]![x] ? grid[y]![x] : null,
+        ),
+      )
 
-  useEffect(() => {
-    if (!containerRef.current) return
+      setGrid(newGrid)
+    }
 
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -64,13 +65,12 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
     })
 
     resizeObserver.observe(containerRef.current)
-
     updateDimensions()
 
     return () => {
       resizeObserver.disconnect()
     }
-  }, [containerRef, cellSize])
+  }, [containerRef, cellSize, rows, cols])
 
   const horizontalLines = Array.from({
     length: rows,
@@ -100,57 +100,59 @@ const Grid = ({ cellSize, lineWidth = 0.5 }: GridProps) => {
     />
   ))
 
+  const handleDrop = (event: React.DragEvent<SVGElement>) => {
+    event.preventDefault()
+
+    const data = event.dataTransfer.getData("application/json")
+    const parsedData = JSON.parse(data)
+
+    console.log(parsedData)
+
+    const { newToken, token, row: origRow, col: origCol } = parsedData
+
+    const rect = event.currentTarget.getBoundingClientRect()
+    const droppedX = event.clientX - rect.left
+    const droppedY = event.clientY - rect.top
+
+    const col = Math.floor(droppedX / cellSize)
+    const row = Math.floor(droppedY / cellSize)
+
+    if (!newToken) removeTokenFromGrid(origCol, origRow)
+
+    addTokenToGrid(col, row, token)
+  }
+
+  const handleDragOver = (event: React.DragEvent<SVGElement>) => {
+    event.preventDefault()
+  }
+
   return (
-    <div ref={containerRef} css={[tw`absolute top-0 left-0 w-full h-full`]}>
-      <svg css={[tw`w-full h-full`]}>
+    <div ref={containerRef} css={[tw`w-full h-full`]}>
+      <svg
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        css={[tw`absolute top-0 left-0 w-full h-full`]}
+      >
         {horizontalLines}
         {verticalLines}
-        {grid?.map(
-          (row, rowIndex) =>
-            row?.map((cell, colIndex) => {
-              if (!cell) return null
-
-              return (
-                <TokenComponent
-                  token={cell}
-                  x={colIndex * cellSize}
-                  y={rowIndex * cellSize}
-                  cellSize={cellSize}
-                />
-              )
-            }),
-        )}
       </svg>
+      {grid?.map(
+        (row, rowIndex) =>
+          row?.map((cell, colIndex) => {
+            if (!cell) return null
+
+            return (
+              <TokenComponent
+                key={`${rowIndex}-${colIndex}`}
+                token={cell}
+                col={colIndex}
+                row={rowIndex}
+                cellSize={cellSize}
+              />
+            )
+          }),
+      )}
     </div>
-  )
-}
-
-const TokenComponent = ({ x, y, cellSize, token }: TokenProps) => {
-  const { id, type } = token || {}
-
-  const isPlayer = type === "player"
-  const isEnemy = type === "enemy"
-  const isNpc = type === "npc"
-  const isItem = type === "item"
-
-  return (
-    <circle
-      id={id}
-      cx={x + cellSize / 2}
-      cy={y + cellSize / 2}
-      r={cellSize / 2 - 5}
-      fill={
-        isPlayer
-          ? "green"
-          : isEnemy
-          ? "red"
-          : isNpc
-          ? "blue"
-          : isItem
-          ? "grey"
-          : "white"
-      }
-    />
   )
 }
 
