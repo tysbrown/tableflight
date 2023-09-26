@@ -9,8 +9,8 @@ type GridProps = {
   setDimensions: React.Dispatch<
     React.SetStateAction<{ width: number; height: number }>
   >
+  setIsTokenDragging: React.Dispatch<React.SetStateAction<boolean>>
   addTokenToGrid: (x: number, y: number, token: Token) => void
-  selectingToken: React.MutableRefObject<boolean>
   removeTokenFromGrid: (x: number, y: number) => void
   rows: number
   cols: number
@@ -28,8 +28,8 @@ const Grid = ({
   dimensions,
   grid,
   setDimensions,
+  setIsTokenDragging,
   addTokenToGrid,
-  selectingToken,
   removeTokenFromGrid,
   rows,
   cols,
@@ -93,6 +93,8 @@ const Grid = ({
     const { currentTarget, clientX, clientY, dataTransfer } = event
     event.preventDefault()
 
+    setIsTokenDragging(false)
+
     const { newToken, token, row, col } = JSON.parse(
       dataTransfer.getData("application/json"),
     )
@@ -133,7 +135,6 @@ const Grid = ({
                 col={colIndex}
                 row={rowIndex}
                 cellSize={cellSize}
-                selectingToken={selectingToken}
               />
             )
           }),

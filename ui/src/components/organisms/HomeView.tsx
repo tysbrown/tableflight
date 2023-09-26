@@ -33,7 +33,6 @@ const HomeView = () => {
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
   const gridContainerRef = useRef<HTMLDivElement>(null)
-  const selectingToken = useRef(false)
 
   const rows = Math.ceil(dimensions.height / cellSize)
   const cols = Math.ceil(dimensions.width / cellSize)
@@ -41,6 +40,7 @@ const HomeView = () => {
 
   const [grid, setGrid] = useState<GridType>(initialGrid)
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
+  const [isTokenDragging, setIsTokenDragging] = useState<boolean>(false)
 
   const addTokenToGrid = (x: number, y: number, token: Token) => {
     setGrid(([...grid]) => {
@@ -95,8 +95,10 @@ const HomeView = () => {
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (selectingToken.current) {
-      selectingToken.current = false // Reset the flag after checking
+    const isOnToken = (e.target as HTMLElement).dataset.istoken === "true"
+
+    if (isOnToken) {
+      setIsTokenDragging(true)
       return
     }
 
@@ -105,6 +107,7 @@ const HomeView = () => {
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (isTokenDragging) return
     if (!dragging.current) return
 
     const dx = e.clientX - lastPosition.current.x
@@ -118,10 +121,6 @@ const HomeView = () => {
   }
 
   const handleMouseUp = () => {
-    if (selectingToken.current) {
-      selectingToken.current = false // Reset the flag after checking
-      return
-    }
     dragging.current = false
   }
 
@@ -168,12 +167,12 @@ const HomeView = () => {
             grid={grid}
             setDimensions={setDimensions}
             addTokenToGrid={addTokenToGrid}
-            selectingToken={selectingToken}
             removeTokenFromGrid={removeTokenFromGrid}
             rows={rows}
             cols={cols}
             cellSize={cellSize}
             lineWidth={0.5}
+            setIsTokenDragging={setIsTokenDragging}
           />
         </div>
       </section>

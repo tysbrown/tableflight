@@ -6,16 +6,9 @@ type TokenComponentProps = {
   col: number
   token: Token | null
   cellSize: number
-  selectingToken: React.MutableRefObject<boolean>
 }
 
-const TokenComponent = ({
-  row,
-  col,
-  token,
-  cellSize,
-  selectingToken,
-}: TokenComponentProps) => {
+const TokenComponent = ({ row, col, token, cellSize }: TokenComponentProps) => {
   const { id, type } = token || {}
 
   const isPlayer = type === "player"
@@ -24,8 +17,6 @@ const TokenComponent = ({
   const isItem = type === "item"
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    selectingToken.current = true
-
     const data = JSON.stringify({
       newToken: false,
       row,
@@ -54,6 +45,7 @@ const TokenComponent = ({
       draggable
       onDragStart={handleDragStart}
       id={id}
+      data-istoken={true}
       css={[
         tw`absolute rounded-full content-none cursor-grab`,
         tokenColor,
