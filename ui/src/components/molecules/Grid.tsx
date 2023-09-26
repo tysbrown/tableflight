@@ -10,6 +10,7 @@ type GridProps = {
     React.SetStateAction<{ width: number; height: number }>
   >
   addTokenToGrid: (x: number, y: number, token: Token) => void
+  selectingToken: React.MutableRefObject<boolean>
   removeTokenFromGrid: (x: number, y: number) => void
   rows: number
   cols: number
@@ -28,6 +29,7 @@ const Grid = ({
   grid,
   setDimensions,
   addTokenToGrid,
+  selectingToken,
   removeTokenFromGrid,
   rows,
   cols,
@@ -131,6 +133,7 @@ const Grid = ({
                 col={colIndex}
                 row={rowIndex}
                 cellSize={cellSize}
+                selectingToken={selectingToken}
               />
             )
           }),
