@@ -110,11 +110,11 @@ const Grid = ({
   }
 
   return (
-    <div ref={containerRef} css={[tw`w-full h-full`]}>
+    <div ref={containerRef} css={[tw`absolute top-0 left-0 right-0 bottom-0`]}>
       <svg
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        css={[tw`absolute top-0 left-0 w-full h-full`]}
+        css={[tw`w-full h-full`]}
       >
         {horizontalLines}
         {verticalLines}

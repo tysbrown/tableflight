@@ -17,7 +17,11 @@ const gamesQuery = gql`
     }
   }
 `
-
+/**
+ * The main view of the application when the user logs in.
+ *
+ * @todo - Add inputs for dynamic height and width setting
+ */
 const HomeView = () => {
   const [{ data, fetching, error }] = useQuery({
     query: gamesQuery,
@@ -31,6 +35,7 @@ const HomeView = () => {
 
   const initialGrid = Array.from({ length: rows }, () => Array(cols).fill(null))
   const [grid, setGrid] = useState<GridType>(initialGrid)
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
 
   const addTokenToGrid = (x: number, y: number, token: Token) => {
     setGrid(([...grid]) => {
@@ -47,22 +52,50 @@ const HomeView = () => {
     })
   }
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null
+
+    if (file) {
+      const reader = new FileReader()
+
+      reader.onloadend = () => {
+        setBackgroundImage(reader.result as string)
+      }
+
+      reader.readAsDataURL(file)
+    }
+  }
+
   if (fetching) return <LoadingView />
   if (error) return <p>Oh no... {error.message}</p>
 
   return (
-    <main css={[tw`relative w-[1500px] h-[1300px]`]}>
-      <Grid
-        dimensions={dimensions}
-        grid={grid}
-        setDimensions={setDimensions}
-        addTokenToGrid={addTokenToGrid}
-        removeTokenFromGrid={removeTokenFromGrid}
-        rows={rows}
-        cols={cols}
-        cellSize={cellSize}
-        lineWidth={0.5}
-      />
+    <main css={[tw`flex overflow-hidden`]}>
+      <section css={[tw`overflow-scroll`]}>
+        <div
+          css={[tw`relative`, !backgroundImage && tw`w-[1500px] h-[1920px]`]}
+        >
+          {backgroundImage && (
+            <img
+              src={backgroundImage}
+              alt="Background"
+              css={[tw`max-w-none w-auto h-auto`]}
+            />
+          )}
+          <Grid
+            dimensions={dimensions}
+            grid={grid}
+            setDimensions={setDimensions}
+            addTokenToGrid={addTokenToGrid}
+            removeTokenFromGrid={removeTokenFromGrid}
+            rows={rows}
+            cols={cols}
+            cellSize={cellSize}
+            lineWidth={0.5}
+          />
+        </div>
+      </section>
+
       <Menu>
         <SliderInput
           name="cellSize"
@@ -75,6 +108,10 @@ const HomeView = () => {
         />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <NewTokenPanel />
+        <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
+        <section>
+          <input type="file" onChange={handleFileChange} accept="image/*" />
+        </section>
       </Menu>
       <section css={[tw`absolute bottom-0 left-0`]}>
         <h1>Games:</h1>
