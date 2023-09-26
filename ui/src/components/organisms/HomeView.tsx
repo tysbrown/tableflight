@@ -71,9 +71,12 @@ const HomeView = () => {
 
   return (
     <main css={[tw`flex overflow-hidden`]}>
-      <section css={[tw`overflow-scroll`]}>
+      <section css={[tw`h-screen overflow-scroll`]}>
         <div
-          css={[tw`relative`, !backgroundImage && tw`w-[1500px] h-[1920px]`]}
+          css={[
+            tw`relative w-fit`,
+            !backgroundImage && tw`w-[1500px] h-[1920px]`,
+          ]}
         >
           {backgroundImage && (
             <img
