@@ -71,14 +71,8 @@ const HomeView = () => {
     }
   }
 
-  /**
-   * B
-   * @param x
-   * @param y
-   * @returns
-   */
   const clampPosition = (x: number, y: number) => {
-    if (!gridContainerRef.current) return { x, y } // added a guard here
+    if (!gridContainerRef.current) return { x, y }
 
     const sectionDimensions = gridContainerRef.current.getBoundingClientRect()
 
@@ -126,7 +120,6 @@ const HomeView = () => {
     dragging.current = false
   }
 
-  // Custom screen panning with trackpad
   const handleWheel = (e: React.WheelEvent) => {
     const dx = e.deltaX
     const dy = e.deltaY
