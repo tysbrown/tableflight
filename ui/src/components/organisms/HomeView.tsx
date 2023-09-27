@@ -1,5 +1,5 @@
 import type { Game, GridType, Token } from "@/types"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
 import Grid from "../molecules/Grid"
@@ -129,6 +129,18 @@ const HomeView = () => {
 
     setPosition(clampedPosition)
   }
+
+  useEffect(() => {
+    const preventDefaultZoom = (e: WheelEvent) => {
+      if (e.ctrlKey) e.preventDefault()
+    }
+
+    window.addEventListener("wheel", preventDefaultZoom, { passive: false })
+
+    return () => {
+      window.removeEventListener("wheel", preventDefaultZoom)
+    }
+  }, [])
 
   if (fetching) return <LoadingView />
   if (error) return <p>Oh no... {error.message}</p>
