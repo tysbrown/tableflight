@@ -95,6 +95,8 @@ const HomeView = () => {
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return
+
     const isOnToken = (e.target as HTMLElement).dataset.istoken === "true"
 
     if (isOnToken) {
