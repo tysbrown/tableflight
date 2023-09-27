@@ -4,8 +4,8 @@ import tw from "twin.macro"
 import TokenComponent from "../atoms/Token"
 
 type GridProps = {
-  dimensions: { width: number; height: number }
   grid: GridType
+  dimensions: { width: number; height: number }
   setDimensions: React.Dispatch<
     React.SetStateAction<{ width: number; height: number }>
   >
@@ -25,8 +25,8 @@ type GridProps = {
  * The entire grid is a drop zone, and the Drag and Drop API is used to add and remove tokens.
  */
 const Grid = ({
-  dimensions,
   grid,
+  dimensions,
   setDimensions,
   setIsTokenDragging,
   addTokenToGrid,
@@ -37,7 +37,6 @@ const Grid = ({
   lineWidth = 0.5,
 }: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
-
   useEffect(() => {
     if (!containerRef.current) return
 
