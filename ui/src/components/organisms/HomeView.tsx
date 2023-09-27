@@ -30,6 +30,7 @@ const HomeView = () => {
   const [cellSize, setCellSize] = useState(50)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [zoomLevel, setZoomLevel] = useState<number>(1)
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
   const gridContainerRef = useRef<HTMLDivElement>(null)
@@ -76,10 +77,14 @@ const HomeView = () => {
 
     const sectionDimensions = gridContainerRef.current.getBoundingClientRect()
 
-    const minX = sectionDimensions.width - dimensions.width
+    // Adjust the dimensions of the grid/image based on the current zoom level
+    const adjustedWidth = dimensions.width * zoomLevel
+    const adjustedHeight = dimensions.height * zoomLevel
+
+    const minX = sectionDimensions.width - adjustedWidth
     const maxX = 0
 
-    const minY = sectionDimensions.height - dimensions.height
+    const minY = sectionDimensions.height - adjustedHeight
     const maxY = 0
 
     return {
@@ -121,13 +126,21 @@ const HomeView = () => {
   }
 
   const handleWheel = (e: React.WheelEvent) => {
-    const dx = e.deltaX
-    const dy = e.deltaY
-
-    const newPos = { x: position.x - dx, y: position.y - dy }
-    const clampedPosition = clampPosition(newPos.x, newPos.y)
-
-    setPosition(clampedPosition)
+    if (backgroundImage && (e.ctrlKey || e.metaKey)) {
+      // Capture pinch-to-zoom
+      const zoomDelta = -e.deltaY * 0.001
+      const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
+      const adjustedPosition = clampPosition(position.x, position.y)
+      setPosition(adjustedPosition)
+      setZoomLevel(newZoom)
+    } else {
+      // Handle panning
+      const dx = e.deltaX
+      const dy = e.deltaY
+      const newPos = { x: position.x - dx, y: position.y - dy }
+      const clampedPosition = clampPosition(newPos.x, newPos.y)
+      setPosition(clampedPosition)
+    }
   }
 
   useEffect(() => {
@@ -166,7 +179,10 @@ const HomeView = () => {
             <img
               src={backgroundImage}
               alt="Background"
-              css={[tw`max-w-none w-auto h-auto`]}
+              css={[
+                tw`max-w-none w-auto h-auto origin-top-left`,
+                `transform: scale(${zoomLevel})`,
+              ]}
             />
           )}
           <Grid
