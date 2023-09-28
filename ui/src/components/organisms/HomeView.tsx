@@ -34,6 +34,7 @@ const HomeView = () => {
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
   const gridContainerRef = useRef<HTMLDivElement>(null)
+  const gridSectionRef = useRef<HTMLDivElement>(null)
 
   const rows = Math.ceil(dimensions.height / cellSize)
   const cols = Math.ceil(dimensions.width / cellSize)
@@ -58,6 +59,43 @@ const HomeView = () => {
     })
   }
 
+  const clampPosition = (x: number, y: number) => {
+    return { x, y }
+    // if (!gridSectionRef.current) return { x, y }
+
+    // const viewportBounds = gridSectionRef.current.getBoundingClientRect()
+    // const effectiveWidth = dimensions.width * zoomLevel
+    // const effectiveHeight = dimensions.height * zoomLevel
+
+    // // Buffer distance is the percentage of the effective width/height.
+    // const bufferX = effectiveWidth * 0.2 // e.g., 20% of effective width
+    // const bufferY = effectiveHeight * 0.2 // e.g., 20% of effective height
+
+    // // Conditions differ based on whether the effectiveWidth/Height is smaller or larger than the viewport
+    // const maxX =
+    //   effectiveWidth <= viewportBounds.width
+    //     ? viewportBounds.width - effectiveWidth + bufferX
+    //     : bufferX
+    // const minX =
+    //   effectiveWidth <= viewportBounds.width
+    //     ? -bufferX
+    //     : viewportBounds.width - effectiveWidth - bufferX
+
+    // const maxY =
+    //   effectiveHeight <= viewportBounds.height
+    //     ? viewportBounds.height - effectiveHeight + bufferY
+    //     : bufferY
+    // const minY =
+    //   effectiveHeight <= viewportBounds.height
+    //     ? -bufferY
+    //     : viewportBounds.height - effectiveHeight - bufferY
+
+    // const clampedX = Math.min(maxX, Math.max(x, minX))
+    // const clampedY = Math.min(maxY, Math.max(y, minY))
+
+    // return { x: clampedX, y: clampedY }
+  }
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null
 
@@ -69,27 +107,6 @@ const HomeView = () => {
       }
 
       reader.readAsDataURL(file)
-    }
-  }
-
-  const clampPosition = (x: number, y: number) => {
-    if (!gridContainerRef.current) return { x, y }
-
-    const sectionDimensions = gridContainerRef.current.getBoundingClientRect()
-
-    // Adjust the dimensions of the grid/image based on the current zoom level
-    const adjustedWidth = dimensions.width * zoomLevel
-    const adjustedHeight = dimensions.height * zoomLevel
-
-    const minX = sectionDimensions.width - adjustedWidth
-    const maxX = 0
-
-    const minY = sectionDimensions.height - adjustedHeight
-    const maxY = 0
-
-    return {
-      x: Math.max(minX, Math.min(maxX, x)),
-      y: Math.max(minY, Math.min(maxY, y)),
     }
   }
 
@@ -161,28 +178,26 @@ const HomeView = () => {
   return (
     <main css={[tw`flex overflow-hidden`]}>
       <section
-        ref={gridContainerRef}
+        ref={gridSectionRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onWheel={handleWheel}
-        css={[tw`relative h-screen overflow-hidden`]}
+        css={[tw`relative h-screen overflow-hidden border border-blue-500`]}
       >
         <div
+          ref={gridContainerRef}
           css={[
-            tw`w-fit`,
-            `transform: translate(${position.x}px, ${position.y}px)`,
-            !backgroundImage && tw`w-[1500px] h-[1920px]`,
+            tw`w-fit border-4 border-red-500`,
+            `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
+            !backgroundImage && tw`w-screen h-screen`,
           ]}
         >
           {backgroundImage && (
             <img
               src={backgroundImage}
               alt="Background"
-              css={[
-                tw`max-w-none w-auto h-auto origin-top-left`,
-                `transform: scale(${zoomLevel})`,
-              ]}
+              css={[tw`max-w-none w-auto h-auto origin-center`]}
             />
           )}
           <Grid
