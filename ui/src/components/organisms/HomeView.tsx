@@ -34,6 +34,9 @@ const HomeView = () => {
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
   const gridContainerRef = useRef<HTMLDivElement>(null)
+  /**
+   * @todo - Use this outter container to set boundaries
+   */
   const gridSectionRef = useRef<HTMLDivElement>(null)
 
   const rows = Math.ceil(dimensions.height / cellSize)
@@ -57,43 +60,6 @@ const HomeView = () => {
       grid[y]![x] = null
       return grid
     })
-  }
-
-  const clampPosition = (x: number, y: number) => {
-    return { x, y }
-    // if (!gridSectionRef.current) return { x, y }
-
-    // const viewportBounds = gridSectionRef.current.getBoundingClientRect()
-    // const effectiveWidth = dimensions.width * zoomLevel
-    // const effectiveHeight = dimensions.height * zoomLevel
-
-    // // Buffer distance is the percentage of the effective width/height.
-    // const bufferX = effectiveWidth * 0.2 // e.g., 20% of effective width
-    // const bufferY = effectiveHeight * 0.2 // e.g., 20% of effective height
-
-    // // Conditions differ based on whether the effectiveWidth/Height is smaller or larger than the viewport
-    // const maxX =
-    //   effectiveWidth <= viewportBounds.width
-    //     ? viewportBounds.width - effectiveWidth + bufferX
-    //     : bufferX
-    // const minX =
-    //   effectiveWidth <= viewportBounds.width
-    //     ? -bufferX
-    //     : viewportBounds.width - effectiveWidth - bufferX
-
-    // const maxY =
-    //   effectiveHeight <= viewportBounds.height
-    //     ? viewportBounds.height - effectiveHeight + bufferY
-    //     : bufferY
-    // const minY =
-    //   effectiveHeight <= viewportBounds.height
-    //     ? -bufferY
-    //     : viewportBounds.height - effectiveHeight - bufferY
-
-    // const clampedX = Math.min(maxX, Math.max(x, minX))
-    // const clampedY = Math.min(maxY, Math.max(y, minY))
-
-    // return { x: clampedX, y: clampedY }
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,9 +98,8 @@ const HomeView = () => {
     const dy = e.clientY - lastPosition.current.y
 
     const newPos = { x: position.x + dx, y: position.y + dy }
-    const clampedPosition = clampPosition(newPos.x, newPos.y)
 
-    setPosition(clampedPosition)
+    setPosition(newPos)
     lastPosition.current = { x: e.clientX, y: e.clientY }
   }
 
@@ -147,16 +112,15 @@ const HomeView = () => {
       // Capture pinch-to-zoom
       const zoomDelta = -e.deltaY * 0.001
       const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
-      const adjustedPosition = clampPosition(position.x, position.y)
-      setPosition(adjustedPosition)
+
+      setPosition({ x: position.x, y: position.y })
       setZoomLevel(newZoom)
     } else {
       // Handle panning
       const dx = e.deltaX
       const dy = e.deltaY
       const newPos = { x: position.x - dx, y: position.y - dy }
-      const clampedPosition = clampPosition(newPos.x, newPos.y)
-      setPosition(clampedPosition)
+      setPosition({ x: newPos.x, y: newPos.y })
     }
   }
 
@@ -183,12 +147,12 @@ const HomeView = () => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onWheel={handleWheel}
-        css={[tw`relative h-screen overflow-hidden border border-blue-500`]}
+        css={[tw`relative h-screen overflow-hidden`]}
       >
         <div
           ref={gridContainerRef}
           css={[
-            tw`w-fit border-4 border-red-500`,
+            tw`w-fit`,
             `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
             !backgroundImage && tw`w-screen h-screen`,
           ]}
