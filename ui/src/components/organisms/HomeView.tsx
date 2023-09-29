@@ -35,7 +35,8 @@ const HomeView = () => {
   const lastPosition = useRef({ x: 0, y: 0 })
   const gridContainerRef = useRef<HTMLDivElement>(null)
   /**
-   * @todo - Use this outter container to set boundaries
+   * @todo - Use this outter container to set boundaries, using the position state
+   * Maybe prevent the position from being set higher/lower than the container's height
    */
   const gridSectionRef = useRef<HTMLDivElement>(null)
 
@@ -48,17 +49,19 @@ const HomeView = () => {
   const [isTokenDragging, setIsTokenDragging] = useState<boolean>(false)
 
   const addTokenToGrid = (x: number, y: number, token: Token) => {
-    setGrid(([...grid]) => {
-      if (!grid[y]) grid[y] = Array(cols).fill(null)
-      grid[y]![x] = token
-      return grid
+    setGrid((prev) => {
+      const newGrid = [...prev]
+      if (!newGrid[y]) newGrid[y] = Array(cols).fill(null)
+      newGrid[y]![x] = token
+      return newGrid
     })
   }
 
   const removeTokenFromGrid = (x: number, y: number) => {
-    setGrid(([...grid]) => {
-      grid[y]![x] = null
-      return grid
+    setGrid((prev) => {
+      const newGrid = [...prev]
+      newGrid[y]![x] = null
+      return newGrid
     })
   }
 
