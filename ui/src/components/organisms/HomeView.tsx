@@ -20,7 +20,7 @@ const gamesQuery = gql`
 /**
  * The main view of the application when the user logs in.
  *
- * @todo - Add inputs for dynamic height and width setting
+ * @todo - Add inputs for dynamic height and width setting when there's no background image.
  */
 const HomeView = () => {
   const [{ data, fetching, error }] = useQuery({
@@ -178,6 +178,7 @@ const HomeView = () => {
             cellSize={cellSize}
             lineWidth={0.5}
             setIsTokenDragging={setIsTokenDragging}
+            zoomLevel={zoomLevel}
           />
         </div>
       </section>
