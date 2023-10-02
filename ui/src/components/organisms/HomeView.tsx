@@ -21,6 +21,8 @@ const gamesQuery = gql`
  * The main view of the application when the user logs in.
  *
  * @todo - Add inputs for dynamic height and width setting when there's no background image.
+ * @todo - Fix grid cell bug when zoomed in or out.
+ * @todo - Fix mouse drag pan and boundary bugs.
  */
 const HomeView = () => {
   const [{ data, fetching, error }] = useQuery({
@@ -34,10 +36,8 @@ const HomeView = () => {
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
   const gridContainerRef = useRef<HTMLDivElement>(null)
-  /**
-   * @todo - Use this outter container to set boundaries, using the position state
-   * Maybe prevent the position from being set higher/lower than the container's height
-   */
+  const imageRef = useRef<HTMLImageElement>(null)
+
   const gridSectionRef = useRef<HTMLDivElement>(null)
 
   const rows = Math.ceil(dimensions.height / cellSize)
@@ -111,19 +111,53 @@ const HomeView = () => {
   }
 
   const handleWheel = (e: React.WheelEvent) => {
+    const { current: gridSection } = gridSectionRef
+    const { current: gridContainer } = gridContainerRef
+    const { current: image } = imageRef
+
+    // Only proceed if we have valid refs
+    if (!gridSection || !gridContainer || !image) return
+
+    const viewportWidth = gridSection.offsetWidth
+    const viewportHeight = gridSection.offsetHeight
+    const originalWidth = image.naturalWidth
+    const originalHeight = image.naturalHeight
+
     if (backgroundImage && (e.ctrlKey || e.metaKey)) {
       // Capture pinch-to-zoom
       const zoomDelta = -e.deltaY * 0.001
       const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
 
-      setPosition({ x: position.x, y: position.y })
+      const effectiveWidth = originalWidth * newZoom
+      const effectiveHeight = originalHeight * newZoom
+
+      // Update DOM styles
+      gridContainer.style.width = `${effectiveWidth}px`
+      gridContainer.style.height = `${effectiveHeight}px`
+      image.style.width = `${effectiveWidth}px`
+      image.style.height = `${effectiveHeight}px`
+
       setZoomLevel(newZoom)
     } else {
       // Handle panning
       const dx = e.deltaX
       const dy = e.deltaY
-      const newPos = { x: position.x - dx, y: position.y - dy }
-      setPosition({ x: newPos.x, y: newPos.y })
+
+      const effectiveWidth = originalWidth * zoomLevel
+      const effectiveHeight = originalHeight * zoomLevel
+
+      const newPos = {
+        x: Math.min(
+          200,
+          Math.max(viewportWidth - effectiveWidth - 200, position.x - dx),
+        ),
+        y: Math.min(
+          200,
+          Math.max(viewportHeight - effectiveHeight - 200, position.y - dy),
+        ),
+      }
+
+      setPosition(newPos)
     }
   }
 
@@ -150,13 +184,13 @@ const HomeView = () => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onWheel={handleWheel}
-        css={[tw`relative h-screen overflow-hidden`]}
+        css={[tw`relative w-full h-screen overflow-hidden`]}
       >
         <div
           ref={gridContainerRef}
           css={[
             tw`w-fit`,
-            `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
+            `transform: translate(${position.x}px, ${position.y}px)`,
             !backgroundImage && tw`w-screen h-screen`,
           ]}
         >
@@ -164,6 +198,7 @@ const HomeView = () => {
             <img
               src={backgroundImage}
               alt="Background"
+              ref={imageRef}
               css={[tw`max-w-none w-auto h-auto origin-center`]}
             />
           )}
