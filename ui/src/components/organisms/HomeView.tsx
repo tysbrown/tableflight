@@ -65,6 +65,32 @@ const HomeView = () => {
     })
   }
 
+  const updatePosition = (
+    dx: number,
+    dy: number,
+    isInverted: boolean = false,
+  ) => {
+    const { current: gridSection } = gridSectionRef
+
+    if (!gridSection || !image) return
+
+    const viewportWidth = gridSection.offsetWidth
+    const viewportHeight = gridSection.offsetHeight
+
+    const effectiveWidth = originalWidth * zoomLevel
+    const effectiveHeight = originalHeight * zoomLevel
+
+    const xPos = isInverted ? position.x + dx : position.x - dx
+    const yPos = isInverted ? position.y + dy : position.y - dy
+
+    const newPos = {
+      x: Math.min(200, Math.max(viewportWidth - effectiveWidth - 200, xPos)),
+      y: Math.min(200, Math.max(viewportHeight - effectiveHeight - 200, yPos)),
+    }
+
+    setPosition(newPos)
+  }
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null
 
@@ -93,6 +119,11 @@ const HomeView = () => {
     lastPosition.current = { x: e.clientX, y: e.clientY }
   }
 
+  const { current: image } = imageRef
+
+  const originalWidth = image?.naturalWidth || 0
+  const originalHeight = image?.naturalHeight || 0
+
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isTokenDragging) return
     if (!dragging.current) return
@@ -100,9 +131,7 @@ const HomeView = () => {
     const dx = e.clientX - lastPosition.current.x
     const dy = e.clientY - lastPosition.current.y
 
-    const newPos = { x: position.x + dx, y: position.y + dy }
-
-    setPosition(newPos)
+    updatePosition(dx, dy, true)
     lastPosition.current = { x: e.clientX, y: e.clientY }
   }
 
@@ -113,15 +142,12 @@ const HomeView = () => {
   const handleWheel = (e: React.WheelEvent) => {
     const { current: gridSection } = gridSectionRef
     const { current: gridContainer } = gridContainerRef
-    const { current: image } = imageRef
 
     // Only proceed if we have valid refs
     if (!gridSection || !gridContainer || !image) return
 
-    const viewportWidth = gridSection.offsetWidth
-    const viewportHeight = gridSection.offsetHeight
-    const originalWidth = image.naturalWidth
-    const originalHeight = image.naturalHeight
+    // const viewportWidth = gridSection.offsetWidth
+    // const viewportHeight = gridSection.offsetHeight
 
     if (backgroundImage && (e.ctrlKey || e.metaKey)) {
       // Capture pinch-to-zoom
@@ -143,21 +169,7 @@ const HomeView = () => {
       const dx = e.deltaX
       const dy = e.deltaY
 
-      const effectiveWidth = originalWidth * zoomLevel
-      const effectiveHeight = originalHeight * zoomLevel
-
-      const newPos = {
-        x: Math.min(
-          200,
-          Math.max(viewportWidth - effectiveWidth - 200, position.x - dx),
-        ),
-        y: Math.min(
-          200,
-          Math.max(viewportHeight - effectiveHeight - 200, position.y - dy),
-        ),
-      }
-
-      setPosition(newPos)
+      updatePosition(dx, dy)
     }
   }
 
