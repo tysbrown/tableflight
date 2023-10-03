@@ -16,7 +16,6 @@ type GridProps = {
   cols: number
   cellSize: number
   lineWidth?: number
-  zoomLevel: number
 }
 /**
  * Dynamic SVG grid component that renders a grid of cells based on the dimensions
@@ -36,7 +35,6 @@ const Grid = ({
   cols,
   cellSize,
   lineWidth = 0.5,
-  zoomLevel,
 }: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
