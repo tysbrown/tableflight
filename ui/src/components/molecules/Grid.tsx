@@ -102,8 +102,8 @@ const Grid = ({
 
     const rect = currentTarget.getBoundingClientRect()
 
-    const droppedX = (clientX - rect.left) / zoomLevel
-    const droppedY = (clientY - rect.top) / zoomLevel
+    const droppedX = (clientX - rect.left)
+    const droppedY = (clientY - rect.top)
 
     const newCol = Math.floor(droppedX / cellSize)
     const newRow = Math.floor(droppedY / cellSize)

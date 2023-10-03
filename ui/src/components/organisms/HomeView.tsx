@@ -21,8 +21,6 @@ const gamesQuery = gql`
  * The main view of the application when the user logs in.
  *
  * @todo - Add inputs for dynamic height and width setting when there's no background image.
- * @todo - Fix grid cell bug when zoomed in or out.
- * @todo - Fix mouse drag pan and boundary bugs.
  */
 const HomeView = () => {
   const [{ data, fetching, error }] = useQuery({
@@ -48,6 +46,15 @@ const HomeView = () => {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
   const [isTokenDragging, setIsTokenDragging] = useState<boolean>(false)
 
+  const { current: gridContainer } = gridContainerRef
+  const { current: image } = imageRef
+
+  const gridWidth = gridContainer?.offsetWidth || 0
+  const gridHeight = gridContainer?.offsetHeight || 0
+
+  const originalWidth = image?.naturalWidth || gridWidth || 0
+  const originalHeight = image?.naturalHeight || gridHeight || 0
+
   const addTokenToGrid = (x: number, y: number, token: Token) => {
     setGrid((prev) => {
       const newGrid = [...prev]
@@ -72,7 +79,7 @@ const HomeView = () => {
   ) => {
     const { current: gridSection } = gridSectionRef
 
-    if (!gridSection || !image) return
+    if (!gridSection) return
 
     const viewportWidth = gridSection.offsetWidth
     const viewportHeight = gridSection.offsetHeight
@@ -119,11 +126,6 @@ const HomeView = () => {
     lastPosition.current = { x: e.clientX, y: e.clientY }
   }
 
-  const { current: image } = imageRef
-
-  const originalWidth = image?.naturalWidth || 0
-  const originalHeight = image?.naturalHeight || 0
-
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isTokenDragging) return
     if (!dragging.current) return
@@ -144,12 +146,9 @@ const HomeView = () => {
     const { current: gridContainer } = gridContainerRef
 
     // Only proceed if we have valid refs
-    if (!gridSection || !gridContainer || !image) return
+    if (!gridSection || !gridContainer) return
 
-    // const viewportWidth = gridSection.offsetWidth
-    // const viewportHeight = gridSection.offsetHeight
-
-    if (backgroundImage && (e.ctrlKey || e.metaKey)) {
+    if (image && (e.ctrlKey || e.metaKey)) {
       // Capture pinch-to-zoom
       const zoomDelta = -e.deltaY * 0.001
       const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
