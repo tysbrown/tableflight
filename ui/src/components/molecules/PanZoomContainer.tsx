@@ -37,32 +37,6 @@ const PanZoomContainer = ({
   const originalWidth = image?.naturalWidth || gridWidth || 0
   const originalHeight = image?.naturalHeight || gridHeight || 0
 
-  const handleZoom = (
-    e: React.WheelEvent,
-    gridContainer: HTMLDivElement,
-    image: HTMLImageElement,
-  ) => {
-    const zoomDelta = -e.deltaY * 0.001
-    const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
-
-    const effectiveWidth = originalWidth * newZoom
-    const effectiveHeight = originalHeight * newZoom
-
-    gridContainer.style.width = `${effectiveWidth}px`
-    gridContainer.style.height = `${effectiveHeight}px`
-    image.style.width = `${effectiveWidth}px`
-    image.style.height = `${effectiveHeight}px`
-
-    setZoomLevel(newZoom)
-  }
-
-  const handlePanning = (e: React.WheelEvent) => {
-    const dx = e.deltaX
-    const dy = e.deltaY
-
-    updatePosition(dx, dy)
-  }
-
   const updatePosition = (
     dx: number,
     dy: number,
@@ -125,6 +99,32 @@ const PanZoomContainer = ({
 
     if (isZooming) handleZoom(e, gridContainer, image)
     else handlePanning(e)
+  }
+
+  const handleZoom = (
+    e: React.WheelEvent,
+    gridContainer: HTMLDivElement,
+    image: HTMLImageElement,
+  ) => {
+    const zoomDelta = -e.deltaY * 0.001
+    const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
+
+    const effectiveWidth = originalWidth * newZoom
+    const effectiveHeight = originalHeight * newZoom
+
+    gridContainer.style.width = `${effectiveWidth}px`
+    gridContainer.style.height = `${effectiveHeight}px`
+    image.style.width = `${effectiveWidth}px`
+    image.style.height = `${effectiveHeight}px`
+
+    setZoomLevel(newZoom)
+  }
+
+  const handlePanning = (e: React.WheelEvent) => {
+    const dx = e.deltaX
+    const dy = e.deltaY
+
+    updatePosition(dx, dy)
   }
 
   useEffect(() => {
