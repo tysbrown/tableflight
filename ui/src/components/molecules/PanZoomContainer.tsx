@@ -36,7 +36,11 @@ const PanZoomContainer = ({
   const originalWidth = image?.naturalWidth || gridWidth || 0
   const originalHeight = image?.naturalHeight || gridHeight || 0
 
-  const containerBuffer = 1200
+  const viewportWidth = gridSection?.offsetWidth || 0
+  const viewportHeight = gridSection?.offsetHeight || 0
+
+  const containerBufferX = viewportWidth - 100
+  const containerBufferY = viewportHeight - 100
 
   const updatePosition = (
     dx: number,
@@ -58,12 +62,12 @@ const PanZoomContainer = ({
 
     const newPos = {
       x: Math.min(
-        containerBuffer,
-        Math.max(viewportWidth - effectiveWidth - containerBuffer, xPos),
+        containerBufferX,
+        Math.max(viewportWidth - effectiveWidth - containerBufferX, xPos),
       ),
       y: Math.min(
-        containerBuffer,
-        Math.max(viewportHeight - effectiveHeight - containerBuffer, yPos),
+        containerBufferY,
+        Math.max(viewportHeight - effectiveHeight - containerBufferY, yPos),
       ),
     }
 
@@ -160,7 +164,7 @@ const PanZoomContainer = ({
         css={[
           tw`w-fit`,
           `transform: translate(${position.x}px, ${position.y}px)`,
-          !backgroundImage && tw`w-screen h-screen`,
+          !backgroundImage && tw`w-screen h-screen bg-white`,
         ]}
       >
         {children}
