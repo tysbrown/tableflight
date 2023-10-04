@@ -88,7 +88,7 @@ const HomeView = () => {
             src={backgroundImage}
             alt="Background"
             ref={imageRef}
-            css={[tw`max-w-none w-auto h-auto origin-center`]}
+            css={[tw`max-w-none w-auto h-auto`]}
           />
         )}
         <Grid

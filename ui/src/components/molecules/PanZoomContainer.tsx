@@ -11,7 +11,6 @@ type PanZoomContainerProps = {
 
 /**
  * Container with custom panning and zooming functionality.
- *
  */
 const PanZoomContainer = ({
   image,
@@ -37,6 +36,8 @@ const PanZoomContainer = ({
   const originalWidth = image?.naturalWidth || gridWidth || 0
   const originalHeight = image?.naturalHeight || gridHeight || 0
 
+  const containerBuffer = 1200
+
   const updatePosition = (
     dx: number,
     dy: number,
@@ -56,8 +57,14 @@ const PanZoomContainer = ({
     const yPos = isInverted ? position.y + dy : position.y - dy
 
     const newPos = {
-      x: Math.min(200, Math.max(viewportWidth - effectiveWidth - 200, xPos)),
-      y: Math.min(200, Math.max(viewportHeight - effectiveHeight - 200, yPos)),
+      x: Math.min(
+        containerBuffer,
+        Math.max(viewportWidth - effectiveWidth - containerBuffer, xPos),
+      ),
+      y: Math.min(
+        containerBuffer,
+        Math.max(viewportHeight - effectiveHeight - containerBuffer, yPos),
+      ),
     }
 
     setPosition(newPos)

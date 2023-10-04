@@ -119,7 +119,7 @@ const Grid = ({
       <svg
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        css={[tw`w-full h-full`]}
+        css={[tw`w-full h-full border border-gray-600 bg-white`]}
       >
         {horizontalLines}
         {verticalLines}
