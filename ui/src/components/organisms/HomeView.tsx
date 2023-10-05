@@ -32,6 +32,7 @@ const HomeView = () => {
 
   const [cellSize, setCellSize] = useState(50)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [zoomLevel, setZoomLevel] = useState<number>(1)
 
   const rows = Math.ceil(dimensions.height / cellSize)
   const cols = Math.ceil(dimensions.width / cellSize)
@@ -82,6 +83,8 @@ const HomeView = () => {
         backgroundImage={backgroundImage}
         isTokenDragging={isTokenDragging}
         setIsTokenDragging={setIsTokenDragging}
+        zoomLevel={zoomLevel}
+        setZoomLevel={setZoomLevel}
       >
         {backgroundImage && (
           <img
@@ -102,6 +105,7 @@ const HomeView = () => {
           cellSize={cellSize}
           lineWidth={0.5}
           setIsTokenDragging={setIsTokenDragging}
+          zoomLevel={zoomLevel}
         />
       </PanZoomContainer>
 

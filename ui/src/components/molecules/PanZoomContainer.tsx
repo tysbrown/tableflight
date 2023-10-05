@@ -6,6 +6,8 @@ type PanZoomContainerProps = {
   backgroundImage: string | null
   isTokenDragging: boolean
   setIsTokenDragging: React.Dispatch<React.SetStateAction<boolean>>
+  zoomLevel: number
+  setZoomLevel: React.Dispatch<React.SetStateAction<number>>
   children: React.ReactNode
 }
 
@@ -17,10 +19,11 @@ const PanZoomContainer = ({
   backgroundImage,
   isTokenDragging,
   setIsTokenDragging,
+  zoomLevel,
+  setZoomLevel,
   children,
 }: PanZoomContainerProps) => {
   const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [zoomLevel, setZoomLevel] = useState<number>(1)
 
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
@@ -106,27 +109,15 @@ const PanZoomContainer = ({
   const handleWheel = (e: React.WheelEvent) => {
     if (!gridSection || !gridContainer) return
 
-    const isZooming = image && (e.ctrlKey || e.metaKey)
+    const isZooming = e.ctrlKey || e.metaKey
 
-    if (isZooming) handleZoom(e, gridContainer, image)
+    if (isZooming) handleZoom(e)
     else handlePanning(e)
   }
 
-  const handleZoom = (
-    e: React.WheelEvent,
-    gridContainer: HTMLDivElement,
-    image: HTMLImageElement,
-  ) => {
+  const handleZoom = (e: React.WheelEvent) => {
     const zoomDelta = -e.deltaY * 0.001
     const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
-
-    const effectiveWidth = originalWidth * newZoom
-    const effectiveHeight = originalHeight * newZoom
-
-    gridContainer.style.width = `${effectiveWidth}px`
-    gridContainer.style.height = `${effectiveHeight}px`
-    image.style.width = `${effectiveWidth}px`
-    image.style.height = `${effectiveHeight}px`
 
     setZoomLevel(newZoom)
   }
@@ -162,8 +153,8 @@ const PanZoomContainer = ({
       <div
         ref={gridContainerRef}
         css={[
-          tw`w-fit`,
-          `transform: translate(${position.x}px, ${position.y}px)`,
+          tw`w-fit origin-top-left`,
+          `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
           !backgroundImage && tw`w-screen h-screen bg-white`,
         ]}
       >

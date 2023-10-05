@@ -16,6 +16,7 @@ type GridProps = {
   cols: number
   cellSize: number
   lineWidth?: number
+  zoomLevel: number
 }
 /**
  * Dynamic SVG grid component that renders a grid of cells based on the dimensions
@@ -35,6 +36,7 @@ const Grid = ({
   cols,
   cellSize,
   lineWidth = 0.5,
+  zoomLevel,
 }: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
@@ -44,6 +46,7 @@ const Grid = ({
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth
         const height = containerRef.current.offsetHeight
+
         setDimensions({ width, height })
       }
     }
@@ -100,11 +103,11 @@ const Grid = ({
 
     const rect = currentTarget.getBoundingClientRect()
 
-    const droppedX = (clientX - rect.left)
-    const droppedY = (clientY - rect.top)
+    const droppedX = clientX - rect.left
+    const droppedY = clientY - rect.top
 
-    const newCol = Math.floor(droppedX / cellSize)
-    const newRow = Math.floor(droppedY / cellSize)
+    const newCol = Math.floor(droppedX / cellSize / zoomLevel)
+    const newRow = Math.floor(droppedY / cellSize / zoomLevel)
 
     if (!newToken) removeTokenFromGrid(col, row)
     addTokenToGrid(newCol, newRow, token)
@@ -115,7 +118,7 @@ const Grid = ({
   }
 
   return (
-    <div ref={containerRef} css={[tw`absolute top-0 left-0 right-0 bottom-0`]}>
+    <div ref={containerRef} css={[tw`absolute top-0 left-0 right-0 bottom-0 overflow-hidden`]}>
       <svg
         onDrop={handleDrop}
         onDragOver={handleDragOver}
