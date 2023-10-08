@@ -83,12 +83,12 @@ const SliderInput = ({
       aria-valuemax={max}
       aria-valuenow={value}
       aria-disabled={disabled}
+      {...props}
     >
       <label htmlFor={name} tw="mb-4">
         {label}
       </label>
       <input
-        {...props}
         ref={sliderRef}
         type="range"
         name={name}
