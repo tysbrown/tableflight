@@ -33,14 +33,14 @@ const PanZoomContainer = ({
   const { current: gridSection } = gridSectionRef
   const { current: gridContainer } = gridContainerRef
 
+  const viewportWidth = gridSection?.offsetWidth || 0
+  const viewportHeight = gridSection?.offsetHeight || 0
+
   const gridWidth = gridContainer?.offsetWidth || 0
   const gridHeight = gridContainer?.offsetHeight || 0
 
   const originalWidth = image?.naturalWidth || gridWidth || 0
   const originalHeight = image?.naturalHeight || gridHeight || 0
-
-  const viewportWidth = gridSection?.offsetWidth || 0
-  const viewportHeight = gridSection?.offsetHeight || 0
 
   const containerBufferX = viewportWidth - 100
   const containerBufferY = viewportHeight - 100
@@ -109,24 +109,23 @@ const PanZoomContainer = ({
   const handleWheel = (e: React.WheelEvent) => {
     if (!gridSection || !gridContainer) return
 
-    const isZooming = e.ctrlKey || e.metaKey
+    const { ctrlKey, metaKey, deltaX, deltaY } = e
 
-    if (isZooming) handleZoom(e)
-    else handlePanning(e)
+    const isZooming = ctrlKey || metaKey
+
+    if (isZooming) handleZoom(deltaY)
+    else handlePanning(deltaX, deltaY)
   }
 
-  const handleZoom = (e: React.WheelEvent) => {
-    const zoomDelta = -e.deltaY * 0.001
+  const handleZoom = (deltaY: number) => {
+    const zoomDelta = -deltaY * 0.001
     const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
 
     setZoomLevel(newZoom)
   }
 
-  const handlePanning = (e: React.WheelEvent) => {
-    const dx = e.deltaX
-    const dy = e.deltaY
-
-    updatePosition(dx, dy)
+  const handlePanning = (deltaX: number, deltaY: number) => {
+    updatePosition(deltaX, deltaY)
   }
 
   useEffect(() => {
