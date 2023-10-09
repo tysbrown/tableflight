@@ -4,7 +4,7 @@ type MenuProps = {
   children: React.ReactNode
 }
 
-const Menu = ({ children }: MenuProps) => {
+const ControlPanel = ({ children }: MenuProps) => {
   return (
     <nav
       css={[
@@ -16,4 +16,4 @@ const Menu = ({ children }: MenuProps) => {
   )
 }
 
-export default Menu
+export default ControlPanel

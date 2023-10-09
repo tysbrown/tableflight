@@ -5,9 +5,10 @@ import tw from "twin.macro"
 import Grid from "../molecules/Grid"
 import SliderInput from "../atoms/SliderInput"
 import LoadingView from "../molecules/LoadingView"
-import Menu from "../molecules/Menu"
+import ControlPanel from "../molecules/ControlPanel"
 import NewTokenPanel from "../molecules/NewTokenPanel"
 import PanZoomContainer from "../molecules/PanZoomContainer"
+import Button from "../atoms/Button"
 
 const gamesQuery = gql`
   query Games {
@@ -109,7 +110,13 @@ const HomeView = () => {
         />
       </PanZoomContainer>
 
-      <Menu>
+      <ControlPanel>
+        <section css={[tw`flex justify-end`]}>
+          <Button style="primary" type="button" css={[tw`px-2 py-0`]}>
+            {Math.round(zoomLevel * 100)}%
+          </Button>
+        </section>
+
         <SliderInput
           name="cellSize"
           label="Cell Size"
@@ -125,7 +132,7 @@ const HomeView = () => {
         <section>
           <input type="file" onChange={handleFileChange} accept="image/*" />
         </section>
-      </Menu>
+      </ControlPanel>
       <section css={[tw`absolute bottom-0 left-0`]}>
         <h1>Games:</h1>
         <ul>

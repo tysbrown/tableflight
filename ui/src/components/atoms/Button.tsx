@@ -1,13 +1,7 @@
 import tw from "twin.macro"
 
 type ButtonProps = {
-  /**
-   * The button variation
-   */
   style: "primary" | "secondary" | "tertiary" | "outline" | "link"
-  /**
-   * The button type
-   */
   type: "submit" | "reset" | "button"
   disabled?: boolean
   onClick?: () => void
