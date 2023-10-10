@@ -42,8 +42,8 @@ const PanZoomContainer = ({
   const originalWidth = image?.naturalWidth || gridWidth || 0
   const originalHeight = image?.naturalHeight || gridHeight || 0
 
-  const containerBufferX = viewportWidth - 100
-  const containerBufferY = viewportHeight - 100
+  const effectiveWidth = originalWidth * zoomLevel
+  const effectiveHeight = originalHeight * zoomLevel
 
   const updatePosition = (
     dx: number,
@@ -54,27 +54,35 @@ const PanZoomContainer = ({
 
     if (!gridSection) return
 
-    const viewportWidth = gridSection.offsetWidth
-    const viewportHeight = gridSection.offsetHeight
+    const shiftX = (effectiveWidth - originalWidth) / 2
+    const shiftY = (effectiveHeight - originalHeight) / 2
 
-    const effectiveWidth = originalWidth * zoomLevel
-    const effectiveHeight = originalHeight * zoomLevel
+    const xPos = isInverted
+      ? position.x + dx - shiftX
+      : position.x - dx - shiftX
+    const yPos = isInverted
+      ? position.y + dy - shiftY
+      : position.y - dy - shiftY
 
-    const xPos = isInverted ? position.x + dx : position.x - dx
-    const yPos = isInverted ? position.y + dy : position.y - dy
+    let newX, newY
 
-    const newPos = {
-      x: Math.min(
-        containerBufferX,
-        Math.max(viewportWidth - effectiveWidth - containerBufferX, xPos),
-      ),
-      y: Math.min(
-        containerBufferY,
-        Math.max(viewportHeight - effectiveHeight - containerBufferY, yPos),
-      ),
+    // Horizontal positioning
+    if (effectiveWidth <= viewportWidth) {
+      newX = (viewportWidth - effectiveWidth) / 2 + shiftX
+    } else {
+      newX =
+        Math.max(Math.min(xPos, 0), viewportWidth - effectiveWidth) + shiftX
     }
 
-    setPosition(newPos)
+    // Vertical positioning
+    if (effectiveHeight <= viewportHeight) {
+      newY = (viewportHeight - effectiveHeight) / 2 + shiftY
+    } else {
+      newY =
+        Math.max(Math.min(yPos, 0), viewportHeight - effectiveHeight) + shiftY
+    }
+
+    setPosition({ x: newX, y: newY })
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -129,6 +137,12 @@ const PanZoomContainer = ({
   }
 
   useEffect(() => {
+    if (effectiveWidth < viewportWidth || effectiveHeight < viewportHeight) {
+      updatePosition(0, 0)
+    }
+  }, [zoomLevel])
+
+  useEffect(() => {
     const preventDefaultZoom = (e: WheelEvent) => {
       if (e.ctrlKey) e.preventDefault()
     }
@@ -152,9 +166,10 @@ const PanZoomContainer = ({
       <div
         ref={gridContainerRef}
         css={[
-          tw`w-fit origin-top-left`,
+          tw`w-fit origin-center`,
           `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
-          !backgroundImage && tw`w-screen h-screen bg-white`,
+          !backgroundImage && tw`w-screen bg-white`,
+          !backgroundImage && `height: calc(100vh + 500px)`,
         ]}
       >
         {children}
