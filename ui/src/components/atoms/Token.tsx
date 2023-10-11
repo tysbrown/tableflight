@@ -45,7 +45,6 @@ const TokenComponent = ({ row, col, token, cellSize }: TokenComponentProps) => {
       draggable
       onDragStart={handleDragStart}
       id={id}
-      data-istoken={true}
       css={[
         tw`absolute rounded-full content-none cursor-grab`,
         tokenColor,

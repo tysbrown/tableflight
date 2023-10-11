@@ -9,7 +9,6 @@ type GridProps = {
   setDimensions: React.Dispatch<
     React.SetStateAction<{ width: number; height: number }>
   >
-  setIsTokenDragging: React.Dispatch<React.SetStateAction<boolean>>
   addTokenToGrid: (x: number, y: number, token: Token) => void
   removeTokenFromGrid: (x: number, y: number) => void
   rows: number
@@ -29,7 +28,6 @@ const Grid = ({
   grid,
   dimensions,
   setDimensions,
-  setIsTokenDragging,
   addTokenToGrid,
   removeTokenFromGrid,
   rows,
@@ -96,8 +94,6 @@ const Grid = ({
     const { currentTarget, clientX, clientY, dataTransfer } = event
     event.preventDefault()
 
-    setIsTokenDragging(false)
-
     const { newToken, token, row, col } = JSON.parse(
       dataTransfer.getData("application/json"),
     )
@@ -126,6 +122,7 @@ const Grid = ({
       <svg
         onDrop={handleDrop}
         onDragOver={handleDragOver}
+        data-isgrid={true}
         css={[tw`w-full h-full border border-gray-600`]}
       >
         {horizontalLines}

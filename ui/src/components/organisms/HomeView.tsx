@@ -40,7 +40,6 @@ const HomeView = () => {
 
   const [grid, setGrid] = useState<GridType>(initialGrid)
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
-  const [isTokenDragging, setIsTokenDragging] = useState<boolean>(false)
 
   const addTokenToGrid = (x: number, y: number, token: Token) => {
     setGrid((prev) => {
@@ -81,8 +80,6 @@ const HomeView = () => {
       <PanZoomContainer
         image={imageRef.current}
         backgroundImage={backgroundImage}
-        isTokenDragging={isTokenDragging}
-        setIsTokenDragging={setIsTokenDragging}
         zoomLevel={zoomLevel}
         setZoomLevel={setZoomLevel}
       >
@@ -105,7 +102,6 @@ const HomeView = () => {
           cols={cols}
           cellSize={cellSize}
           lineWidth={0.5}
-          setIsTokenDragging={setIsTokenDragging}
           zoomLevel={zoomLevel}
         />
       </PanZoomContainer>
