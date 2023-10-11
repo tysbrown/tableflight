@@ -4,7 +4,7 @@ import tw from "twin.macro"
 
 type SliderInputProps = {
   name: string
-  label: string
+  label?: string
   value: number
   setValue: React.Dispatch<React.SetStateAction<number>>
   min?: number
@@ -41,10 +41,13 @@ const SliderInput = ({
     const rect = sliderRef!.current!.getBoundingClientRect()
     let newValue = ((e.clientX - rect.left) / rect.width) * (max - min) + min
 
+    // Adjust for step
+    newValue = Math.round(newValue / step) * step
+
     if (newValue < min) newValue = min
     if (newValue > max) newValue = max
 
-    setValue(Math.round(newValue))
+    setValue(newValue)
   }
 
   const handleMouseUp = () => {
@@ -63,16 +66,19 @@ const SliderInput = ({
 
     const clickedPercentage = (clickPosition / width) * 100
 
-    const min = sliderRef!.current!.min
-      ? parseInt(sliderRef!.current!.min, 10)
+    const minVal = sliderRef!.current!.min
+      ? parseFloat(sliderRef!.current!.min)
       : 0
-    const max = sliderRef!.current!.max
-      ? parseInt(sliderRef!.current!.max, 10)
+    const maxVal = sliderRef!.current!.max
+      ? parseFloat(sliderRef!.current!.max)
       : 100
 
-    const newValue = (clickedPercentage / 100) * (max - min) + min
+    let newValue = (clickedPercentage / 100) * (maxVal - minVal) + minVal
 
-    setValue(Math.round(newValue))
+    // Adjust for step
+    newValue = Math.round(newValue / step) * step
+
+    setValue(newValue)
   }
 
   return (
