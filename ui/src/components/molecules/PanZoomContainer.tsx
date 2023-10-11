@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
 
 type PanZoomContainerProps = {
@@ -29,44 +29,21 @@ const PanZoomContainer = ({
 
   const gridSectionRef = useRef<HTMLDivElement>(null)
   const gridContainerRef = useRef<HTMLDivElement>(null)
+
   const { current: gridSection } = gridSectionRef
   const { current: gridContainer } = gridContainerRef
 
-  const viewportWidth = useMemo(
-    () => gridSection?.offsetWidth || 0,
-    [gridSection],
-  )
-  const viewportHeight = useMemo(
-    () => gridSection?.offsetHeight || 0,
-    [gridSection],
-  )
+  const viewportWidth = gridSection?.offsetWidth || 0
+  const viewportHeight = gridSection?.offsetHeight || 0
 
-  const gridWidth = useMemo(
-    () => gridContainer?.offsetWidth || 0,
-    [gridContainer],
-  )
-  const gridHeight = useMemo(
-    () => gridContainer?.offsetHeight || 0,
-    [gridContainer],
-  )
+  const gridWidth = gridContainer?.offsetWidth || 0
+  const gridHeight = gridContainer?.offsetHeight || 0
 
-  const originalWidth = useMemo(
-    () => image?.naturalWidth || gridWidth || 0,
-    [image, gridWidth],
-  )
-  const originalHeight = useMemo(
-    () => image?.naturalHeight || gridHeight || 0,
-    [image, gridHeight],
-  )
+  const originalWidth = image?.naturalWidth || gridWidth || 0
+  const originalHeight = image?.naturalHeight || gridHeight || 0
 
-  const effectiveWidth = useMemo(
-    () => originalWidth * zoomLevel,
-    [originalWidth, zoomLevel],
-  )
-  const effectiveHeight = useMemo(
-    () => originalHeight * zoomLevel,
-    [originalHeight, zoomLevel],
-  )
+  const effectiveWidth = originalWidth * zoomLevel
+  const effectiveHeight = originalHeight * zoomLevel
 
   const updatePosition = (
     dx: number,
