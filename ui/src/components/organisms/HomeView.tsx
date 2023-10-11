@@ -1,5 +1,5 @@
 import type { Game, GridType, Token } from "@/types"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
 import Grid from "../molecules/Grid"
@@ -74,10 +74,6 @@ const HomeView = () => {
     }
   }
 
-  useEffect(() => {
-    setZoomLevel(1)
-  }, [backgroundImage])
-
   if (fetching) return <LoadingView />
   if (error) return <p>Oh no... {error.message}</p>
 
@@ -96,6 +92,7 @@ const HomeView = () => {
             src={backgroundImage}
             alt="Background"
             ref={imageRef}
+            onLoad={() => setZoomLevel(1)}
             css={[tw`max-w-none w-auto h-auto`]}
           />
         )}
