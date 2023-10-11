@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import tw from "twin.macro"
 
 type PanZoomContainerProps = {
@@ -24,36 +24,55 @@ const PanZoomContainer = ({
   children,
 }: PanZoomContainerProps) => {
   const [position, setPosition] = useState({ x: 0, y: 0 })
-
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
+
   const gridSectionRef = useRef<HTMLDivElement>(null)
   const gridContainerRef = useRef<HTMLDivElement>(null)
-
   const { current: gridSection } = gridSectionRef
   const { current: gridContainer } = gridContainerRef
 
-  const viewportWidth = gridSection?.offsetWidth || 0
-  const viewportHeight = gridSection?.offsetHeight || 0
+  const viewportWidth = useMemo(
+    () => gridSection?.offsetWidth || 0,
+    [gridSection],
+  )
+  const viewportHeight = useMemo(
+    () => gridSection?.offsetHeight || 0,
+    [gridSection],
+  )
 
-  const gridWidth = gridContainer?.offsetWidth || 0
-  const gridHeight = gridContainer?.offsetHeight || 0
+  const gridWidth = useMemo(
+    () => gridContainer?.offsetWidth || 0,
+    [gridContainer],
+  )
+  const gridHeight = useMemo(
+    () => gridContainer?.offsetHeight || 0,
+    [gridContainer],
+  )
 
-  const originalWidth = image?.naturalWidth || gridWidth || 0
-  const originalHeight = image?.naturalHeight || gridHeight || 0
+  const originalWidth = useMemo(
+    () => image?.naturalWidth || gridWidth || 0,
+    [image, gridWidth],
+  )
+  const originalHeight = useMemo(
+    () => image?.naturalHeight || gridHeight || 0,
+    [image, gridHeight],
+  )
 
-  const effectiveWidth = originalWidth * zoomLevel
-  const effectiveHeight = originalHeight * zoomLevel
+  const effectiveWidth = useMemo(
+    () => originalWidth * zoomLevel,
+    [originalWidth, zoomLevel],
+  )
+  const effectiveHeight = useMemo(
+    () => originalHeight * zoomLevel,
+    [originalHeight, zoomLevel],
+  )
 
   const updatePosition = (
     dx: number,
     dy: number,
     isInverted: boolean = false,
   ) => {
-    const { current: gridSection } = gridSectionRef
-
-    if (!gridSection) return
-
     const shiftX = (effectiveWidth - originalWidth) / 2
     const shiftY = (effectiveHeight - originalHeight) / 2
 
@@ -137,9 +156,7 @@ const PanZoomContainer = ({
   }
 
   useEffect(() => {
-    if (effectiveWidth < viewportWidth || effectiveHeight < viewportHeight) {
-      updatePosition(0, 0)
-    }
+    updatePosition(0, 0)
   }, [zoomLevel])
 
   useEffect(() => {
