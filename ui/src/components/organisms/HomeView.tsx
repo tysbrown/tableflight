@@ -8,7 +8,6 @@ import LoadingView from "../molecules/LoadingView"
 import ControlPanel from "../molecules/ControlPanel"
 import NewTokenPanel from "../molecules/NewTokenPanel"
 import PanZoomContainer from "../molecules/PanZoomContainer"
-import Button from "../atoms/Button"
 
 const gamesQuery = gql`
   query Games {
@@ -112,12 +111,6 @@ const HomeView = () => {
       </PanZoomContainer>
 
       <ControlPanel>
-        <section css={[tw`flex justify-end`]}>
-          <Button style="primary" type="button" css={[tw`px-2 py-0`]}>
-            {Math.round(zoomLevel * 100)}%
-          </Button>
-        </section>
-
         <SliderInput
           name="cellSize"
           label="Cell Size"

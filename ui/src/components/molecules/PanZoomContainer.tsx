@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
+import Button from "../atoms/Button"
 
 type PanZoomContainerProps = {
   image: HTMLImageElement | null
@@ -168,6 +169,12 @@ const PanZoomContainer = ({
       >
         {children}
       </div>
+
+      <section css={[tw`absolute top-4 right-4`]}>
+        <Button style="primary" type="button" css={[tw`px-2 py-0`]}>
+          {Math.round(zoomLevel * 100)}%
+        </Button>
+      </section>
     </section>
   )
 }
