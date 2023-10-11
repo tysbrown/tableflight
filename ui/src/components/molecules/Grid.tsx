@@ -39,6 +39,7 @@ const Grid = ({
   zoomLevel,
 }: GridProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
+
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -118,7 +119,10 @@ const Grid = ({
   }
 
   return (
-    <div ref={containerRef} css={[tw`absolute top-0 left-0 right-0 bottom-0 overflow-hidden`]}>
+    <div
+      ref={containerRef}
+      css={[tw`absolute top-0 left-0 right-0 bottom-0 overflow-hidden`]}
+    >
       <svg
         onDrop={handleDrop}
         onDragOver={handleDragOver}
