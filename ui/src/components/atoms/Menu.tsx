@@ -1,8 +1,10 @@
 import { useRef, type ReactNode, type RefObject } from "react"
+import useOutsideClick from "../../../src/hooks/useOutsideClick"
 import tw from "twin.macro"
 
 type MenuProps = {
   isOpen: boolean
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   /**
    * The element that the menu should be positioned relative to.
    */
@@ -20,6 +22,7 @@ type MenuProps = {
  */
 export const Menu = ({
   isOpen,
+  setIsOpen,
   anchorElement,
   children,
   ...props
@@ -27,6 +30,8 @@ export const Menu = ({
   const menuRef = useRef<HTMLUListElement | null>(null)
   const { offsetWidth: menuOffsetWidth, scrollHeight: menuHeight } =
     menuRef?.current || {}
+
+  useOutsideClick(menuRef, anchorElement, () => setIsOpen(false))
 
   if (!anchorElement.current) return null
 
@@ -61,7 +66,7 @@ export const MenuItem = ({ children, ...props }: { children: ReactNode }) => {
   return (
     <li
       css={[
-        tw`bg-surfaceContainer h-10 py-2 px-3 min-w-[200px] cursor-pointer`,
+        tw`bg-surfaceContainer py-2 px-3 min-w-[200px] cursor-pointer`,
         tw`hover:bg-surfaceContainerHighest`,
       ]}
       {...props}
