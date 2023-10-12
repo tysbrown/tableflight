@@ -1,9 +1,8 @@
-import React from "react"
+import React, { useRef, useState } from "react"
 import tw from "twin.macro"
 import Button from "../atoms/Button"
 import { Menu, MenuItem } from "../atoms/Menu"
 import SliderInput from "../atoms/SliderInput"
-import { useRef, useState } from "react"
 
 type ZoomMenuProps = {
   zoomLevel: number
