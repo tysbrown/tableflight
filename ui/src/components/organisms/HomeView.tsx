@@ -7,7 +7,7 @@ import SliderInput from "../atoms/SliderInput"
 import LoadingView from "../molecules/LoadingView"
 import ControlPanel from "../molecules/ControlPanel"
 import NewTokenPanel from "../molecules/NewTokenPanel"
-import PanZoomContainer from "../molecules/PanZoomContainer"
+import PanZoomContainer from "./PanZoomContainer"
 
 const gamesQuery = gql`
   query Games {
