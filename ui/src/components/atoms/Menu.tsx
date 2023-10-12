@@ -1,28 +1,47 @@
-import type { ReactNode, RefObject } from "react"
+import { useRef, type ReactNode, type RefObject } from "react"
 import tw from "twin.macro"
 
 type MenuProps = {
   isOpen: boolean
+  /**
+   * The element that the menu should be positioned relative to.
+   */
   anchorElement: RefObject<HTMLElement>
   children: ReactNode
 }
 
+/**
+ * Dropdown menu component that dynamically positions itself relative to an anchor element
+ * and the viewport.
+ *
+ * @remarks
+ * 320 is the width of the control panel.
+ */
 export const Menu = ({ isOpen, anchorElement, children }: MenuProps) => {
-  if (!isOpen) return null
+  const menuRef = useRef<HTMLUListElement | null>(null)
 
-  // Guard against null or undefined values
+  if (!isOpen) return null
   if (!anchorElement.current) return null
 
-  const { top, left, right, height, width } =
+  const { top, left, right, height } =
     anchorElement.current.getBoundingClientRect()
+
+  const viewportWidth = window.innerWidth - 320
+
+  const menuWidth = menuRef?.current?.offsetWidth || 250
+
+  const tooCloseToRightEdge = right > viewportWidth - menuWidth - 20
+
+  const leftValue = tooCloseToRightEdge ? right - menuWidth : left
 
   return (
     <ul
+      ref={menuRef}
       css={[
-        tw`absolute z-[99999] flex flex-col bg-surfaceContainer rounded-md overflow-visible`,
+        tw`absolute z-50 flex flex-col bg-surfaceContainer rounded-md overflow-visible`,
         `
           top: ${top + height}px;
-          right: ${right - left - width}px;
+          left: ${leftValue}px;
         `,
       ]}
     >
@@ -39,9 +58,7 @@ export const MenuItem = ({
 }) => {
   return (
     <li
-      css={[
-        tw`bg-surfaceContainerHighest py-2 px-3 z-[99999] min-w-[250px] overflow-visible`,
-      ]}
+      css={[tw`bg-surfaceContainer py-2 px-3 min-w-[250px] overflow-visible`]}
       {...remainingProps}
     >
       {children}
