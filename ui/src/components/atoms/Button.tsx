@@ -2,7 +2,7 @@ import { forwardRef, LegacyRef } from "react"
 import tw from "twin.macro"
 
 type ButtonProps = {
-  style: "primary" | "secondary" | "tertiary" | "outline" | "link"
+  style: "primary" | "secondary" | "tertiary" | "outline" | "link" | "text"
   type: "submit" | "reset" | "button"
   disabled?: boolean
   onClick?: () => void
@@ -28,6 +28,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       outline: tw`bg-none border border-outline text-primary outlineHoverOverlay outlineFocusOverlay`,
       tertiary: tw`bg-tertiary border border-tertiary text-onTertiary`,
       link: tw`bg-none text-sm p-0 rounded-none text-primary underline`,
+      text: tw`bg-none text-sm p-0 rounded-none`,
     }
 
     return (
