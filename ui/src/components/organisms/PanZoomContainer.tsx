@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
-import Button from "../atoms/Button"
-import { Menu, MenuItem } from "../atoms/Menu"
-import SliderInput from "../atoms/SliderInput"
+import ZoomMenu from "../molecules/ZoomMenu"
 
 type PanZoomContainerProps = {
   image: HTMLImageElement | null
@@ -22,8 +20,6 @@ const PanZoomContainer = ({
   setZoomLevel,
   children,
 }: PanZoomContainerProps) => {
-  const [zoomMenuIsOpen, setZoomMenuIsOpen] = useState<boolean>(false)
-  const zoomMenuRef = useRef<HTMLButtonElement | null>(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
@@ -165,42 +161,14 @@ const PanZoomContainer = ({
       >
         {children}
       </div>
-
-      <Button
-        style="primary"
-        type="button"
-        ref={zoomMenuRef}
-        css={[tw`flex items-center gap-1 absolute top-4 right-4 px-2 py-0`]}
-        onClick={() => setZoomMenuIsOpen((prev) => !prev)}
-      >
-        {Math.round(zoomLevel * 100)}%
-        <svg
-          fill="#000000"
-          height="10px"
-          width="10px"
-          version="1.1"
-          id="Layer_1"
-          viewBox="0 0 386.257 386.257"
-        >
-          <polygon points="0,96.879 193.129,289.379 386.257,96.879 " />
-        </svg>
-      </Button>
-
-      <Menu anchorElement={zoomMenuRef} isOpen={zoomMenuIsOpen}>
-        <MenuItem>
-          <SliderInput
-            hideValueLabel
-            name="zoom"
-            min={0.1}
-            max={2}
-            step={0.01}
-            value={zoomLevel}
-            setValue={setZoomLevel}
-            onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
-            css={[tw`mb-4`]}
-          />
-        </MenuItem>
-      </Menu>
+      <ZoomMenu
+        zoomLevel={zoomLevel}
+        setZoomLevel={setZoomLevel}
+        viewportWidth={viewportWidth}
+        viewportHeight={viewportHeight}
+        originalWidth={originalWidth}
+        originalHeight={originalHeight}
+      />
     </section>
   )
 }
