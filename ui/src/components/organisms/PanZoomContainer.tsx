@@ -21,8 +21,8 @@ const PanZoomContainer = ({
   children,
 }: PanZoomContainerProps) => {
   const [position, setPosition] = useState({ x: 0, y: 0 })
-  const dragging = useRef(false)
   const lastPosition = useRef({ x: 0, y: 0 })
+  const dragging = useRef(false)
 
   const gridSectionRef = useRef<HTMLDivElement>(null)
   const gridContainerRef = useRef<HTMLDivElement>(null)
@@ -59,16 +59,17 @@ const PanZoomContainer = ({
 
     let newX, newY
 
-    // Horizontal positioning
-    if (effectiveWidth <= viewportWidth) {
+    const shouldCenterHorizontally = effectiveWidth <= viewportWidth
+    const shouldCenterVertically = effectiveHeight <= viewportHeight
+
+    if (shouldCenterHorizontally) {
       newX = (viewportWidth - effectiveWidth) / 2 + shiftX
     } else {
       newX =
         Math.max(Math.min(xPos, 0), viewportWidth - effectiveWidth) + shiftX
     }
 
-    // Vertical positioning
-    if (effectiveHeight <= viewportHeight) {
+    if (shouldCenterVertically) {
       newY = (viewportHeight - effectiveHeight) / 2 + shiftY
     } else {
       newY =
