@@ -50,7 +50,7 @@ export const Menu = ({
         `
           top: ${bottom + 2}px;
           left: ${leftValue}px;
-          transition: opacity 200ms linear, height 150ms ease-in-out;
+          transition: opacity 130ms linear, height 170ms ease-in-out;
         `,
         isOpen && tw`opacity-100`,
         isOpen && `height: ${menuHeight}px`,
