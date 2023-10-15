@@ -100,7 +100,6 @@ const PanZoomContainer = ({
     if (!gridSection || !gridContainer) return
 
     const { ctrlKey, metaKey, deltaX, deltaY } = e
-
     const isZooming = ctrlKey || metaKey
 
     if (isZooming) handleZoom(deltaY)
