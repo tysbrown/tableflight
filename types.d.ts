@@ -78,10 +78,7 @@ export type CharacterSheet = {
       name: string
       description: string
     }[]
-    spells: {
-      name: string
-      description: string
-    }[]
+    spells: Spell[]
     abilities: Abilities
     savingThrows: SavingThrows
     skills: Skills
