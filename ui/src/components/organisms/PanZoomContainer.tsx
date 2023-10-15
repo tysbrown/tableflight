@@ -57,24 +57,16 @@ const PanZoomContainer = ({
       ? position.y + dy - shiftY
       : position.y - dy - shiftY
 
-    let newX, newY
-
     const shouldCenterHorizontally = effectiveWidth <= viewportWidth
     const shouldCenterVertically = effectiveHeight <= viewportHeight
 
-    if (shouldCenterHorizontally) {
-      newX = (viewportWidth - effectiveWidth) / 2 + shiftX
-    } else {
-      newX =
-        Math.max(Math.min(xPos, 0), viewportWidth - effectiveWidth) + shiftX
-    }
+    const newX = shouldCenterHorizontally
+      ? (viewportWidth - effectiveWidth) / 2 + shiftX
+      : Math.max(Math.min(xPos, 0), viewportWidth - effectiveWidth) + shiftX
 
-    if (shouldCenterVertically) {
-      newY = (viewportHeight - effectiveHeight) / 2 + shiftY
-    } else {
-      newY =
-        Math.max(Math.min(yPos, 0), viewportHeight - effectiveHeight) + shiftY
-    }
+    const newY = shouldCenterVertically
+      ? (viewportHeight - effectiveHeight) / 2 + shiftY
+      : Math.max(Math.min(yPos, 0), viewportHeight - effectiveHeight) + shiftY
 
     setPosition({ x: newX, y: newY })
   }
