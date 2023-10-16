@@ -25,6 +25,7 @@ export const typeDefs = `#graphql
     id: ID!
     name: String!
     description: String
+    image: String
     createdAt: String!
     updatedAt: String!
   }
