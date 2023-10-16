@@ -14,6 +14,7 @@ export type Game = {
   id: number
   name: string
   description: string
+  image: string
   createdBy: User
   createdById: number
   Grid: GridType
