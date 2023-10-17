@@ -1,4 +1,4 @@
-import type { Game, GridType, Token } from "@/types"
+import type { GridType, Token } from "@/types"
 import React, { useRef, useState } from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
@@ -8,12 +8,14 @@ import LoadingView from "../molecules/LoadingView"
 import ControlPanel from "../molecules/ControlPanel"
 import NewTokenPanel from "../molecules/NewTokenPanel"
 import PanZoomContainer from "./PanZoomContainer"
+import GameSelectModal from "../molecules/GameSelectModal"
 
 const gamesQuery = gql`
   query Games {
     games {
       id
       description
+      image
       name
     }
   }
@@ -30,6 +32,8 @@ const HomeView = () => {
 
   const imageRef = useRef<HTMLImageElement | null>(null)
 
+  const [shouldShowGameSelect, setShouldShowGameSelect] =
+    useState<boolean>(true)
   const [cellSize, setCellSize] = useState(50)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [zoomLevel, setZoomLevel] = useState<number>(1)
@@ -120,12 +124,12 @@ const HomeView = () => {
           <input type="file" onChange={handleFileChange} accept="image/*" />
         </section>
       </ControlPanel>
-      <section css={[tw`absolute bottom-0 left-0`]}>
-        <h1>Games:</h1>
-        <ul>
-          {data?.games?.map((game: Game) => <li key={game.id}>{game.name}</li>)}
-        </ul>
-      </section>
+
+      <GameSelectModal
+        isOpen={shouldShowGameSelect}
+        setIsOpen={setShouldShowGameSelect}
+        games={data?.games}
+      />
     </main>
   )
 }
