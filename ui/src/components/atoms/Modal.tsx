@@ -1,11 +1,14 @@
 import React from "react"
+import { createPortal } from "react-dom"
 import { useDisableScroll } from "../../hooks/useDisableScroll"
 import tw from "twin.macro"
 
 type Props = {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  heading: string
+  heading?: string
+  noHeading?: boolean
+  noCloseOnOutsideClick?: boolean
   children: React.ReactNode
 }
 
@@ -13,19 +16,23 @@ const Modal = ({
   isOpen,
   setIsOpen,
   heading,
+  noHeading = false,
+  noCloseOnOutsideClick = false,
   children,
   ...remainingProps
 }: Props) => {
   useDisableScroll(isOpen)
 
   if (isOpen)
-    return (
+    return createPortal(
       <>
         <div
           css={[
-            tw`fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 z-[999]`,
+            tw`fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-90 z-[999]`,
           ]}
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            if (!noCloseOnOutsideClick) setIsOpen(false)
+          }}
         />
         <article
           css={[
@@ -33,38 +40,41 @@ const Modal = ({
           ]}
           {...remainingProps}
         >
-          <section
-            css={[tw`grid items-center h-[60px] border-b-gray-300 border-b`]}
-          >
-            <h2
-              css={[
-                tw`text-xl font-bold col-start-1 col-end-2 row-start-1 row-end-2 justify-self-center`,
-              ]}
+          {!noHeading && (
+            <section
+              css={[tw`grid items-center h-[60px] border-b-gray-300 border-b`]}
             >
-              {heading}
-            </h2>
-            <button
-              onClick={() => setIsOpen(false)}
-              css={[
-                tw`w-9 h-9 mr-4 rounded-full bg-gray-200 col-start-1 col-end-2 row-start-1 row-end-2 justify-self-end flex justify-center items-center`,
-              ]}
-            >
-              <svg
-                css={[tw`w-5 h-5 text-gray-500`]}
-                fill="currentColor"
-                viewBox="0 0 20 20"
+              <h2
+                css={[
+                  tw`text-xl font-bold col-start-1 col-end-2 row-start-1 row-end-2 justify-self-center`,
+                ]}
               >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M10 8.586L3.707 2.293 2.293 3.707 8.586 10l-6.293 6.293 1.414 1.414L10 11.414l6.293 6.293 1.414-1.414L11.414 10l6.293-6.293-1.414-1.414L10 8.586z"
-                />
-              </svg>
-            </button>
-          </section>
+                {heading}
+              </h2>
+              <button
+                onClick={() => setIsOpen(false)}
+                css={[
+                  tw`w-9 h-9 mr-4 rounded-full bg-gray-200 col-start-1 col-end-2 row-start-1 row-end-2 justify-self-end flex justify-center items-center`,
+                ]}
+              >
+                <svg
+                  css={[tw`w-5 h-5 text-gray-500`]}
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M10 8.586L3.707 2.293 2.293 3.707 8.586 10l-6.293 6.293 1.414 1.414L10 11.414l6.293 6.293 1.414-1.414L11.414 10l6.293-6.293-1.414-1.414L10 8.586z"
+                  />
+                </svg>
+              </button>
+            </section>
+          )}
           {children}
         </article>
-      </>
+      </>,
+      document.body,
     )
 
   return null
