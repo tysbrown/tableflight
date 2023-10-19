@@ -1,10 +1,10 @@
-import type { Token } from "@/types"
+import type { TokenType } from "@/types"
 import tw from "twin.macro"
 
 const NewTokenPanel = () => {
   const handleDragStart = (
     event: React.DragEvent<HTMLDivElement>,
-    token: Token,
+    token: TokenType,
   ) => {
     const data = JSON.stringify({
       newToken: true,

@@ -1,12 +1,11 @@
 import type { User } from "@/types"
 import { gql, useMutation } from "urql"
-import SignUpModal from "./SignUpModal"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
-import { useGlobalState } from "../../hooks/useGlobalState"
-import Button from "../atoms/Button"
-import TextInput from "../atoms/TextInput"
+import { useGlobalState } from "@/hooks/useGlobalState"
 import tw from "twin.macro"
+import { Button, TextInput } from "@/atoms"
+import { SignUpModal } from "@/molecules"
 
 const loginMutation = gql`
   mutation Login($email: String!, $password: String!) {

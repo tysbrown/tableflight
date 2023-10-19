@@ -20,12 +20,12 @@ export type Game = {
   Grid: GridType
 }
 
-export type Token = {
+export type TokenType = {
   id: string
   type: "player" | "enemy" | "npc" | "item"
 }
 
-export type GridType = (Token | null | undefined)[][]
+export type GridType = (TokenType | null | undefined)[][]
 
 export type CharacterSheet = {
   id: number

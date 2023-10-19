@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { isFirefox } from "../../utils"
+import { isFirefox } from "@/utils"
 import tw from "twin.macro"
 
 type SliderInputProps = {

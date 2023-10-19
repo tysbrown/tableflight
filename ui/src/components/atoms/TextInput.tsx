@@ -5,7 +5,7 @@ import {
   Merge,
   UseFormRegisterReturn,
 } from "react-hook-form"
-import { SignUpFormValues } from "../molecules/SignUpModal"
+import type { SignUpFormValues } from "@/molecules"
 import tw from "twin.macro"
 
 type TextInputProps = {

@@ -1,6 +1,6 @@
 import React from "react"
 import { createPortal } from "react-dom"
-import { useDisableScroll } from "../../hooks/useDisableScroll"
+import { useDisableScroll } from "@/hooks/useDisableScroll"
 import tw from "twin.macro"
 
 type Props = {

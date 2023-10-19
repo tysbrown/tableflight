@@ -1,10 +1,8 @@
 import React from "react"
 import tw from "twin.macro"
-import Modal from "../atoms/Modal"
-import { Game } from "@/types"
-import { List, ListItem } from "../atoms/List"
-import HeadlineSmall from "../atoms/HeadlineSmall"
-import BodyMedium from "../atoms/BodyMedium"
+import type { Game } from "@/types"
+import { List, ListItem, Modal } from "@/atoms"
+import { HeadlineSmall, BodyMedium } from "@/typography"
 
 type GameSelectModalProps = {
   isOpen: boolean

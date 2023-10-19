@@ -1,10 +1,23 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 // import fs from "fs"
-// import path from "path"
+import path from "path"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@/": path.resolve(__dirname, "src"),
+      "@/atoms": path.resolve(__dirname, "src/components/atoms"),
+      "@/molecules": path.resolve(__dirname, "src/components/molecules"),
+      "@/organisms": path.resolve(__dirname, "src/components/organisms"),
+      "@/typography": path.resolve(__dirname, "src/components/typography"),
+      "@/hooks": path.resolve(__dirname, "src/hooks"),
+      "@/contexts": path.resolve(__dirname, "src/contexts"),
+      "@/styles": path.resolve(__dirname, "src/styles"),
+      "@/utils": path.resolve(__dirname, "src/utils"),
+    },
+  },
   optimizeDeps: {
     esbuildOptions: {
       target: "es2020",

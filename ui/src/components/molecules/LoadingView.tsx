@@ -1,5 +1,5 @@
 import tw from "twin.macro"
-import LoadingIndicator from "../atoms/LoadingIndicator"
+import { LoadingIndicator } from "@/atoms"
 
 const LoadingView = () => (
   <section css={[tw`flex justify-center items-center min-h-screen`]}>

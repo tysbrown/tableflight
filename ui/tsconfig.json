@@ -35,7 +35,16 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/types": ["../types.d.ts"]
+      "@/*": ["./src/*"],
+      "@/types": ["../types.d.ts"],
+      "@/atoms": ["./src/components/atoms"],
+      "@/molecules": ["./src/components/molecules"],
+      "@/organisms": ["./src/components/organisms"],
+      "@/typography": ["./src/components/typography"],
+      "@/hooks": ["./src/hooks"],
+      "@/contexts": ["./src/contexts"],
+      "@/styles": ["./src/styles"],
+      "@/utils": ["./src/utils"],
     }
   },
   "include": ["src", "twin.d.ts", "../types.d.ts"],

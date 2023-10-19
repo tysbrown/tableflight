@@ -1,4 +1,4 @@
 import { useContext } from "react"
-import { GlobalStateContext } from "../context/GlobalStateProvider"
+import { GlobalStateContext } from "../contexts/GlobalStateProvider"
 
 export const useGlobalState = () => useContext(GlobalStateContext)

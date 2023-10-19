@@ -1,4 +1,4 @@
-import LoginBox from "../molecules/LoginBox"
+import { LoginBox } from "@/molecules"
 
 const LoginView = () => {
   return (

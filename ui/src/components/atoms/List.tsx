@@ -1,6 +1,5 @@
 import tw from "twin.macro"
-import BodyLarge from "./BodyLarge"
-import BodyMedium from "./BodyMedium"
+import { BodyMedium, BodyLarge } from "@/typography"
 
 export const List = ({ children, ...props }: { children: React.ReactNode }) => {
   return (
@@ -24,9 +23,7 @@ export const ListItem = ({
 }: ListItemProps) => {
   return (
     <li
-      css={[
-        tw`grid grid-cols-[min-content_1fr] grid-rows-2 gap-x-4 w-full`,
-      ]}
+      css={[tw`grid grid-cols-[min-content_1fr] grid-rows-2 gap-x-4 w-full`]}
       {...props}
     >
       <Image

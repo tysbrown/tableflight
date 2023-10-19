@@ -1,7 +1,7 @@
-import type { GridType, Token } from "@/types"
+import type { GridType, TokenType } from "@/types"
 import React, { useEffect, useRef } from "react"
 import tw from "twin.macro"
-import TokenComponent from "../atoms/Token"
+import { Token } from "@/atoms"
 
 type GridProps = {
   grid: GridType
@@ -9,7 +9,7 @@ type GridProps = {
   setDimensions: React.Dispatch<
     React.SetStateAction<{ width: number; height: number }>
   >
-  addTokenToGrid: (x: number, y: number, token: Token) => void
+  addTokenToGrid: (x: number, y: number, token: TokenType) => void
   removeTokenFromGrid: (x: number, y: number) => void
   rows: number
   cols: number
@@ -134,7 +134,7 @@ const Grid = ({
             if (!cell) return null
 
             return (
-              <TokenComponent
+              <Token
                 key={`${rowIndex}-${colIndex}`}
                 token={cell}
                 col={colIndex}

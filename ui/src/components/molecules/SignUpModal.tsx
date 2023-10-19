@@ -1,11 +1,9 @@
 import type { User } from "@/types"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import Modal from "../atoms/Modal"
-import TextInput from "../atoms/TextInput"
 import { useMutation, gql } from "urql"
-import Button from "../atoms/Button"
 import tw from "twin.macro"
+import { Modal, TextInput, Button } from "@/atoms"
 
 const signUpMutation = gql`
   mutation SignUp(

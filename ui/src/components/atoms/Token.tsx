@@ -1,14 +1,14 @@
-import { Token } from "@/types"
+import type { TokenType } from "@/types"
 import tw from "twin.macro"
 
 type TokenComponentProps = {
   row: number
   col: number
-  token: Token | null
+  token: TokenType | null
   cellSize: number
 }
 
-const TokenComponent = ({ row, col, token, cellSize }: TokenComponentProps) => {
+const Token = ({ row, col, token, cellSize }: TokenComponentProps) => {
   const { id, type } = token || {}
 
   const isPlayer = type === "player"
@@ -59,4 +59,4 @@ const TokenComponent = ({ row, col, token, cellSize }: TokenComponentProps) => {
   )
 }
 
-export default TokenComponent
+export default Token

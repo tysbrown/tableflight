@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
-import ZoomMenu from "../molecules/ZoomMenu"
+import { ZoomMenu } from "@/molecules"
 
 type PanZoomContainerProps = {
   image: HTMLImageElement | null

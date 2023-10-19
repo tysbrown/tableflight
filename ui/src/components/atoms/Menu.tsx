@@ -1,5 +1,5 @@
 import { useRef, type ReactNode, type RefObject } from "react"
-import useOutsideClick from "../../../src/hooks/useOutsideClick"
+import useOutsideClick from "@/hooks/useOutsideClick"
 import tw from "twin.macro"
 
 type MenuProps = {

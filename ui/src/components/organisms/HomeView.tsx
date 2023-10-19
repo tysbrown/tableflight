@@ -1,14 +1,16 @@
-import type { GridType, Token } from "@/types"
+import type { GridType, TokenType } from "@/types"
 import React, { useRef, useState } from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
-import Grid from "../molecules/Grid"
-import SliderInput from "../atoms/SliderInput"
-import LoadingView from "../molecules/LoadingView"
-import ControlPanel from "../molecules/ControlPanel"
-import NewTokenPanel from "../molecules/NewTokenPanel"
-import PanZoomContainer from "./PanZoomContainer"
-import GameSelectModal from "../molecules/GameSelectModal"
+import { SliderInput } from "@/atoms"
+import {
+  Grid,
+  LoadingView,
+  ControlPanel,
+  NewTokenPanel,
+  GameSelectModal,
+} from "@/molecules"
+import { PanZoomContainer } from "@/organisms"
 
 const gamesQuery = gql`
   query Games {
@@ -45,7 +47,7 @@ const HomeView = () => {
   const [grid, setGrid] = useState<GridType>(initialGrid)
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
 
-  const addTokenToGrid = (x: number, y: number, token: Token) => {
+  const addTokenToGrid = (x: number, y: number, token: TokenType) => {
     setGrid((prev) => {
       const newGrid = [...prev]
       if (!newGrid[y]) newGrid[y] = Array(cols).fill(null)
