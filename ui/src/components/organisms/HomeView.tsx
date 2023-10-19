@@ -1,4 +1,3 @@
-import type { GridType, TokenType } from "@/types"
 import React, { useRef, useState } from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
@@ -11,6 +10,8 @@ import {
   GameSelectModal,
 } from "@/molecules"
 import { PanZoomContainer } from "@/organisms"
+import { useGridState } from "@/hooks/useGridState"
+import { GridState } from "@/contexts/GridStateProvider"
 
 const gamesQuery = gql`
   query Games {
@@ -32,47 +33,31 @@ const HomeView = () => {
     query: gamesQuery,
   })
 
+  const { state, dispatch } = useGridState()
+
+  const { backgroundImage, cellSize } = state as GridState
+
   const imageRef = useRef<HTMLImageElement | null>(null)
 
-  const [shouldShowGameSelect, setShouldShowGameSelect] =
-    useState<boolean>(true)
-  const [cellSize, setCellSize] = useState(50)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
-  const [zoomLevel, setZoomLevel] = useState<number>(1)
-
-  const rows = Math.ceil(dimensions.height / cellSize)
-  const cols = Math.ceil(dimensions.width / cellSize)
-  const initialGrid = Array.from({ length: rows }, () => Array(cols).fill(null))
-
-  const [grid, setGrid] = useState<GridType>(initialGrid)
-  const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
-
-  const addTokenToGrid = (x: number, y: number, token: TokenType) => {
-    setGrid((prev) => {
-      const newGrid = [...prev]
-      if (!newGrid[y]) newGrid[y] = Array(cols).fill(null)
-      newGrid[y]![x] = token
-      return newGrid
-    })
-  }
-
-  const removeTokenFromGrid = (x: number, y: number) => {
-    setGrid((prev) => {
-      const newGrid = [...prev]
-      newGrid[y]![x] = null
-      return newGrid
-    })
-  }
+  // const [shouldShowGameSelect, setShouldShowGameSelect] =
+  //   useState<boolean>(true)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setBackgroundImage(reader.result as string)
+        dispatch({
+          type: "SET_BACKGROUND",
+          backgroundImage: reader.result as string,
+        })
       }
       reader.readAsDataURL(file)
     }
+  }
+
+  const setCellSize = (cellSize: number) => {
+    dispatch({ type: "SET_CELL_SIZE", cellSize })
   }
 
   if (fetching) return <LoadingView />
@@ -83,30 +68,17 @@ const HomeView = () => {
       <PanZoomContainer
         image={imageRef.current}
         backgroundImage={backgroundImage}
-        zoomLevel={zoomLevel}
-        setZoomLevel={setZoomLevel}
       >
         {backgroundImage && (
           <img
             src={backgroundImage}
             alt="Background"
             ref={imageRef}
-            onLoad={() => setZoomLevel(1)}
+            onLoad={() => dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: 1 })}
             css={[tw`max-w-none w-auto h-auto`]}
           />
         )}
-        <Grid
-          dimensions={dimensions}
-          grid={grid}
-          setDimensions={setDimensions}
-          addTokenToGrid={addTokenToGrid}
-          removeTokenFromGrid={removeTokenFromGrid}
-          rows={rows}
-          cols={cols}
-          cellSize={cellSize}
-          lineWidth={0.5}
-          zoomLevel={zoomLevel}
-        />
+        <Grid />
       </PanZoomContainer>
 
       <ControlPanel>
@@ -117,7 +89,12 @@ const HomeView = () => {
           setValue={setCellSize}
           min={10}
           max={100}
-          onChange={(e) => setCellSize(parseInt(e.target.value))}
+          onChange={(e) =>
+            dispatch({
+              type: "SET_CELL_SIZE",
+              cellSize: parseInt(e.target.value),
+            })
+          }
         />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <NewTokenPanel />
@@ -127,11 +104,11 @@ const HomeView = () => {
         </section>
       </ControlPanel>
 
-      <GameSelectModal
+      {/* <GameSelectModal
         isOpen={shouldShowGameSelect}
         setIsOpen={setShouldShowGameSelect}
         games={data?.games}
-      />
+      /> */}
     </main>
   )
 }

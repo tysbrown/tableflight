@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
 import { ZoomMenu } from "@/molecules"
+import { useGridState } from "@/hooks/useGridState"
+import { GridState } from "@/contexts/GridStateProvider"
 
 type PanZoomContainerProps = {
   image: HTMLImageElement | null
   backgroundImage: string | null
-  zoomLevel: number
-  setZoomLevel: React.Dispatch<React.SetStateAction<number>>
   children: React.ReactNode
 }
 
@@ -16,10 +16,11 @@ type PanZoomContainerProps = {
 const PanZoomContainer = ({
   image,
   backgroundImage,
-  zoomLevel,
-  setZoomLevel,
   children,
 }: PanZoomContainerProps) => {
+  const { state, dispatch } = useGridState()
+  const { zoomLevel } = state as GridState
+
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const lastPosition = useRef({ x: 0, y: 0 })
   const dragging = useRef(false)
@@ -110,7 +111,7 @@ const PanZoomContainer = ({
     const zoomDelta = -deltaY * 0.001
     const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
 
-    setZoomLevel(newZoom)
+    dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
   }
 
   const handlePanning = (deltaX: number, deltaY: number) => {
@@ -154,8 +155,6 @@ const PanZoomContainer = ({
         {children}
       </div>
       <ZoomMenu
-        zoomLevel={zoomLevel}
-        setZoomLevel={setZoomLevel}
         viewportWidth={viewportWidth}
         viewportHeight={viewportHeight}
         originalWidth={originalWidth}

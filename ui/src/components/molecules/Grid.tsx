@@ -1,22 +1,9 @@
-import type { GridType, TokenType } from "@/types"
 import React, { useEffect, useRef } from "react"
 import tw from "twin.macro"
 import { Token } from "@/atoms"
+import { useGridState } from "@/hooks/useGridState"
+import { GridState } from "@/contexts/GridStateProvider"
 
-type GridProps = {
-  grid: GridType
-  dimensions: { width: number; height: number }
-  setDimensions: React.Dispatch<
-    React.SetStateAction<{ width: number; height: number }>
-  >
-  addTokenToGrid: (x: number, y: number, token: TokenType) => void
-  removeTokenFromGrid: (x: number, y: number) => void
-  rows: number
-  cols: number
-  cellSize: number
-  lineWidth?: number
-  zoomLevel: number
-}
 /**
  * Dynamic SVG grid component that renders a grid of cells based on the dimensions
  * of its parent container and the provided cell size.
@@ -24,18 +11,11 @@ type GridProps = {
  * @remarks
  * The entire grid is a drop zone, and the Drag and Drop API is used to add and remove tokens.
  */
-const Grid = ({
-  grid,
-  dimensions,
-  setDimensions,
-  addTokenToGrid,
-  removeTokenFromGrid,
-  rows,
-  cols,
-  cellSize,
-  lineWidth = 0.5,
-  zoomLevel,
-}: GridProps) => {
+const Grid = () => {
+  const { state, dispatch } = useGridState()
+  const { grid, rows, cols, dimensions, lineWidth, cellSize, zoomLevel } =
+    state as GridState
+
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -46,7 +26,7 @@ const Grid = ({
         const width = containerRef.current.offsetWidth
         const height = containerRef.current.offsetHeight
 
-        setDimensions({ width, height })
+        dispatch({ type: "SET_DIMENSIONS", dimensions: { width, height } })
       }
     }
 
@@ -106,8 +86,8 @@ const Grid = ({
     const newCol = Math.floor(droppedX / cellSize / zoomLevel)
     const newRow = Math.floor(droppedY / cellSize / zoomLevel)
 
-    if (!newToken) removeTokenFromGrid(col, row)
-    addTokenToGrid(newCol, newRow, token)
+    if (!newToken) dispatch({ type: "REMOVE_TOKEN", x: col, y: row })
+    dispatch({ type: "ADD_TOKEN", x: newCol, y: newRow, token })
   }
 
   const handleDragOver = (event: React.DragEvent<SVGElement>) => {

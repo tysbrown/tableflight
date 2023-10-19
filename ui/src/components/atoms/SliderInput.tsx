@@ -6,7 +6,9 @@ type SliderInputProps = {
   name: string
   label?: string
   value: number
-  setValue: React.Dispatch<React.SetStateAction<number>>
+  setValue:
+    | React.Dispatch<React.SetStateAction<number>>
+    | ((value: number) => void)
   min?: number
   max?: number
   step?: number

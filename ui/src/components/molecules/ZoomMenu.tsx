@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react"
 import tw from "twin.macro"
 import { Menu, MenuItem, SliderInput, Button } from "@/atoms"
+import { useGridState } from "@/hooks/useGridState"
+import { GridState } from "@/contexts/GridStateProvider"
 
 type ZoomMenuProps = {
-  zoomLevel: number
-  setZoomLevel: React.Dispatch<React.SetStateAction<number>>
   viewportWidth: number
   viewportHeight: number
   originalWidth: number
@@ -12,13 +12,14 @@ type ZoomMenuProps = {
 }
 
 const ZoomMenu = ({
-  zoomLevel,
-  setZoomLevel,
   viewportWidth,
   viewportHeight,
   originalWidth,
   originalHeight,
 }: ZoomMenuProps) => {
+  const { state, dispatch } = useGridState()
+  const { zoomLevel } = state as GridState
+
   const [zoomMenuIsOpen, setZoomMenuIsOpen] = useState<boolean>(false)
   const zoomMenuRef = useRef<HTMLButtonElement | null>(null)
 
@@ -27,7 +28,11 @@ const ZoomMenu = ({
     const heightRatio = viewportHeight / originalHeight
     const newZoom = Math.min(widthRatio, heightRatio)
 
-    setZoomLevel(newZoom)
+    dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
+  }
+
+  const setZoomLevel = (newZoom: number) => {
+    dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
   }
 
   return (
