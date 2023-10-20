@@ -1,15 +1,10 @@
-import React, { useRef, useState } from "react"
+import React, { useState } from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
 import { SliderInput } from "@/atoms"
-import {
-  Grid,
-  LoadingView,
-  ControlPanel,
-  NewTokenPanel,
-  GameSelectModal,
-} from "@/molecules"
-import { PanZoomContainer } from "@/organisms"
+import { ControlPanel, NewTokenPanel, GameSelectModal } from "@/molecules"
+import { GameBoard } from "@/organisms"
+import { LoadingView } from "@/views"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
 
@@ -35,12 +30,13 @@ const HomeView = () => {
 
   const { state, dispatch } = useGridState()
 
-  const { backgroundImage, cellSize } = state as GridState
+  const { cellSize } = state as GridState
 
-  const imageRef = useRef<HTMLImageElement | null>(null)
-
-  // const [shouldShowGameSelect, setShouldShowGameSelect] =
-  //   useState<boolean>(true)
+  /**
+   * @todo - Change default to true and finish game select modal
+   */
+  const [shouldShowGameSelect, setShouldShowGameSelect] =
+    useState<boolean>(false)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null
@@ -65,21 +61,7 @@ const HomeView = () => {
 
   return (
     <main css={[tw`flex overflow-hidden`]}>
-      <PanZoomContainer
-        image={imageRef.current}
-        backgroundImage={backgroundImage}
-      >
-        {backgroundImage && (
-          <img
-            src={backgroundImage}
-            alt="Background"
-            ref={imageRef}
-            onLoad={() => dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: 1 })}
-            css={[tw`max-w-none w-auto h-auto`]}
-          />
-        )}
-        <Grid />
-      </PanZoomContainer>
+      <GameBoard />
 
       <ControlPanel>
         <SliderInput
@@ -104,11 +86,11 @@ const HomeView = () => {
         </section>
       </ControlPanel>
 
-      {/* <GameSelectModal
+      <GameSelectModal
         isOpen={shouldShowGameSelect}
         setIsOpen={setShouldShowGameSelect}
         games={data?.games}
-      /> */}
+      />
     </main>
   )
 }

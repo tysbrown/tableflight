@@ -1,8 +1,6 @@
-import HomeView from "./components/organisms/HomeView"
-import LoginView from "./components/organisms/LoginView"
 import { useGlobalState } from "./hooks/useGlobalState"
 import useInitializeAuth from "./hooks/useInitializeAuth"
-import LoadingView from "./components/molecules/LoadingView"
+import { LoadingView, LoginView, HomeView } from "@/views"
 
 const App = () => {
   const isInitialized = useInitializeAuth()

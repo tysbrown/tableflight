@@ -12,6 +12,7 @@ export default defineConfig({
       "@/molecules": path.resolve(__dirname, "src/components/molecules"),
       "@/organisms": path.resolve(__dirname, "src/components/organisms"),
       "@/typography": path.resolve(__dirname, "src/components/typography"),
+      "@/views": path.resolve(__dirname, "src/components/views"),
       "@/hooks": path.resolve(__dirname, "src/hooks"),
       "@/contexts": path.resolve(__dirname, "src/contexts"),
       "@/styles": path.resolve(__dirname, "src/styles"),

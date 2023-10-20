@@ -4,22 +4,12 @@ import { ZoomMenu } from "@/molecules"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
 
-type PanZoomContainerProps = {
-  image: HTMLImageElement | null
-  backgroundImage: string | null
-  children: React.ReactNode
-}
-
 /**
  * Container with custom panning and zooming functionality.
  */
-const PanZoomContainer = ({
-  image,
-  backgroundImage,
-  children,
-}: PanZoomContainerProps) => {
+const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
   const { state, dispatch } = useGridState()
-  const { zoomLevel } = state as GridState
+  const { backgroundImage, zoomLevel } = state as GridState
 
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const lastPosition = useRef({ x: 0, y: 0 })
@@ -37,19 +27,16 @@ const PanZoomContainer = ({
   const gridWidth = gridContainer?.offsetWidth || 0
   const gridHeight = gridContainer?.offsetHeight || 0
 
-  const originalWidth = image?.naturalWidth || gridWidth || 0
-  const originalHeight = image?.naturalHeight || gridHeight || 0
-
-  const effectiveWidth = originalWidth * zoomLevel
-  const effectiveHeight = originalHeight * zoomLevel
+  const effectiveWidth = gridWidth * zoomLevel
+  const effectiveHeight = gridHeight * zoomLevel
 
   const updatePosition = (
     dx: number,
     dy: number,
     isInverted: boolean = false,
   ) => {
-    const shiftX = (effectiveWidth - originalWidth) / 2
-    const shiftY = (effectiveHeight - originalHeight) / 2
+    const shiftX = (effectiveWidth - gridWidth) / 2
+    const shiftY = (effectiveHeight - gridHeight) / 2
 
     const xPos = isInverted
       ? position.x + dx - shiftX
@@ -157,8 +144,8 @@ const PanZoomContainer = ({
       <ZoomMenu
         viewportWidth={viewportWidth}
         viewportHeight={viewportHeight}
-        originalWidth={originalWidth}
-        originalHeight={originalHeight}
+        originalWidth={gridWidth}
+        originalHeight={gridHeight}
       />
     </section>
   )

@@ -41,10 +41,11 @@
       "@/molecules": ["./src/components/molecules"],
       "@/organisms": ["./src/components/organisms"],
       "@/typography": ["./src/components/typography"],
+      "@/views": ["./src/components/views"],
       "@/hooks": ["./src/hooks"],
       "@/contexts": ["./src/contexts"],
       "@/styles": ["./src/styles"],
-      "@/utils": ["./src/utils"],
+      "@/utils": ["./src/utils"]
     }
   },
   "include": ["src", "twin.d.ts", "../types.d.ts"],
