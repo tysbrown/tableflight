@@ -13,17 +13,24 @@ type ListItemProps = {
   image: string
   title: string
   description: string
+  showArrow?: boolean
+  onClick?: () => void
 }
 
 export const ListItem = ({
   image,
   title,
   description,
+  showArrow,
+  onClick,
   ...props
 }: ListItemProps) => {
   return (
     <li
-      css={[tw`grid grid-cols-[min-content_1fr] grid-rows-2 gap-x-4 w-full`]}
+      css={[
+        tw`grid grid-cols-[min-content_1fr_min-content] grid-rows-2 gap-x-4`,
+      ]}
+      onClick={onClick}
       {...props}
     >
       <Image
@@ -33,9 +40,22 @@ export const ListItem = ({
       <BodyLarge css={[tw`col-start-2 col-end-3 row-start-1 row-end-2`]}>
         {title}
       </BodyLarge>
-      <BodyMedium css={[tw`col-start-2 col-end-3 row-start-2 row-end-3`]}>
+      <BodyMedium
+        css={[tw`col-start-2 col-end-3 row-start-2 row-end-3`]}
+      >
         {description}
       </BodyMedium>
+      {showArrow && (
+        <svg
+          fill="#C9C5CA"
+          height="10px"
+          width="10px"
+          viewBox="0 0 386.257 386.257"
+          css={[tw`col-start-3 col-end-4 row-start-1 row-end-3 self-center`]}
+        >
+          <polygon points="96.879,0 96.879,386.257 289.379,193.129" />
+        </svg>
+      )}
     </li>
   )
 }
