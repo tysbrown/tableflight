@@ -3,6 +3,7 @@ import { GridType, TokenType } from "@/types"
 
 export type GridState = {
   grid: GridType
+  gameSessionId?: number | null
   rows: number
   cols: number
   cellSize: number
@@ -27,6 +28,7 @@ type ActionType =
     }
   | { type: "SET_CELL_SIZE"; cellSize: number }
   | { type: "SET_ZOOM_LEVEL"; zoomLevel: number }
+  | { type: "SET_GAME_SESSION_ID"; gameSessionId: number }
 
 const gridReducer = (state: GridState, action: ActionType): GridState => {
   switch (action.type) {
@@ -73,6 +75,11 @@ const gridReducer = (state: GridState, action: ActionType): GridState => {
         ...state,
         zoomLevel: action.zoomLevel,
       }
+    case "SET_GAME_SESSION_ID":
+      return {
+        ...state,
+        gameSessionId: action.gameSessionId,
+      }
     default:
       return state
   }
@@ -92,6 +99,7 @@ const initialState: GridState = {
   backgroundImage: null,
   lineWidth: 0.5,
   zoomLevel: 1,
+  gameSessionId: null,
 }
 
 export const GridStateContext = createContext<GridContextType>({

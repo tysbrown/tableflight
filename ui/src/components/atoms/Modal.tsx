@@ -5,7 +5,7 @@ import tw from "twin.macro"
 
 type Props = {
   isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
   heading?: string
   noHeading?: boolean
   noCloseOnOutsideClick?: boolean
@@ -31,7 +31,7 @@ const Modal = ({
             tw`fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-90 z-[999]`,
           ]}
           onClick={() => {
-            if (!noCloseOnOutsideClick) setIsOpen(false)
+            if (!noCloseOnOutsideClick && setIsOpen) setIsOpen(false)
           }}
         />
         <article
@@ -40,7 +40,7 @@ const Modal = ({
           ]}
           {...remainingProps}
         >
-          {!noHeading && (
+          {!noHeading && setIsOpen && (
             <section
               css={[tw`grid items-center h-[60px] border-b-gray-300 border-b`]}
             >

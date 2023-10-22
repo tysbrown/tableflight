@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
 import { SliderInput } from "@/atoms"
@@ -20,8 +20,6 @@ const gamesQuery = gql`
 `
 /**
  * The main view of the application when the user logs in.
- *
- * @todo - Add inputs for dynamic height and width setting when there's no background image.
  */
 const HomeView = () => {
   const [{ data, fetching, error }] = useQuery({
@@ -29,14 +27,7 @@ const HomeView = () => {
   })
 
   const { state, dispatch } = useGridState()
-
   const { cellSize } = state as GridState
-
-  /**
-   * @todo - Change default to true and finish game select modal
-   */
-  const [shouldShowGameSelect, setShouldShowGameSelect] =
-    useState<boolean>(false)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null
@@ -86,11 +77,7 @@ const HomeView = () => {
         </section>
       </ControlPanel>
 
-      <GameSelectModal
-        isOpen={shouldShowGameSelect}
-        setIsOpen={setShouldShowGameSelect}
-        games={data?.games}
-      />
+      <GameSelectModal games={data?.games} />
     </main>
   )
 }
