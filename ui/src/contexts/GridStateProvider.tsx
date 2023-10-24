@@ -14,21 +14,51 @@ export type GridState = {
 }
 
 type ActionType =
-  | {
-      type: "ADD_TOKEN"
-      x: number
-      y: number
-      token: TokenType
-    }
-  | { type: "REMOVE_TOKEN"; x: number; y: number }
-  | { type: "SET_BACKGROUND"; backgroundImage: string }
-  | {
-      type: "SET_DIMENSIONS"
-      dimensions: { width: number; height: number }
-    }
-  | { type: "SET_CELL_SIZE"; cellSize: number }
-  | { type: "SET_ZOOM_LEVEL"; zoomLevel: number }
-  | { type: "SET_GAME_SESSION_ID"; gameSessionId: number }
+  | AddTokenAction
+  | RemoveTokenAction
+  | SetBackgroundAction
+  | SetDimensionsAction
+  | SetCellSizeAction
+  | SetZoomLevelAction
+  | SetGameSessionIdAction
+
+type AddTokenAction = {
+  type: "ADD_TOKEN"
+  x: number
+  y: number
+  token: TokenType
+}
+
+type RemoveTokenAction = {
+  type: "REMOVE_TOKEN"
+  x: number
+  y: number
+}
+
+type SetBackgroundAction = {
+  type: "SET_BACKGROUND"
+  backgroundImage: string
+}
+
+type SetDimensionsAction = {
+  type: "SET_DIMENSIONS"
+  dimensions: { width: number; height: number }
+}
+
+type SetCellSizeAction = {
+  type: "SET_CELL_SIZE"
+  cellSize: number
+}
+
+type SetZoomLevelAction = {
+  type: "SET_ZOOM_LEVEL"
+  zoomLevel: number
+}
+
+type SetGameSessionIdAction = {
+  type: "SET_GAME_SESSION_ID"
+  gameSessionId: number
+}
 
 const gridReducer = (state: GridState, action: ActionType): GridState => {
   switch (action.type) {
