@@ -17,12 +17,19 @@ export type Game = {
   image: string
   createdBy: User
   createdById: number
-  Grid: GridType
+  ownedBy: User
+  ownedById: number
+  grid: GridType
+  party: User[]
 }
 
 export type TokenType = {
   id: string
   type: "player" | "enemy" | "npc" | "item"
+  createdBy: User
+  createdById: number
+  ownedBy: User
+  ownedById: number
 }
 
 export type GridType = (TokenType | null | undefined)[][]
