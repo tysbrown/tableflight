@@ -36,8 +36,9 @@ export const setRefreshTokenCookie = (res: Response, token: string) => {
   res.cookie("jid", token, {
     httpOnly: true,
     path: "/",
-    // secure: true,
-    // sameSite: "none",
+    secure: true,
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   })
 }
 
@@ -46,6 +47,6 @@ export const clearRefreshTokenCookie = (res: Response) => {
     httpOnly: true,
     path: "/refresh_token",
     secure: true,
-    sameSite: "none",
+    sameSite: "strict",
   })
 }
