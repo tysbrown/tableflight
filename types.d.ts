@@ -1,5 +1,10 @@
 /// <reference types="@emotion/react/types/css-prop" />
 
+export type InitialContext = YogaInitialContext & {
+  req: Request
+  res: Response
+}
+
 export type User = {
   id: number
   tokenVersion: number

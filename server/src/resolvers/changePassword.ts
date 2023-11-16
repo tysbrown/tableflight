@@ -5,7 +5,7 @@ import { compare, hash, genSalt } from "bcrypt"
 export const changePassword = async (
   _: never,
   args: { oldPassword: string; newPassword: string },
-  context: Context
+  context: Context,
 ) => {
   const { oldPassword, newPassword } = args
   const { prisma, user } = context
@@ -14,7 +14,7 @@ export const changePassword = async (
     throw new GraphQLError("You are not authorized to make this request.", {
       extensions: {
         code: "UNAUTHORIZED",
-        http: 401,
+        httpStatus: 401,
       },
     })
   }
@@ -27,7 +27,7 @@ export const changePassword = async (
     throw new GraphQLError("The old password you entered is invalid.", {
       extensions: {
         code: "BAD_USER_INPUT",
-        http: 400,
+        httpStatus: 400,
       },
     })
   }

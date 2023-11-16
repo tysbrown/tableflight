@@ -11,7 +11,7 @@ import { Context } from "../context.js"
 export const login = async (
   _: never,
   { email, password }: Partial<User>,
-  context: Context
+  context: Context,
 ) => {
   const { res, prisma } = context
 
@@ -25,7 +25,7 @@ export const login = async (
     throw new GraphQLError("The username you entered does not exist", {
       extensions: {
         code: "BAD_USER_INPUT",
-        http: 401,
+        httpStatus: 401,
       },
     })
   }
