@@ -32,7 +32,7 @@ const yoga = createYoga({
   schema: createSchema({
     typeDefs,
     resolvers,
-  }) as any,
+  }),
   context: ({ req, res }: InitialContext) => createContext(req, res),
 })
 
