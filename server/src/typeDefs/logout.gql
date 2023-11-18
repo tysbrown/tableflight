@@ -1,0 +1,7 @@
+type Logout {
+  message: String
+}
+
+type Mutation {
+  logout: Logout
+}

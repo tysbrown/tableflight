@@ -1,0 +1,18 @@
+type User {
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  createdAt: String!
+  updatedAt: String!
+  games: [Game]
+}
+
+type Login {
+  accessToken: String
+  user: User
+}
+
+type Mutation {
+  login(email: String!, password: String!): Login
+}

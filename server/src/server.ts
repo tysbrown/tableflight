@@ -1,8 +1,10 @@
 import { createSchema, createYoga } from "graphql-yoga"
+import { mergeResolvers, mergeTypeDefs } from "@graphql-tools/merge"
+import { loadFilesSync } from "@graphql-tools/load-files"
 import express, { Request, Response } from "express"
+import path from "path"
 import cors from "cors"
 import bodyParser from "body-parser"
-import { typeDefs, resolvers } from "./schema.js"
 import { context } from "./context.js"
 import {
   createAccessToken,
@@ -14,6 +16,12 @@ import pkg, { JwtPayload } from "jsonwebtoken"
 import cookieParser from "cookie-parser"
 import { InitialContext } from "@/types"
 const { verify } = pkg
+
+const resolversPath = path.join(__dirname, "./resolvers")
+const typeDefsPath = path.join(__dirname, "./typeDefs")
+
+const resolvers = loadFilesSync(resolversPath, { extensions: ["js"] })
+const typeDefs = loadFilesSync(typeDefsPath, { extensions: ["gql"] })
 
 const createContext = (req: Request, res: Response) => {
   const { authorization } = req.headers
@@ -30,8 +38,8 @@ const createContext = (req: Request, res: Response) => {
 
 const yoga = createYoga({
   schema: createSchema({
-    typeDefs,
-    resolvers,
+    typeDefs: mergeTypeDefs(typeDefs),
+    resolvers: mergeResolvers(resolvers),
   }),
   context: ({ req, res }: InitialContext) => createContext(req, res),
 })

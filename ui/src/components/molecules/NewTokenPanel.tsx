@@ -4,7 +4,7 @@ import tw from "twin.macro"
 const NewTokenPanel = () => {
   const handleDragStart = (
     event: React.DragEvent<HTMLDivElement>,
-    token: TokenType,
+    token: Partial<TokenType>,
   ) => {
     const data = JSON.stringify({
       newToken: true,
