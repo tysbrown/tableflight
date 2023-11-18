@@ -2,6 +2,14 @@
 
 The virtual tabletop we all want, with AI and Discord integration.
 
+Frontend
+React + TypeScript + Vite + Tailwind + URQL
+Single Page Application that uses URQL to talk with the backend.
+
+Backend 
+Node + TypeScript + GraphQL Yoga + Prisma
+GraphQL API running The Guild's ecosystem, with Prisma as the ORM.
+
 ## Local Development
 
 ### You need a database
