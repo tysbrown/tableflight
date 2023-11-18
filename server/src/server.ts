@@ -23,10 +23,10 @@ const generateSchema = () => {
   const resolvers = loadFilesSync(modulesPath, { extensions: ["js"] })
   const typeDefs = loadFilesSync(modulesPath, { extensions: ["gql"] })
 
-  return {
+  return createSchema({
     typeDefs: mergeTypeDefs(typeDefs),
     resolvers: mergeResolvers(resolvers),
-  }
+  })
 }
 
 const createContext = (req: Request, res: Response) => {
@@ -43,7 +43,7 @@ const createContext = (req: Request, res: Response) => {
 }
 
 const yoga = createYoga({
-  schema: createSchema(generateSchema()),
+  schema: generateSchema(),
   context: ({ req, res }: InitialContext) => createContext(req, res),
 })
 
