@@ -1,5 +1,6 @@
 import type { Game } from "@/types"
-import type { Context } from "../context"
+import { GraphQLError } from "graphql"
+import type { Context } from "~/context"
 
 export default {
   Mutation: {
@@ -8,6 +9,16 @@ export default {
       { name, description }: Partial<Game>,
       { prisma, user }: Context,
     ) => {
+      if (!user)
+        throw new GraphQLError("You are not authorized to make this request.", {
+          extensions: {
+            code: "UNAUTHORIZED",
+            http: {
+              status: 401,
+            },
+          },
+        })
+
       const game = await prisma.game.create({
         data: {
           name,

@@ -1,5 +1,5 @@
+import type { Context } from "~/context"
 import { GraphQLError } from "graphql"
-import type { Context } from "../context"
 import { compare, hash, genSalt } from "bcrypt"
 
 export default {
@@ -12,14 +12,15 @@ export default {
       const { oldPassword, newPassword } = args
       const { prisma, user } = context
 
-      if (!user) {
+      if (!user)
         throw new GraphQLError("You are not authorized to make this request.", {
           extensions: {
             code: "UNAUTHORIZED",
-            httpStatus: 401,
+            http: {
+              status: 401,
+            },
           },
         })
-      }
 
       const { id: userId, password } = user
 

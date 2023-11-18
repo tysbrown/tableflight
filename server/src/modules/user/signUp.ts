@@ -1,5 +1,5 @@
 import type { User } from "@/types"
-import type { Context } from "../context"
+import type { Context } from "~/context"
 import { genSalt, hash } from "bcrypt"
 
 export default {

@@ -1,14 +1,12 @@
-import { clearRefreshTokenCookie } from "../auth.js"
-import type { Context } from "../context"
+import { clearRefreshTokenCookie } from "../../auth.js"
+import type { Context } from "~/context"
 
 export default {
   Mutation: {
     logout: async (_: never, __: never, context: Context) => {
       const { res, prisma, user } = context
 
-      if (!user) {
-        throw new Error("You are not authenticated.")
-      }
+      if (!user) throw new Error("You are not logged in.")
 
       await prisma.user.update({
         where: { id: user.id },

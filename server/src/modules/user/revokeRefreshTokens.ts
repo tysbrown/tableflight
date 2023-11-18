@@ -1,5 +1,5 @@
 import type { User } from "@/types"
-import { Context } from "../context"
+import type { Context } from "~/context"
 
 export default {
   Mutation: {

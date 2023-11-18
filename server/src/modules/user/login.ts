@@ -1,12 +1,12 @@
 import type { User } from "@/types"
+import type { Context } from "~/context"
 import { compare } from "bcrypt"
 import { GraphQLError } from "graphql"
 import {
   createAccessToken,
   createRefreshToken,
   setRefreshTokenCookie,
-} from "../auth.js"
-import { Context } from "../context"
+} from "../../auth.js"
 
 export default {
   Mutation: {
@@ -23,14 +23,13 @@ export default {
         },
       })
 
-      if (!user) {
+      if (!user)
         throw new GraphQLError("The username you entered does not exist", {
           extensions: {
             code: "BAD_USER_INPUT",
             httpStatus: 401,
           },
         })
-      }
 
       const isMatch = await compare(password, user?.password)
 

@@ -17,11 +17,17 @@ import cookieParser from "cookie-parser"
 import { InitialContext } from "@/types"
 const { verify } = pkg
 
-const resolversPath = path.join(__dirname, "./resolvers")
-const typeDefsPath = path.join(__dirname, "./typeDefs")
+const generateSchema = () => {
+  const modulesPath = path.join(__dirname, "./modules")
 
-const resolvers = loadFilesSync(resolversPath, { extensions: ["js"] })
-const typeDefs = loadFilesSync(typeDefsPath, { extensions: ["gql"] })
+  const resolvers = loadFilesSync(modulesPath, { extensions: ["js"] })
+  const typeDefs = loadFilesSync(modulesPath, { extensions: ["gql"] })
+
+  return {
+    typeDefs: mergeTypeDefs(typeDefs),
+    resolvers: mergeResolvers(resolvers),
+  }
+}
 
 const createContext = (req: Request, res: Response) => {
   const { authorization } = req.headers
@@ -37,10 +43,7 @@ const createContext = (req: Request, res: Response) => {
 }
 
 const yoga = createYoga({
-  schema: createSchema({
-    typeDefs: mergeTypeDefs(typeDefs),
-    resolvers: mergeResolvers(resolvers),
-  }),
+  schema: createSchema(generateSchema()),
   context: ({ req, res }: InitialContext) => createContext(req, res),
 })
 

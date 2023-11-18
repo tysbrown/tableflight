@@ -1,7 +1,0 @@
-type revokeRefreshTokens {
-  message: String
-}
-
-type Mutation {
-  revokeRefreshTokens(id: ID!): revokeRefreshTokens
-}
