@@ -42,7 +42,7 @@ const SliderInput = ({
   const percentage = ((value - min) / (max - min)) * 100
 
   const handleMouseMove = (e: MouseEvent) => {
-    const rect = sliderRef!.current!.getBoundingClientRect()
+    const rect = sliderRef.current!.getBoundingClientRect()
     let newValue = ((e.clientX - rect.left) / rect.width) * (max - min) + min
 
     // Adjust for step
@@ -64,17 +64,17 @@ const SliderInput = ({
   }
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = sliderRef!.current!.getBoundingClientRect()
+    const rect = sliderRef.current!.getBoundingClientRect()
     const clickPosition = e.clientX - rect.left
     const width = rect.width
 
     const clickedPercentage = (clickPosition / width) * 100
 
-    const minVal = sliderRef!.current!.min
-      ? parseFloat(sliderRef!.current!.min)
+    const minVal = sliderRef.current!.min
+      ? parseFloat(sliderRef.current!.min)
       : 0
-    const maxVal = sliderRef!.current!.max
-      ? parseFloat(sliderRef!.current!.max)
+    const maxVal = sliderRef.current!.max
+      ? parseFloat(sliderRef.current!.max)
       : 100
 
     let newValue = (clickedPercentage / 100) * (maxVal - minVal) + minVal

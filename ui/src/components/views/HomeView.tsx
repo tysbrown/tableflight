@@ -23,7 +23,7 @@ const gamesQuery = gql`
  * The main view of the application when the user logs in.
  */
 const HomeView = () => {
-  const [{ data, fetching, error }] = useQuery<Game[]>({
+  const [{ data, fetching, error }] = useQuery<{ games: Game[] }>({
     query: gamesQuery,
   })
 
