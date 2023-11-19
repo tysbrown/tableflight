@@ -21,6 +21,7 @@ module.exports = {
       "error",
       { varsIgnorePattern: "^React$" },
     ],
+    "react/no-unknown-property": ["error", { ignore: ["css", "tw"] }],
   },
   parserOptions: {
     ecmaVersion: "latest",
