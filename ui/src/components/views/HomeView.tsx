@@ -7,6 +7,7 @@ import { GameBoard } from "@/organisms"
 import { LoadingView } from "@/views"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
+import { Game } from "@/types"
 
 const gamesQuery = gql`
   query Games {
@@ -22,7 +23,7 @@ const gamesQuery = gql`
  * The main view of the application when the user logs in.
  */
 const HomeView = () => {
-  const [{ data, fetching, error }] = useQuery({
+  const [{ data, fetching, error }] = useQuery<Game[]>({
     query: gamesQuery,
   })
 

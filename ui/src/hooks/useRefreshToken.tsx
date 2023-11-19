@@ -1,3 +1,4 @@
+import { User } from "@/types"
 import { useGlobalState } from "./useGlobalState"
 
 export const useRefreshToken = () => {
@@ -10,7 +11,8 @@ export const useRefreshToken = () => {
         credentials: "include",
       })
 
-      const { accessToken, user } = await response.json()
+      const { accessToken, user } =
+        (await response.json()) as RefreshTokenResponse
 
       if (!accessToken) {
         setState({ ...state, isLoggedIn: false })
@@ -26,4 +28,9 @@ export const useRefreshToken = () => {
   }
 
   return refresh
+}
+
+type RefreshTokenResponse = {
+  accessToken: string
+  user: User
 }

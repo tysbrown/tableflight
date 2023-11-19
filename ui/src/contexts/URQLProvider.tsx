@@ -6,6 +6,7 @@ import { authExchange } from "@urql/exchange-auth"
 import { cacheExchange } from "@urql/exchange-graphcache"
 import { useRefreshToken } from "../hooks/useRefreshToken"
 import { useGlobalState } from "../hooks/useGlobalState"
+import { GraphQLError } from "graphql"
 
 /**
  * Provider for the URQL GraphQL client
@@ -22,7 +23,7 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
     url: `/graphql`,
     exchanges: [
       cacheExchange({}),
-      authExchange(async (utils: AuthUtilities): Promise<AuthConfig> => {
+      authExchange((utils: AuthUtilities): Promise<AuthConfig> => {
         return {
           addAuthToOperation(operation: Operation) {
             if (accessToken)
@@ -32,7 +33,7 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
               })
             return operation
           },
-          didAuthError: (error) => {
+          didAuthError: (error: { graphQLErrors: GraphQLError[] }) => {
             return error.graphQLErrors.some(
               (e) => e.extensions?.code === "UNAUTHORIZED",
             )
