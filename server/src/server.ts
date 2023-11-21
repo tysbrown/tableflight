@@ -67,7 +67,7 @@ const handleRefreshToken = async (req: Request, res: Response) => {
 
     return res.send({ ok: true, accessToken: createAccessToken(user), user })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     return res.send({ ok: false, accessToken: "" })
   }
 }
