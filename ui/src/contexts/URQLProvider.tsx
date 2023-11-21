@@ -1,5 +1,4 @@
 import type { Operation } from "urql"
-import type { AuthConfig, AuthUtilities } from "@urql/exchange-auth"
 import type { ReactNode } from "react"
 import { Client, Provider, fetchExchange } from "urql"
 import { authExchange } from "@urql/exchange-auth"
@@ -23,7 +22,6 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
     url: `/graphql`,
     exchanges: [
       cacheExchange({}),
-      fetchExchange,
       authExchange((utils) => {
         return Promise.resolve({
           addAuthToOperation(operation: Operation) {
@@ -40,11 +38,12 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
               (e) => e.extensions?.code === "UNAUTHORIZED",
             )
           },
-          async refreshAuth() {
+          refreshAuth: async () => {
             await refreshToken()
           },
         })
       }),
+      fetchExchange,
     ],
   })
 
