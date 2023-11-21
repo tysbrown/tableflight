@@ -35,6 +35,7 @@ const createContext = (req: Request, res: Response) => {
   if (authorization) {
     const token = authorization.split(" ")[1]
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET) as JwtPayload
+
     const user = getUser(context, payload.userId)
     return { ...context, req, res, user }
   }
