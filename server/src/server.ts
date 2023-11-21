@@ -52,19 +52,24 @@ const handleRefreshToken = async (req: Request, res: Response) => {
 
   if (!refreshToken) return res.send({ ok: false, accessToken: "" })
 
-  const payload = verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-  ) as JwtPayload
+  try {
+    const payload = verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+    ) as JwtPayload
 
-  const user = await getUser(context, payload.userId)
+    const user = await getUser(context, payload.userId)
 
-  if (!user || user.tokenVersion !== payload.tokenVersion)
+    if (!user || user.tokenVersion !== payload.tokenVersion)
+      return res.send({ ok: false, accessToken: "" })
+
+    setRefreshTokenCookie(res, createRefreshToken(user))
+
+    return res.send({ ok: true, accessToken: createAccessToken(user), user })
+  } catch (err) {
+    console.log(err)
     return res.send({ ok: false, accessToken: "" })
-
-  setRefreshTokenCookie(res, createRefreshToken(user))
-
-  return res.send({ ok: true, accessToken: createAccessToken(user), user })
+  }
 }
 
 const app = express()
