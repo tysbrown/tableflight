@@ -23,14 +23,16 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
     url: `/graphql`,
     exchanges: [
       cacheExchange({}),
-      authExchange((utils: AuthUtilities): Promise<AuthConfig> => {
-        return {
+      fetchExchange,
+      authExchange((utils) => {
+        return Promise.resolve({
           addAuthToOperation(operation: Operation) {
-            if (accessToken)
+            if (accessToken) {
               return utils.appendHeaders(operation, {
                 Authorization: `Bearer ${accessToken}`,
                 "Apollo-Require-Preflight": "true",
               })
+            }
             return operation
           },
           didAuthError: (error: { graphQLErrors: GraphQLError[] }) => {
@@ -38,12 +40,11 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
               (e) => e.extensions?.code === "UNAUTHORIZED",
             )
           },
-          refreshAuth: async () => {
+          async refreshAuth() {
             await refreshToken()
           },
-        }
+        })
       }),
-      fetchExchange,
     ],
   })
 

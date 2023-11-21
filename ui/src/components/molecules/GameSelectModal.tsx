@@ -7,7 +7,7 @@ import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
 
 type GameSelectModalProps = {
-  games: Game[]
+  games: Game[] | undefined
 }
 
 const GameSelectModal = ({ games }: GameSelectModalProps) => {
@@ -28,7 +28,7 @@ const GameSelectModal = ({ games }: GameSelectModalProps) => {
         list below, or create a new one.
       </BodyMedium>
       <List css={[tw`my-6`]}>
-        {games.map(({ id, image, name, description }, index) => (
+        {games?.map(({ id, image, name, description }, index) => (
           <>
             <ListItem
               key={id}
