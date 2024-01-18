@@ -74,6 +74,7 @@ const HomeView = () => {
         <NewTokenPanel />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <section>
+          <h2 css={[tw`mb-3`]}>Upload Map</h2>
           <input type="file" onChange={handleFileChange} accept="image/*" />
         </section>
       </ControlPanel>

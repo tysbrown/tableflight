@@ -132,7 +132,8 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
       <div
         ref={gridContainerRef}
         css={[
-          tw`w-fit transition-transform duration-[25ms] ease-linear`,
+          tw`w-fit transition-transform duration-[25ms] ease-linear cursor-grab`,
+          tw`active:cursor-grabbing`,
           `transform: translate(${position.x}px, ${position.y}px)`,
         ]}
       >
