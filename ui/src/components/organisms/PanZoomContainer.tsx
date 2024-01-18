@@ -5,7 +5,7 @@ import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
 
 /**
- * Container with custom panning and zooming functionality.
+ * Container with panning and zooming functionality.
  */
 const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
   const { state, dispatch } = useGridState()
@@ -30,7 +30,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
   const effectiveWidth = gridWidth * zoomLevel
   const effectiveHeight = gridHeight * zoomLevel
 
-  const updatePosition = (
+  const updatePanPosition = (
     dx: number,
     dy: number,
     isInverted: boolean = false,
@@ -60,11 +60,10 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return
-
+    const isLeftClick = e.button === 0
     const isOnGrid = (e.target as HTMLElement).dataset.isgrid === "true"
 
-    if (!isOnGrid) return
+    if (!isLeftClick || !isOnGrid) return
 
     dragging.current = true
     lastPosition.current = { x: e.clientX, y: e.clientY }
@@ -76,7 +75,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     const dx = e.clientX - lastPosition.current.x
     const dy = e.clientY - lastPosition.current.y
 
-    updatePosition(dx, dy, true)
+    updatePanPosition(dx, dy, true)
     lastPosition.current = { x: e.clientX, y: e.clientY }
   }
 
@@ -91,7 +90,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     const isZooming = ctrlKey || metaKey
 
     if (isZooming) handleZoom(deltaY)
-    else handlePanning(deltaX, deltaY)
+    else updatePanPosition(deltaX, deltaY)
   }
 
   const handleZoom = (deltaY: number) => {
@@ -101,12 +100,12 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
   }
 
-  const handlePanning = (deltaX: number, deltaY: number) => {
-    updatePosition(deltaX, deltaY)
-  }
-
   useEffect(() => {
-    updatePosition(0, 0)
+    const timeoutId = setTimeout(() => {
+      updatePanPosition(0, 0)
+    }, 250)
+
+    return () => clearTimeout(timeoutId)
   }, [zoomLevel])
 
   useEffect(() => {
@@ -133,13 +132,21 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
       <div
         ref={gridContainerRef}
         css={[
-          tw`w-fit origin-center`,
-          `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
-          !backgroundImage && tw`w-screen bg-white`,
-          !backgroundImage && `height: calc(100vh + 500px)`,
+          tw`w-fit transition-transform duration-[25ms] ease-linear`,
+          `transform: translate(${position.x}px, ${position.y}px)`,
         ]}
       >
-        {children}
+        {/* Extracted into new element to apply different transition-durations for translate and scale */}
+        <div
+          css={[
+            tw`duration-75`,
+            `transform: scale(${zoomLevel})`,
+            !backgroundImage && tw`w-screen bg-white`,
+            !backgroundImage && `height: calc(100vh + 500px)`,
+          ]}
+        >
+          {children}
+        </div>
       </div>
       <ZoomMenu
         viewportWidth={viewportWidth}
