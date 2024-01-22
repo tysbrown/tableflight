@@ -35,28 +35,21 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     dy: number,
     isInverted: boolean = false,
   ) => {
-    const shiftX = (effectiveWidth - gridWidth) / 2
-    const shiftY = (effectiveHeight - gridHeight) / 2
-
-    const xPos = isInverted
-      ? position.x + dx - shiftX
-      : position.x - dx - shiftX
-    const yPos = isInverted
-      ? position.y + dy - shiftY
-      : position.y - dy - shiftY
+    const newX = isInverted ? position.x + dx : position.x - dx
+    const newY = isInverted ? position.y + dy : position.y - dy
 
     const shouldCenterHorizontally = effectiveWidth <= viewportWidth
     const shouldCenterVertically = effectiveHeight <= viewportHeight
 
-    const newX = shouldCenterHorizontally
-      ? (viewportWidth - effectiveWidth) / 2 + shiftX
-      : Math.max(Math.min(xPos, 0), viewportWidth - effectiveWidth) + shiftX
+    const adjustedX = shouldCenterHorizontally
+      ? (viewportWidth - effectiveWidth) / 2
+      : Math.max(Math.min(newX, 0), viewportWidth - effectiveWidth)
 
-    const newY = shouldCenterVertically
-      ? (viewportHeight - effectiveHeight) / 2 + shiftY
-      : Math.max(Math.min(yPos, 0), viewportHeight - effectiveHeight) + shiftY
+    const adjustedY = shouldCenterVertically
+      ? (viewportHeight - effectiveHeight) / 2
+      : Math.max(Math.min(newY, 0), viewportHeight - effectiveHeight)
 
-    setPosition({ x: newX, y: newY })
+    setPosition({ x: adjustedX, y: adjustedY })
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -97,20 +90,13 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     const zoomDelta = -deltaY * 0.001
     const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
 
+    const scale = newZoom / zoomLevel
+
+    const newX = position.x * scale + ((1 - scale) * viewportWidth) / 2
+    const newY = position.y * scale + ((1 - scale) * viewportHeight) / 2
+
     dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
-
-    /**
-     * Update the pan position to keep the viewport over the same point
-     * @todo - This works okay for now, but isn't perfectly centered like it should be
-     */
-    const zoomRatio = newZoom / zoomLevel
-    const x = position.x * zoomRatio
-    const y = backgroundImage
-      ? position.y * zoomRatio +
-        (viewportHeight * zoomRatio - viewportHeight) / 2
-      : position.y * zoomRatio
-
-    setPosition({ x, y })
+    setPosition({ x: newX, y: newY })
   }
 
   useEffect(() => {
@@ -145,7 +131,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
       <div
         ref={gridContainerRef}
         css={[
-          tw`w-fit h-fit transition-transform duration-[25ms] ease-linear cursor-grab`,
+          tw`w-fit transition-transform duration-[25ms] ease-linear cursor-grab origin-[0% 0%]`,
           tw`active:cursor-grabbing`,
           `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
           !backgroundImage && tw`w-screen bg-white`,
