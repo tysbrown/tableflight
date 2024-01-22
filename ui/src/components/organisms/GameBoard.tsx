@@ -14,7 +14,6 @@ const GameBoard = () => {
           src={backgroundImage}
           alt="Background"
           onLoad={() => dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: 1 })}
-          css={[tw`max-w-none w-auto h-auto`]}
         />
       )}
       <Grid />

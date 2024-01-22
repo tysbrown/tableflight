@@ -98,6 +98,19 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
 
     dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
+
+    /**
+     * Update the pan position to keep the viewport over the same point
+     * @todo - This works okay for now, but isn't perfectly centered like it should be
+     */
+    const zoomRatio = newZoom / zoomLevel
+    const x = position.x * zoomRatio
+    const y = backgroundImage
+      ? position.y * zoomRatio +
+        (viewportHeight * zoomRatio - viewportHeight) / 2
+      : position.y * zoomRatio
+
+    setPosition({ x, y })
   }
 
   useEffect(() => {
@@ -132,22 +145,14 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
       <div
         ref={gridContainerRef}
         css={[
-          tw`w-fit transition-transform duration-[25ms] ease-linear cursor-grab`,
+          tw`w-fit h-fit transition-transform duration-[25ms] ease-linear cursor-grab`,
           tw`active:cursor-grabbing`,
-          `transform: translate(${position.x}px, ${position.y}px)`,
+          `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
+          !backgroundImage && tw`w-screen bg-white`,
+          !backgroundImage && `height: calc(100vh + 500px)`,
         ]}
       >
-        {/* Extracted into new element to apply different transition-durations for translate and scale */}
-        <div
-          css={[
-            tw`duration-75`,
-            `transform: scale(${zoomLevel})`,
-            !backgroundImage && tw`w-screen bg-white`,
-            !backgroundImage && `height: calc(100vh + 500px)`,
-          ]}
-        >
-          {children}
-        </div>
+        {children}
       </div>
       <ZoomMenu
         viewportWidth={viewportWidth}
