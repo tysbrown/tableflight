@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate --schema=server/prisma/schema.prisma",
     "prisma:migrate:dev": "prisma migrate dev --name init --schema=server/prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema=server/prisma/schema.prisma",
-    "clean": "lerna clean && rm -rf server/dist && rm -rf ui/dist && npm cache clean --force",
+    "clean": "lerna clean && rm -rf node_modules && rm -rf server/dist && rm -rf ui/dist && npm cache clean --force",
     "build": "lerna run build",
     "test": "lerna run test",
     "lint": "lerna run lint",
