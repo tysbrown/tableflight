@@ -18,7 +18,7 @@ const ZoomMenu = ({
   originalHeight,
 }: ZoomMenuProps) => {
   const { state, dispatch } = useGridState()
-  const { zoomLevel } = state as GridState
+  const { zoomLevel, position } = state as GridState
 
   const [zoomMenuIsOpen, setZoomMenuIsOpen] = useState<boolean>(false)
   const zoomMenuRef = useRef<HTMLButtonElement | null>(null)
@@ -32,6 +32,15 @@ const ZoomMenu = ({
   }
 
   const setZoomLevel = (newZoom: number) => {
+    const scale = newZoom / zoomLevel
+
+    const newX = position.x * scale + ((1 - scale) * viewportWidth) / 2
+    const newY = position.y * scale + ((1 - scale) * viewportHeight) / 2
+
+    dispatch({
+      type: "SET_POSITION",
+      position: { x: newX, y: newY },
+    })
     dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
   }
 
