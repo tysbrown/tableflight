@@ -20,6 +20,9 @@ export default {
         orderBy: {
           updatedAt: "desc",
         },
+        include: {
+          playersParticipating: true,
+        },
       })
     },
   },

@@ -23,11 +23,7 @@ export default {
         data: {
           name,
           description,
-          createdBy: {
-            connect: {
-              id: user.id,
-            },
-          },
+          createdById: user.id,
         },
       })
       return game
