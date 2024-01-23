@@ -71,7 +71,8 @@ const gridReducer = (state: GridState, action: ActionType): GridState => {
   switch (action.type) {
     case "ADD_TOKEN": {
       const newGrid = [...state.grid]
-      if (!newGrid[action.y]) newGrid[action.y] = Array(state.cols).fill(null)
+      if (!newGrid[action.y])
+        newGrid[action.y] = Array(state.cols).fill(null) as GridType[number]
       newGrid[action.y]![action.x] = action.token
 
       return {
