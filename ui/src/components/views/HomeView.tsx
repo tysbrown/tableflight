@@ -16,6 +16,9 @@ const gamesQuery = gql`
       description
       image
       name
+      playersParticipating {
+        id
+      }
     }
   }
 `
