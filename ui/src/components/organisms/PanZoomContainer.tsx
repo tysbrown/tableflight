@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import tw from "twin.macro"
 import { ZoomMenu } from "@/molecules"
 import { useGridState } from "@/hooks/useGridState"
@@ -6,12 +6,12 @@ import { GridState } from "@/contexts/GridStateProvider"
 
 /**
  * Container with panning and zooming functionality.
+ * @todo ADD THE PANNING LOGIC TO THE SLIDER TOO
  */
 const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
   const { state, dispatch } = useGridState()
-  const { backgroundImage, zoomLevel } = state as GridState
+  const { backgroundImage, zoomLevel, position } = state as GridState
 
-  const [position, setPosition] = useState({ x: 0, y: 0 })
   const lastPosition = useRef({ x: 0, y: 0 })
   const dragging = useRef(false)
 
@@ -49,7 +49,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
       ? (viewportHeight - effectiveHeight) / 2
       : Math.max(Math.min(newY, 0), viewportHeight - effectiveHeight)
 
-    setPosition({ x: adjustedX, y: adjustedY })
+    dispatch({ type: "SET_POSITION", position: { x: adjustedX, y: adjustedY } })
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -96,7 +96,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     const newY = position.y * scale + ((1 - scale) * viewportHeight) / 2
 
     dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
-    setPosition({ x: newX, y: newY })
+    dispatch({ type: "SET_POSITION", position: { x: newX, y: newY } })
   }
 
   useEffect(() => {

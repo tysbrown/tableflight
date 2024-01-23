@@ -11,6 +11,7 @@ export type GridState = {
   backgroundImage: string | null
   lineWidth: number
   zoomLevel: number
+  position: { x: number; y: number }
 }
 
 type ActionType =
@@ -21,6 +22,7 @@ type ActionType =
   | SetCellSizeAction
   | SetZoomLevelAction
   | SetGameSessionIdAction
+  | SetPositionAction
 
 type AddTokenAction = {
   type: "ADD_TOKEN"
@@ -58,6 +60,11 @@ type SetZoomLevelAction = {
 type SetGameSessionIdAction = {
   type: "SET_GAME_SESSION_ID"
   gameSessionId: number
+}
+
+type SetPositionAction = {
+  type: "SET_POSITION"
+  position: { x: number; y: number }
 }
 
 const gridReducer = (state: GridState, action: ActionType): GridState => {
@@ -110,6 +117,11 @@ const gridReducer = (state: GridState, action: ActionType): GridState => {
         ...state,
         gameSessionId: action.gameSessionId,
       }
+    case "SET_POSITION":
+      return {
+        ...state,
+        position: action.position,
+      }
     default:
       return state
   }
@@ -129,6 +141,7 @@ const initialState: GridState = {
   backgroundImage: null,
   lineWidth: 0.5,
   zoomLevel: 1,
+  position: { x: 0, y: 0 },
   gameSessionId: null,
 }
 
