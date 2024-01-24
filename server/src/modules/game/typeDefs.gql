@@ -1,17 +1,3 @@
-type User {
-  id: ID!
-  tokenVersion: Int!
-  email: String!
-  password: String!
-  firstName: String!
-  lastName: String!
-  createdAt: String!
-  updatedAt: String!
-  gamesCreated: [Game]
-  gamesParticipating: [Game]
-  characterSheets: [CharacterSheet]
-}
-
 type Game {
   id: ID!
   name: String!
@@ -60,7 +46,8 @@ type CharacterSheet {
 }
 
 type Query {
-  games: [Game!]!
+  games: [Game]
+  gameList: [Game]
 }
 
 type Mutation {
