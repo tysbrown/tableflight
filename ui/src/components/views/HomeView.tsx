@@ -9,25 +9,25 @@ import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
 import { Game } from "@/types"
 
-const gamesQuery = gql`
-  query Games {
-    games {
+const gameListQuery = gql`
+  query gameList {
+    gameList {
       id
+      name
       description
       image
-      name
-      playersParticipating {
-        id
-      }
+      createdById
+      updatedAt
     }
   }
 `
+
 /**
  * The main view of the application when the user logs in.
  */
 const HomeView = () => {
-  const [{ data, fetching, error }] = useQuery<{ games: Game[] }>({
-    query: gamesQuery,
+  const [{ data, fetching, error }] = useQuery<{ gameList: Game[] }>({
+    query: gameListQuery,
   })
 
   const { state, dispatch } = useGridState()
@@ -82,7 +82,7 @@ const HomeView = () => {
         </section>
       </ControlPanel>
 
-      <GameSelectModal games={data?.games} />
+      <GameSelectModal games={data?.gameList} />
     </main>
   )
 }
