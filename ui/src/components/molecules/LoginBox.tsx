@@ -62,7 +62,7 @@ const LoginBox = () => {
 
       <hr css={[tw`mb-8 border-outlineVariant`]} />
 
-      <form onSubmit={handleSubmit(onSubmit)} css={[tw`grid`]}>
+      <form onSubmit={() => handleSubmit(onSubmit)} css={[tw`grid`]}>
         <TextInput
           type="email"
           name="email"
