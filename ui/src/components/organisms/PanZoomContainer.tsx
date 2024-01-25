@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
 import { ZoomMenu } from "@/molecules"
 import { useGridState } from "@/hooks/useGridState"
@@ -10,7 +10,8 @@ import { GridState } from "@/contexts/GridStateProvider"
  */
 const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
   const { state, dispatch } = useGridState()
-  const { backgroundImage, zoomLevel, position } = state as GridState
+  const { backgroundImage, zoomLevel } = state as GridState
+  const [position, setPosition] = useState({ x: 0, y: 0 })
 
   const lastPosition = useRef({ x: 0, y: 0 })
   const dragging = useRef(false)
@@ -49,7 +50,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
       ? (viewportHeight - effectiveHeight) / 2
       : Math.max(Math.min(newY, 0), viewportHeight - effectiveHeight)
 
-    dispatch({ type: "SET_POSITION", position: { x: adjustedX, y: adjustedY } })
+    setPosition({ x: adjustedX, y: adjustedY })
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -96,7 +97,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
     const newY = position.y * scale + ((1 - scale) * viewportHeight) / 2
 
     dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
-    dispatch({ type: "SET_POSITION", position: { x: newX, y: newY } })
+    setPosition({ x: newX, y: newY })
   }
 
   useEffect(() => {
@@ -145,6 +146,8 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
         viewportHeight={viewportHeight}
         originalWidth={gridWidth}
         originalHeight={gridHeight}
+        position={position}
+        setPosition={setPosition}
       />
     </section>
   )
