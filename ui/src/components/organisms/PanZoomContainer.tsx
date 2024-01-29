@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
+import { clamp } from "@/utils"
 import { ZoomMenu } from "@/molecules"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
@@ -44,11 +45,11 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
 
     const adjustedX = shouldCenterHorizontally
       ? (viewportWidth - effectiveWidth) / 2
-      : Math.max(Math.min(newX, 0), viewportWidth - effectiveWidth)
+      : clamp(newX, viewportWidth - effectiveWidth, 0)
 
     const adjustedY = shouldCenterVertically
       ? (viewportHeight - effectiveHeight) / 2
-      : Math.max(Math.min(newY, 0), viewportHeight - effectiveHeight)
+      : clamp(newY, viewportHeight - effectiveHeight, 0)
 
     setPosition({ x: adjustedX, y: adjustedY })
   }
