@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { isFirefox } from "@/utils"
+import { isFirefox, clamp } from "@/utils"
 import tw from "twin.macro"
 
 type SliderInputProps = {
@@ -43,15 +43,16 @@ const SliderInput = ({
 
   const handleMouseMove = (e: MouseEvent) => {
     const rect = sliderRef.current!.getBoundingClientRect()
-    let newValue = ((e.clientX - rect.left) / rect.width) * (max - min) + min
 
-    // Adjust for step
-    newValue = Math.round(newValue / step) * step
+    const newValueToPercentage =
+      ((e.clientX - rect.left) / rect.width) * (max - min) + min
 
-    if (newValue < min) newValue = min
-    if (newValue > max) newValue = max
+    const newValueAdjustedForStep =
+      Math.round(newValueToPercentage / step) * step
 
-    setValue(newValue)
+    const newValueClamped = clamp(newValueAdjustedForStep, min, max)
+
+    setValue(newValueClamped)
   }
 
   const handleMouseUp = () => {
@@ -81,6 +82,10 @@ const SliderInput = ({
 
     // Adjust for step
     newValue = Math.round(newValue / step) * step
+
+    // Check bounds
+    if (newValue < min) newValue = min
+    if (newValue > max) newValue = max
 
     setValue(newValue)
   }
