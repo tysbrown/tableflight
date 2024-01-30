@@ -33,4 +33,4 @@ If you don't want to use Prisma Accelerate:
 3. From the root directory, run `npm run dev` to start the development servers.
  - UI: http://localhost:5173
  - Server: http://localhost:1337
-4. (Optional) If you're using your own databse, you'll also need to run `npm run prisma:migrate:dev` from the root directory.
+4. You may also need to run `npm run prisma:migrate:dev` and/or `npm run prisma:generate` from the root directory.
