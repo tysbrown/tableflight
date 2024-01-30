@@ -14,16 +14,17 @@ If you aren't part of the TableFlight dev team, you won't have access to our dat
 
 [Prisma Docs - Connect your database](https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch/relational-databases/connect-your-database-typescript-postgresql)
 
-Note that we use [Prisma's database proxy.](https://cloud.prisma.io/) If you want to use it too:
+Note that we use [Prisma Accelerate.](https://www.prisma.io/data-platform/accelerate) If you want to use it too:
 
 - The DATABASE_URL environment variable is for the endpoint to Prisma's proxy.
 - The DIRECT_URL environment variable is for the endpoint to your database.
 
-If you don't want to use Prisma's database proxy:
+If you don't want to use Prisma Accelerate:
 
 - The DATABASE_URL environment variable is for the endpoint to your database.
 - You don't need the DIRECT_URL environment variable.
-- You'll also need to remove the `directUrl = env("DIRECT_URL")` line from `api/prisma/schema.prisma`.
+- Remove the `directUrl = env("DIRECT_URL")` line from `api/prisma/schema.prisma`.
+- Remove `withAccelerate` from `server/src/context.ts`.
 
 ### Start the development servers
 
