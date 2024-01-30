@@ -71,23 +71,14 @@ const SliderInput = ({
 
     const clickedPercentage = (clickPosition / width) * 100
 
-    const minVal = sliderRef.current!.min
-      ? parseFloat(sliderRef.current!.min)
-      : 0
-    const maxVal = sliderRef.current!.max
-      ? parseFloat(sliderRef.current!.max)
-      : 100
+    const newValueToPercentage = (clickedPercentage / 100) * (max - min) + min
 
-    let newValue = (clickedPercentage / 100) * (maxVal - minVal) + minVal
+    const newValueAdjustedForStep =
+      Math.round(newValueToPercentage / step) * step
 
-    // Adjust for step
-    newValue = Math.round(newValue / step) * step
+    const newValueClamped = clamp(newValueAdjustedForStep, min, max)
 
-    // Check bounds
-    if (newValue < min) newValue = min
-    if (newValue > max) newValue = max
-
-    setValue(newValue)
+    setValue(newValueClamped)
   }
 
   return (
