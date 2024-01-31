@@ -8,6 +8,7 @@ import { LoadingView } from "@/views"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
 import { Game } from "@/types"
+import UploadMapPanel from "../molecules/UploadMapPanel"
 
 const gameListQuery = gql`
   query gameList {
@@ -32,20 +33,6 @@ const HomeView = () => {
 
   const { state, dispatch } = useGridState()
   const { cellSize } = state as GridState
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        dispatch({
-          type: "SET_BACKGROUND",
-          backgroundImage: reader.result as string,
-        })
-      }
-      reader.readAsDataURL(file)
-    }
-  }
 
   const setCellSize = (cellSize: number) => {
     dispatch({ type: "SET_CELL_SIZE", cellSize })
@@ -76,10 +63,7 @@ const HomeView = () => {
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <NewTokenPanel />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
-        <section>
-          <h2 css={[tw`mb-3`]}>Upload Map</h2>
-          <input type="file" onChange={handleFileChange} accept="image/*" />
-        </section>
+        <UploadMapPanel />
       </ControlPanel>
 
       <GameSelectModal games={data?.gameList} />
