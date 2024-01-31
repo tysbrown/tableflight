@@ -13,7 +13,7 @@ import { GridState } from "@/contexts/GridStateProvider"
  */
 const Grid = () => {
   const { state, dispatch } = useGridState()
-  const { grid, rows, cols, dimensions, lineWidth, cellSize, zoomLevel, backgroundImage } =
+  const { grid, rows, cols, dimensions, lineWidth, cellSize, zoomLevel } =
     state as GridState
 
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -21,17 +21,17 @@ const Grid = () => {
   useEffect(() => {
     if (!containerRef.current) return
 
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.offsetWidth
-        const height = containerRef.current.offsetHeight
+    const resizeObserver = new ResizeObserver((entries) => {
+      const { width, height } = entries[0]!.contentRect
+      dispatch({ type: "SET_DIMENSIONS", dimensions: { width, height } })
+    })
 
-        dispatch({ type: "SET_DIMENSIONS", dimensions: { width, height } })
-      }
+    resizeObserver.observe(containerRef.current)
+
+    return () => {
+      resizeObserver.disconnect()
     }
-
-    updateDimensions()
-  }, [containerRef, cellSize, rows, cols, backgroundImage])
+  }, [containerRef, dispatch])
 
   const horizontalLines = Array.from({
     length: rows,
