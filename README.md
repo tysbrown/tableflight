@@ -31,6 +31,6 @@ If you don't want to use Prisma Accelerate:
 1. Fill in the environment variables in the root directory .env file. Remove `.template` from the filename.
 2. From the root directory, run `npm i` to install dependencies for both /server and /ui.
 3. From the root directory, run `npm run dev` to start the development servers.
- - UI: http://localhost:5173
- - Server: http://localhost:1337
+   - UI: http://localhost:5173
+   - Server: http://localhost:1337
 4. You may also need to run `npm run prisma:migrate:dev` and/or `npm run prisma:generate` from the root directory.
