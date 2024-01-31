@@ -10,21 +10,16 @@ Monorepo setup:
 
 ### You need a database
 
-If you aren't part of the TableFlight dev team, you won't have access to our database. You can still run the app locally, but you'll need to set up your own database and paste in it's URL for the DATABASE_URL and DIRECT_URL environment variables. We use Postgres, but you can use whatever you want. Just make sure to change the configuration in `api/prisma/schema.prisma` based on the provider you choose.
+If you're a visitor checking out the repo, you can run the project locally but will have to spin up your own database and plug in the connection string for the DATABASE_URL environment variable. I use Postgres, but you can use whatever relational database you want. Just make sure to change the configuration in `api/prisma/schema.prisma` based on the provider you choose.
 
 [Prisma Docs - Connect your database](https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch/relational-databases/connect-your-database-typescript-postgresql)
 
-Note that we use [Prisma Accelerate.](https://www.prisma.io/data-platform/accelerate) If you want to use it too:
+Note that the project's also configured to use [Prisma Accelerate.](https://www.prisma.io/data-platform/accelerate) I don't imagine a visitor would want to subscribe to it, so you'll want to:
 
-- The DATABASE_URL environment variable is for the endpoint to Prisma's proxy.
-- The DIRECT_URL environment variable is for the endpoint to your database.
-
-If you don't want to use Prisma Accelerate:
-
-- The DATABASE_URL environment variable is for the endpoint to your database.
-- You don't need the DIRECT_URL environment variable.
+- Ensure your connection string is set to the DATABASE_URL env.
+- You don't need the DIRECT_URL environment variable, remove it or leave it blank.
 - Remove the `directUrl = env("DIRECT_URL")` line from `api/prisma/schema.prisma`.
-- Remove `withAccelerate` from `server/src/context.ts`.
+- Remove the `withAccelerate` stuff from `server/src/context.ts`.
 
 ### Start the development servers
 
@@ -34,3 +29,4 @@ If you don't want to use Prisma Accelerate:
    - UI: http://localhost:5173
    - Server: http://localhost:1337
 4. You may also need to run `npm run prisma:migrate:dev` and/or `npm run prisma:generate` from the root directory.
+5. You can spin up a local instance of Prisma Studio with `npm run prisma:studio`.
