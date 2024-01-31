@@ -12,7 +12,7 @@ export const isFirefox = !!navigator.userAgent.match(/firefox|fxios/i)
 /**
  * Enforces boundaries, ensures that a value is not less than min and not greater than max.
  * @memberof Utils
- * @returns The value clamped between min and max.
+ * @returns {number} The value clamped between min and max.
  */
-export const clamp = (value: number, min: number, max: number) =>
+export const clamp = (value: number, min: number, max: number): number =>
   Math.max(Math.min(value, max), min)

@@ -90,7 +90,7 @@ const PanZoomContainer = ({ children }: { children: React.ReactNode }) => {
 
   const handleZoom = (deltaY: number) => {
     const zoomDelta = -deltaY * 0.001
-    const newZoom = Math.max(0.1, Math.min(5, zoomLevel + zoomDelta))
+    const newZoom = clamp(zoomLevel + zoomDelta, 0.1, 5)
 
     const scale = newZoom / zoomLevel
 
