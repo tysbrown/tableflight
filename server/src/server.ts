@@ -18,7 +18,7 @@ import { InitialContext } from "@/types"
 const { verify } = pkg
 
 const generateSchema = () => {
-  const modulesPath = path.join(__dirname, "./modules")
+  const modulesPath = path.join(__dirname, "./graphql")
 
   const resolvers = loadFilesSync(modulesPath, { extensions: ["js"] })
   const typeDefs = loadFilesSync(modulesPath, { extensions: ["gql"] })

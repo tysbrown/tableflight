@@ -4,8 +4,8 @@
     "description": "GraphQL API for TableFlight",
     "main": "./dist/server.js",
     "scripts": {
-        "dev": "cpx \"src/modules/**/*.gql\" dist/modules && concurrently \"npx tsc --watch\" \"nodemon --delay 2 dist/server.js\"",
-        "build": "tsc && cpx \"src/modules/**/*.gql\" dist/modules",
+        "dev": "cpx \"src/graphql/**/*.gql\" dist/graphql && concurrently \"npx tsc --watch\" \"nodemon --delay 2 dist/server.js\"",
+        "build": "tsc && cpx \"src/graphql/**/*.gql\" dist/graphql",
         "test": "jest"
     },
     "author": "Tyler Brown",
