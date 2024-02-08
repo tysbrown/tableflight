@@ -38,7 +38,7 @@ const Token = ({ row, col, token, cellSize }: TokenComponentProps) => {
     : tw`bg-gray-500`
 
   const tokenSize = cellSize * 0.8
-  const tokenOffset = (cellSize - tokenSize) / 2 // Centers the token in the cell
+  const tokenOffset = (cellSize - tokenSize) / 2 + 1 // Centers token in cell
 
   return (
     <div
