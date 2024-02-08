@@ -1,7 +1,7 @@
 import React from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
-import { SliderInput } from "@/atoms"
+import { Button, SliderInput } from "@/atoms"
 import { ControlPanel, NewTokenPanel, GameSelectModal } from "@/molecules"
 import { GameBoard } from "@/organisms"
 import { LoadingView } from "@/views"
@@ -32,7 +32,7 @@ const HomeView = () => {
   })
 
   const { state, dispatch } = useGridState()
-  const { cellSize } = state as GridState
+  const { cellSize, mode } = state as GridState
 
   const setCellSize = (cellSize: number) => {
     dispatch({ type: "SET_CELL_SIZE", cellSize })
@@ -64,6 +64,34 @@ const HomeView = () => {
         <NewTokenPanel />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <UploadMapPanel />
+        <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
+        <h2 css={[tw`mb-3`]}>Set Mode</h2>
+        <p css={[tw`mb-3`]}>
+          Current Mode: <b>{mode.toUpperCase()}</b>
+        </p>
+        <section css={[tw`flex flex-wrap gap-3`]}>
+          <Button
+            type="button"
+            style="primary"
+            onClick={() => dispatch({ type: "SET_MODE", mode: "draw" })}
+          >
+            Draw
+          </Button>
+          <Button
+            type="button"
+            style="primary"
+            onClick={() => dispatch({ type: "SET_MODE", mode: "pan" })}
+          >
+            Pan
+          </Button>
+          <Button
+            type="button"
+            style="primary"
+            onClick={() => dispatch({ type: "SET_MODE", mode: "edit" })}
+          >
+            Edit
+          </Button>
+        </section>
       </ControlPanel>
 
       <GameSelectModal games={data?.gameList} />
