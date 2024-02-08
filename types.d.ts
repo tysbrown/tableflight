@@ -39,6 +39,20 @@ export type TokenType = {
 
 export type GridType = (TokenType | null | undefined)[][]
 
+export type Line = {
+  startX: number
+  startY: number
+  endX: number
+  endY: number
+  color: string
+  lineWidth: number
+  id: string
+}
+
+export type Canvas = {
+  lines: Line[]
+}
+
 export type CharacterSheet = {
   id: number
   name: string

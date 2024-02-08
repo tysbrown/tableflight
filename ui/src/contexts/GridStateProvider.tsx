@@ -1,5 +1,5 @@
 import { createContext, useEffect, useReducer } from "react"
-import { GridType, TokenType } from "@/types"
+import { GridType, TokenType, Canvas } from "@/types"
 
 export type GridState = {
   grid: GridType
@@ -11,6 +11,8 @@ export type GridState = {
   backgroundImage: string | null
   lineWidth: number
   zoomLevel: number
+  mode: "draw" | "pan" | "edit"
+  canvas: Canvas
 }
 
 type ActionType =
@@ -21,6 +23,8 @@ type ActionType =
   | SetCellSizeAction
   | SetZoomLevelAction
   | SetGameSessionIdAction
+  | SetMode
+  | SetCanvas
 
 type AddTokenAction = {
   type: "ADD_TOKEN"
@@ -60,6 +64,16 @@ type SetGameSessionIdAction = {
   gameSessionId: number
 }
 
+type SetMode = {
+  type: "SET_MODE"
+  mode: "draw" | "pan" | "edit"
+}
+
+type SetCanvas = {
+  type: "SET_CANVAS"
+  canvas: Canvas
+}
+
 const gridReducer = (state: GridState, action: ActionType): GridState => {
   switch (action.type) {
     case "ADD_TOKEN": {
@@ -86,6 +100,9 @@ const gridReducer = (state: GridState, action: ActionType): GridState => {
       return {
         ...state,
         backgroundImage: action.backgroundImage,
+        canvas: {
+          lines: [], // TODO: Remove this when canvas is persisted to db
+        },
       }
     case "SET_DIMENSIONS":
       return {
@@ -111,6 +128,16 @@ const gridReducer = (state: GridState, action: ActionType): GridState => {
         ...state,
         gameSessionId: action.gameSessionId,
       }
+    case "SET_MODE":
+      return {
+        ...state,
+        mode: action.mode,
+      }
+    case "SET_CANVAS":
+      return {
+        ...state,
+        canvas: action.canvas,
+      }
     default:
       return state
   }
@@ -131,6 +158,10 @@ const initialState: GridState = {
   lineWidth: 0.5,
   zoomLevel: 1,
   gameSessionId: null,
+  mode: "pan",
+  canvas: {
+    lines: [],
+  },
 }
 
 export const GridStateContext = createContext<GridContextType>({
