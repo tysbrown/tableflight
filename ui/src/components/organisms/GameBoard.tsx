@@ -135,8 +135,7 @@ const GameBoard = () => {
           tw`w-fit transition-transform duration-[25ms] ease-linear cursor-grab origin-[0% 0%]`,
           tw`active:cursor-grabbing`,
           `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
-          !backgroundImage && tw`w-screen bg-white`,
-          !backgroundImage && `height: calc(100vh + 500px)`,
+          !backgroundImage && tw`w-[3000px] h-[3000px] bg-white`,
         ]}
       >
         {backgroundImage && (
