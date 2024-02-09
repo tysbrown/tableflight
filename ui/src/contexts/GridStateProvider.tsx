@@ -23,8 +23,8 @@ type ActionType =
   | SetCellSizeAction
   | SetZoomLevelAction
   | SetGameSessionIdAction
-  | SetMode
-  | SetCanvas
+  | SetModeAction
+  | SetCanvasAction
 
 type AddTokenAction = {
   type: "ADD_TOKEN"
@@ -64,12 +64,12 @@ type SetGameSessionIdAction = {
   gameSessionId: number
 }
 
-type SetMode = {
+type SetModeAction = {
   type: "SET_MODE"
   mode: "draw" | "pan" | "edit"
 }
 
-type SetCanvas = {
+type SetCanvasAction = {
   type: "SET_CANVAS"
   canvas: Canvas
 }
