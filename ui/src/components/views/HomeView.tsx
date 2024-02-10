@@ -1,4 +1,3 @@
-import React from "react"
 import { gql, useQuery } from "urql"
 import tw from "twin.macro"
 import { Button, SliderInput } from "@/atoms"

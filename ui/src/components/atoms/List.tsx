@@ -10,6 +10,7 @@ export const List = ({ children, ...props }: { children: React.ReactNode }) => {
 }
 
 type ListItemProps = {
+  key: string
   image: string
   title: string
   description: string
@@ -18,6 +19,7 @@ type ListItemProps = {
 }
 
 export const ListItem = ({
+  key,
   image,
   title,
   description,
@@ -31,6 +33,7 @@ export const ListItem = ({
         tw`grid grid-cols-[min-content_1fr_min-content] grid-rows-2 gap-x-4`,
       ]}
       onClick={onClick}
+      key={key}
       {...props}
     >
       <Image
@@ -40,9 +43,7 @@ export const ListItem = ({
       <BodyLarge css={[tw`col-start-2 col-end-3 row-start-1 row-end-2`]}>
         {title}
       </BodyLarge>
-      <BodyMedium
-        css={[tw`col-start-2 col-end-3 row-start-2 row-end-3`]}
-      >
+      <BodyMedium css={[tw`col-start-2 col-end-3 row-start-2 row-end-3`]}>
         {description}
       </BodyMedium>
       {showArrow && (

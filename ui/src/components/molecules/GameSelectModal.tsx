@@ -1,4 +1,4 @@
-import React from "react"
+import { useState } from "react"
 import tw from "twin.macro"
 import type { Game } from "@/types"
 import { Button, List, ListItem, Modal } from "@/atoms"
@@ -11,7 +11,7 @@ type GameSelectModalProps = {
 }
 
 const GameSelectModal = ({ games }: GameSelectModalProps) => {
-  const [selected, setSelected] = React.useState<number>(0)
+  const [selected, setSelected] = useState<string>("")
   const { state, dispatch } = useGridState()
   const { gameSessionId } = state as GridState
 
@@ -29,24 +29,20 @@ const GameSelectModal = ({ games }: GameSelectModalProps) => {
       </BodyMedium>
       <List css={[tw`my-6`]}>
         {games?.map(({ id, image, name, description }, index) => (
-          <>
-            <ListItem
-              key={id}
-              image={image}
-              title={name}
-              description={description}
-              showArrow
-              onClick={() => setSelected(id)}
-              css={[
-                tw`py-4 px-2 cursor-pointer`,
-                tw`hover:bg-surfaceContainerHighest`,
-                selected === id && tw`bg-surfaceContainerHighest`,
-              ]}
-            />
-            {index !== games.length - 1 && (
-              <hr css={[tw`border-outlineVariant`]} />
-            )}
-          </>
+          <ListItem
+            key={id}
+            image={image}
+            title={name}
+            description={description}
+            showArrow
+            onClick={() => setSelected(id)}
+            css={[
+              tw`py-4 px-2 cursor-pointer`,
+              tw`hover:bg-surfaceContainerHighest`,
+              selected === id && tw`bg-surfaceContainerHighest`,
+              index !== games.length - 1 && tw`border-b border-outlineVariant`,
+            ]}
+          />
         ))}
       </List>
       <section css={[tw`flex justify-end gap-2`]}>

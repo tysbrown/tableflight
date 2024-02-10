@@ -3,7 +3,7 @@ import { GridType, TokenType, Canvas } from "@/types"
 
 export type GridState = {
   grid: GridType
-  gameSessionId?: number | null
+  gameSessionId?: string | null
   rows: number
   cols: number
   cellSize: number
@@ -61,7 +61,7 @@ type SetZoomLevelAction = {
 
 type SetGameSessionIdAction = {
   type: "SET_GAME_SESSION_ID"
-  gameSessionId: number
+  gameSessionId: string
 }
 
 type SetModeAction = {

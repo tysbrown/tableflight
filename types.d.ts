@@ -16,7 +16,7 @@ export type User = {
 }
 
 export type Game = {
-  id: number
+  id: string
   name: string
   description: string
   image: string
