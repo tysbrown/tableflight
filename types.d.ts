@@ -5,6 +5,13 @@ export type InitialContext = YogaInitialContext & {
   res: Response
 }
 
+export type LoginResponse = {
+  login: {
+    accessToken: string
+    user: User
+  }
+}
+
 export type User = {
   id: number
   tokenVersion: number

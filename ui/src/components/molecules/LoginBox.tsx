@@ -1,5 +1,5 @@
-import type { User } from "@/types"
-import { gql, useMutation } from "urql"
+import type { LoginResponse, User } from "@/types"
+import { OperationResult, gql, useMutation } from "urql"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { useGlobalState } from "@/hooks/useGlobalState"
@@ -34,10 +34,11 @@ const LoginBox = () => {
 
   const onSubmit = async (fields: Partial<User>) => {
     const { email, password } = fields || {}
-    const loginResp = await login({
+
+    const loginResp = (await login({
       email,
       password,
-    })
+    })) as OperationResult<LoginResponse>
     const { accessToken, user } = loginResp?.data?.login || {}
 
     if (loginResp.error) {
@@ -62,7 +63,7 @@ const LoginBox = () => {
 
       <hr css={[tw`mb-8 border-outlineVariant`]} />
 
-      <form onSubmit={() => handleSubmit(onSubmit)} css={[tw`grid`]}>
+      <form onSubmit={handleSubmit(onSubmit) as () => void} css={[tw`grid`]}>
         <TextInput
           type="email"
           name="email"

@@ -92,5 +92,22 @@ app.use(yoga.graphqlEndpoint, yoga)
 app.post("/refresh_token", handleRefreshToken)
 
 app.listen(1337, () => {
-  console.log("✨ Server is running on http://localhost:1337/graphql")
+  serverMessage([
+    "✨ http://localhost:5173                     UI",
+    "✨ http://localhost:1337/graphql       GraphiQL",
+    "✨ http://localhost:5555          Prisma Studio",
+  ])
 })
+
+const serverMessage = (messages: string[]) => {
+  const maxLength = Math.max(...messages.map((msg) => msg.length))
+  const topBottomBorder = `┌${"─".repeat(maxLength + 3)}┐`
+  const bottomBorder = `└${"─".repeat(maxLength + 3)}┘`
+
+  console.log(topBottomBorder)
+  messages.forEach((msg: string) => {
+    const padding = maxLength - msg.length
+    console.log(`│ ${msg}${" ".repeat(padding)} │`)
+  })
+  console.log(bottomBorder)
+}

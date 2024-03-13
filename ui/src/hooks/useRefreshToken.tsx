@@ -4,17 +4,17 @@ import { useGlobalState } from "./useGlobalState"
 export const useRefreshToken = () => {
   const { state, setState } = useGlobalState()
 
-  const refresh = async () => {
+  return async () => {
     try {
       const response = await fetch(`http://localhost:1337/refresh_token`, {
         method: "POST",
         credentials: "include",
       })
 
-      const { accessToken, user } =
+      const { accessToken, user, ok } =
         (await response.json()) as RefreshTokenResponse
 
-      if (!accessToken) {
+      if (!ok) {
         setState({ ...state, isLoggedIn: false })
         return false
       }
@@ -22,15 +22,14 @@ export const useRefreshToken = () => {
       setState({ ...state, accessToken, user, isLoggedIn: true })
       return true
     } catch (error) {
-      console.error("Error refreshing token:", error)
+      console.error("Error refreshing token: ", error)
       return false
     }
   }
-
-  return refresh
 }
 
 type RefreshTokenResponse = {
   accessToken: string
   user: User
+  ok: boolean
 }

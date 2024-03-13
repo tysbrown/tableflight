@@ -14,11 +14,11 @@ const useInitializeAuth = () => {
       if (userRefreshedAuthToken) {
         setState((prev) => ({ ...prev, isLoggedIn: true }))
       }
-
-      setIsInitialized(true)
     }
 
     callRefreshToken()
+      .then(() => setIsInitialized(true))
+      .catch((error) => console.error("Error initializing auth:", error))
   }, [])
 
   return isInitialized

@@ -43,7 +43,12 @@ export default {
           user,
         }
       } else {
-        throw new Error("Incorrect password")
+        throw new GraphQLError("The password you entered is incorrect", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            httpStatus: 401,
+          },
+        })
       }
     },
   },

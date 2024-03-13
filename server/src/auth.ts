@@ -32,14 +32,18 @@ export const getUser = async (context: Context, userId: number) => {
   return user
 }
 
-export const setRefreshTokenCookie = (res: Response, token: string) => {
-  res.cookie("jid", token, {
-    httpOnly: true,
-    path: "/",
-    secure: true,
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  })
+export const setRefreshTokenCookie = async (res: Response, token: string) => {
+  try {
+    res.cookie("jid", token, {
+      httpOnly: true,
+      path: "/",
+      secure: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+  } catch (err) {
+    console.error("Error setting refresh token cookie: ", err)
+  }
 }
 
 export const clearRefreshTokenCookie = (res: Response) => {
