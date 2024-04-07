@@ -11,7 +11,7 @@ export type GridState = {
   backgroundImage: string | null
   lineWidth: number
   zoomLevel: number
-  mode: "draw" | "pan" | "edit"
+  mode: "draw" | "pan"
   canvas: Canvas
 }
 

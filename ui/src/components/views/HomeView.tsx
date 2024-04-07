@@ -83,13 +83,6 @@ const HomeView = () => {
           >
             Pan
           </Button>
-          <Button
-            type="button"
-            style="primary"
-            onClick={() => dispatch({ type: "SET_MODE", mode: "edit" })}
-          >
-            Edit
-          </Button>
         </section>
       </ControlPanel>
 

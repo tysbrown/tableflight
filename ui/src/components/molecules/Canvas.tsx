@@ -17,7 +17,6 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 
   const isDrawMode = mode === "draw"
   const isPanMode = mode === "pan"
-  const isEditMode = mode === "edit"
 
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
   const [hoveredLine, setHoveredLine] = useState<string | null>(null)
@@ -166,7 +165,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           `width: ${gridWidth}px;`,
           `height: ${gridHeight}px;`,
           isPanMode && tw`z-0`,
-          (isDrawMode || isEditMode) && tw`z-10 cursor-crosshair`,
+          isDrawMode && tw`z-10 cursor-crosshair`,
         ]}
       />
       {lines.map((line: Line) => {
