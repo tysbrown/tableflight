@@ -101,13 +101,14 @@ app.listen(1337, () => {
 
 const serverMessage = (messages: string[]) => {
   const maxLength = Math.max(...messages.map((msg) => msg.length))
-  const topBottomBorder = `┌${"─".repeat(maxLength + 3)}┐`
+  const topBorder = `┌${"─".repeat(maxLength + 3)}┐`
   const bottomBorder = `└${"─".repeat(maxLength + 3)}┘`
 
-  console.log(topBottomBorder)
+  console.log(topBorder)
+
   messages.forEach((msg: string) => {
-    const padding = maxLength - msg.length
-    console.log(`│ ${msg}${" ".repeat(padding)} │`)
+    console.log(`│ ${msg} │`)
   })
+
   console.log(bottomBorder)
 }
