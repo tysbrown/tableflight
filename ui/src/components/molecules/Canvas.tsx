@@ -17,8 +17,10 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 
   const isDrawMode = mode === "draw"
   const isPanMode = mode === "pan"
+  const isEditMode = mode === "edit"
 
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
+  const [hoveredLine, setHoveredLine] = useState<string | null>(null)
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const currentLine = useRef<Line>({
@@ -58,7 +60,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const handleClick = (event: React.MouseEvent) => {
     if (!canvasRef.current) return
 
-    const { x, y } = getPositionRelativeToZoom(event)
+    const { x, y } = getMousePosition(event)
 
     if (!isDrawing) {
       currentLine.current = {
@@ -83,31 +85,31 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   }
 
   const handleMouseMove = (event: React.MouseEvent) => {
-    const { x, y } = getPositionRelativeToZoom(event)
-    let isHovering = false
-    for (const line of lines) {
-      if (isCursorNearLine(x, y, line)) {
-        isHovering = true
-        // Optionally, set some state here to know which line is being hovered over
-        break
-      }
-    }
+    const { x, y } = getMousePosition(event)
+
+    const hoveredLineId = getHoveredLineId(x, y)
+    const isALineHovered = !!hoveredLineId
+
+    if (isALineHovered) setHoveredLine(hoveredLineId)
+    else setHoveredLine(null)
 
     if (!isDrawing || !canvasRef.current) return
-    const isLineStraight =
+
+    const isCurrentLineStraight =
       currentLine.current.startX === x || currentLine.current.startY === y
 
     currentLine.current = {
       ...currentLine.current,
       endX: x,
       endY: y,
-      color: isLineStraight ? "blue" : "black",
+      color: isCurrentLineStraight ? "blue" : "black",
     }
 
     redrawCanvas()
   }
 
-  const getPositionRelativeToZoom = (event: React.MouseEvent) => {
+  // Gets the mouse position relative to the canvas, accounting for zoom level
+  const getMousePosition = (event: React.MouseEvent) => {
     if (!canvasRef.current) return { x: 0, y: 0 }
 
     const rect = canvasRef.current.getBoundingClientRect()
@@ -117,44 +119,48 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
     return { x, y }
   }
 
-  // const cursorIsHoveringALine = (event: React.MouseEvent) => {
-  //   if (!canvasRef.current) return false
+  const getHoveredLineId = (x: number, y: number) => {
+    if (!canvasRef.current) return null
 
-  //   const { x, y } = getPositionRelativeToZoom(event)
+    const threshold = 10
 
-  //   return lines.some((line) => {
-  //     const { startX, startY, endX, endY } = line
-  //     return (
-  //       x > startX - shift &&
-  //       x < startX + shift &&
-  //       y > startY - shift &&
-  //       y < startY + shift
-  //     )
-  //   })
-  // }
+    for (const line of lines) {
+      const { id, startX, startY, endX, endY } = line
 
-  function isCursorNearLine(cursorX, cursorY, line) {
-    const { startX, startY, endX, endY } = line
+      // Calculate the squared distance from the start of the line to the end
+      const lineLengthSquared =
+        (endX - startX) * (endX - startX) + (endY - startY) * (endY - startY)
 
-    // Calculate distances to start and end points
-    const distToStart = Math.sqrt(
-      Math.pow(cursorX - startX, 2) + Math.pow(cursorY - startY, 2),
-    )
-    const distToEnd = Math.sqrt(
-      Math.pow(cursorX - endX, 2) + Math.pow(cursorY - endY, 2),
-    )
+      // If the line length is 0, it's a point, so calculate the distance from the point to the cursor
+      if (lineLengthSquared === 0) {
+        if (Math.hypot(startX - x, startY - y) <= threshold) {
+          return id
+        }
+        continue
+      }
 
-    // Threshold for considering cursor "close enough" to the line
-    const threshold = 10 // Pixels
+      // Calculate the t parameter for the point on the line closest to the cursor
+      let t =
+        ((x - startX) * (endX - startX) + (y - startY) * (endY - startY)) /
+        lineLengthSquared
 
-    if (distToStart < threshold || distToEnd < threshold) {
-      return true
+      // If the point is outside the line segment, clamp it to the closest endpoint
+      t = Math.max(0, Math.min(1, t))
+
+      // Calculate the coordinates of the point on the line closest to the cursor
+      const closestX = startX + t * (endX - startX)
+      const closestY = startY + t * (endY - startY)
+
+      // Calculate the distance from the cursor to the closest point on the line
+      const distanceToLine = Math.hypot(closestX - x, closestY - y)
+
+      // If the distance is less than or equal to the line thickness, the cursor is over the line
+      if (distanceToLine <= threshold) {
+        return id
+      }
     }
 
-    // Optionally, include more accurate point-to-line segment distance calculation
-    // to handle cursor hovering over the middle of a line
-
-    return false
+    return null
   }
 
   return (
@@ -170,28 +176,32 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           `width: ${gridWidth}px;`,
           `height: ${gridHeight}px;`,
           isPanMode && tw`z-0`,
-          isDrawMode && tw`z-10 cursor-crosshair`,
+          (isDrawMode || isEditMode) && tw`z-10 cursor-crosshair`,
         ]}
       />
-      {lines.map((line: Line) => (
-        <>
-          <button
-            key={`${line.id} - ${line.startX} - ${line.startY}`}
-            css={[
-              tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
-              `top: ${line.startY}px;`,
-              `left: ${line.startX}px;`,
-            ]}
-          ></button>
-          <button
-            css={[
-              tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
-              `top: ${line.endY}px;`,
-              `left: ${line.endX}px;`,
-            ]}
-          ></button>
-        </>
-      ))}
+      {lines.map((line: Line) => {
+        if (line.id !== hoveredLine) return null
+
+        return (
+          <>
+            <button
+              key={`${line.id} - ${line.startX} - ${line.startY}`}
+              css={[
+                tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
+                `top: ${line.startY}px;`,
+                `left: ${line.startX}px;`,
+              ]}
+            ></button>
+            <button
+              css={[
+                tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
+                `top: ${line.endY}px;`,
+                `left: ${line.endX}px;`,
+              ]}
+            ></button>
+          </>
+        )
+      })}
     </>
   )
 }
