@@ -131,14 +131,6 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       const lineLengthSquared =
         (endX - startX) * (endX - startX) + (endY - startY) * (endY - startY)
 
-      // If the line length is 0, it's a point, so calculate the distance from the point to the cursor
-      if (lineLengthSquared === 0) {
-        if (Math.hypot(startX - x, startY - y) <= threshold) {
-          return id
-        }
-        continue
-      }
-
       // Calculate the t parameter for the point on the line closest to the cursor
       let t =
         ((x - startX) * (endX - startX) + (y - startY) * (endY - startY)) /
@@ -155,9 +147,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       const distanceToLine = Math.hypot(closestX - x, closestY - y)
 
       // If the distance is less than or equal to the line thickness, the cursor is over the line
-      if (distanceToLine <= threshold) {
-        return id
-      }
+      if (distanceToLine <= threshold) return id
     }
 
     return null
