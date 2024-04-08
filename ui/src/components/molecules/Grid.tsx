@@ -3,6 +3,7 @@ import tw from "twin.macro"
 import { Token } from "@/atoms"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
+import { DroppedToken } from "@/types"
 
 /**
  * Dynamic SVG grid component that renders a grid of cells based on the dimensions
@@ -67,7 +68,7 @@ const Grid = () => {
 
     const { newToken, token, row, col } = JSON.parse(
       dataTransfer.getData("application/json"),
-    )
+    ) as DroppedToken
 
     const rect = currentTarget.getBoundingClientRect()
 

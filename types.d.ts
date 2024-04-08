@@ -44,6 +44,16 @@ export type TokenType = {
   ownedById: number
 }
 
+/**
+ * Data that is passed when a token is dragged and dropped onto the grid.
+ */
+export type DroppedToken = {
+  newToken: boolean
+  token: TokenType
+  row: number
+  col: number
+}
+
 export type GridType = (TokenType | null | undefined)[][]
 
 export type Line = {
