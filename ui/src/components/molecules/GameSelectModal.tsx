@@ -24,7 +24,7 @@ const GameSelectModal = ({ games }: GameSelectModalProps) => {
     >
       <HeadlineSmall>Games</HeadlineSmall>
       <BodyMedium>
-        Welcome back! Please select the game session you'd like to load from the
+        Welcome back! Please select the game session you&apos;d like to load from the
         list below, or create a new one.
       </BodyMedium>
       <List css={[tw`my-6`]}>
