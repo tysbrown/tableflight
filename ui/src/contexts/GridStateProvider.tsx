@@ -66,7 +66,7 @@ type SetGameSessionIdAction = {
 
 type SetModeAction = {
   type: "SET_MODE"
-  mode: "draw" | "pan" | "edit"
+  mode: "draw" | "pan"
 }
 
 type SetCanvasAction = {
