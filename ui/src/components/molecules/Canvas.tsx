@@ -2,6 +2,7 @@ import type { Line } from "@/types"
 import { useEffect, useRef, useState } from "react"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
+import { clamp } from "@/utils"
 import tw from "twin.macro"
 import React from "react"
 
@@ -169,8 +170,8 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         ((x - startX) * (endX - startX) + (y - startY) * (endY - startY)) /
         lineLengthSquared
 
-      // If the point is outside the line segment, clamp it to the closest endpoint
-      t = Math.max(0, Math.min(1, t))
+      // Clamp to the confines of the line segment
+      t = clamp(t, 0, 1)
 
       // Calculate the coordinates of the point on the line closest to the cursor
       const closestX = startX + t * (endX - startX)
@@ -179,7 +180,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       // Calculate the distance from the cursor to the closest point on the line
       const distanceToLine = Math.hypot(closestX - x, closestY - y)
 
-      // If the distance is less than or equal to the line thickness, the cursor is over the line
+      // If the distance is less than or equal to the threshold, return the line's id
       if (distanceToLine <= threshold) return id
     }
 
