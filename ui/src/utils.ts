@@ -2,6 +2,9 @@
  * @module Utils
  */
 
+import colors from "tailwindcss/colors"
+import { DefaultColors } from "tailwindcss/types/generated/colors"
+
 /**
  * Check's the user agent to determine if the browser is Firefox.
  * @memberof Utils
@@ -16,3 +19,17 @@ export const isFirefox = !!navigator.userAgent.match(/firefox|fxios/i)
  */
 export const clamp = (value: number, min: number, max: number): number =>
   Math.max(Math.min(value, max), min)
+
+/**
+ *
+ * @memberof Utils
+ * @returns {string} The hex value of the Tailwind color.
+ */
+export const getTailwindColorHex = (color: string, shade: string): string => {
+  const tailwindColors: DefaultColors = colors
+  return (
+    (tailwindColors[color as keyof DefaultColors] as Record<string, string>)[
+      shade
+    ] || ""
+  )
+}
