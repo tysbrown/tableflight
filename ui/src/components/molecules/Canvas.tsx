@@ -19,20 +19,18 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const isPanMode = mode === "pan"
 
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
   const [hoveredLine, setHoveredLine] = useState<string | null>(null)
-  const [changingLine, setChangingLine] = useState<
-    (Line & { changing: string }) | null
-  >(null)
-  const [currentLine, setCurrentLine] = useState<Line>({
-    id: "",
-    startX: 0,
-    startY: 0,
-    endX: 0,
-    endY: 0,
-    color: "",
-    lineWidth: 0,
-  })
+  const [currentLine, setCurrentLine] = useState<Line & { isEditing?: string }>(
+    {
+      id: "",
+      startX: 0,
+      startY: 0,
+      endX: 0,
+      endY: 0,
+      color: "",
+      lineWidth: 0,
+    },
+  )
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -50,7 +48,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
     context.clearRect(0, 0, canvas.width, canvas.height)
     lines.forEach((line) => drawLine(context, line))
 
-    if (isDrawing && currentLine.id) {
+    if (isDrawing) {
       drawLine(context, currentLine)
     }
   }
@@ -65,10 +63,11 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   }
 
   const handleClick = (event: React.MouseEvent) => {
-    if (!canvasRef.current || isEditing) return
+    if (!canvasRef.current) return
 
     const { x, y } = getMousePosition(event)
 
+    // User is drawing a new line
     if (!isDrawing) {
       setCurrentLine({
         id: `line-${x}-${y}-${lines.length}`,
@@ -81,15 +80,15 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       })
       setIsDrawing(true)
     } else {
-      dispatch({
-        type: "SET_CANVAS",
-        canvas: { lines: [...lines, currentLine] },
-      })
-      setIsDrawing(false)
-      setCurrentLine({
+      const newLine = {
         ...currentLine,
         color: "black",
+      }
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: { lines: [...lines, newLine] },
       })
+      setIsDrawing(false)
     }
   }
 
@@ -102,38 +101,43 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
     if (isALineHovered) setHoveredLine(hoveredLineId)
     else setHoveredLine(null)
 
-    if (isEditing) {
-      const newLines = lines.map((line) => {
-        if (line.id === changingLine!.id) {
-          if (changingLine!.changing === "start")
-            return {
-              ...line,
-              startX: x,
-              startY: y,
-            }
-          if (changingLine!.changing === "end")
-            return {
-              ...line,
-              endX: x,
-              endY: y,
-            }
-        }
-        return line
-      })
-
-      dispatch({ type: "SET_CANVAS", canvas: { lines: newLines } })
-    }
-
     if (isDrawing) {
-      const isCurrentLineStraight =
-        currentLine.startX === x || currentLine.startY === y
+      const isDrawingNewLine = !currentLine.isEditing
+      const isEditingStart = currentLine.isEditing === "start"
+      const isEditingEnd = currentLine.isEditing === "end"
+      let isCurrentLineStraight = false
 
-      setCurrentLine({
-        ...currentLine,
-        endX: x,
-        endY: y,
-        color: isCurrentLineStraight ? "blue" : "black",
-      })
+      if (isEditingStart) {
+        isCurrentLineStraight = currentLine.endX === x || currentLine.endY === y
+        setCurrentLine({
+          ...currentLine,
+          startX: x,
+          startY: y,
+          color: isCurrentLineStraight ? "blue" : "black",
+        })
+      }
+
+      if (isEditingEnd) {
+        isCurrentLineStraight =
+          currentLine.startX === x || currentLine.startY === y
+        setCurrentLine({
+          ...currentLine,
+          endX: x,
+          endY: y,
+          color: isCurrentLineStraight ? "blue" : "black",
+        })
+      }
+
+      if (isDrawingNewLine) {
+        isCurrentLineStraight =
+          currentLine.startX === x || currentLine.startY === y
+        setCurrentLine({
+          ...currentLine,
+          endX: x,
+          endY: y,
+          color: isCurrentLineStraight ? "blue" : "black",
+        })
+      }
     }
   }
 
@@ -206,32 +210,36 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
             <button
               key={`${line.id} - ${line.startX} - ${line.startY}`}
               css={[
-                tw`absolute w-2 h-2 bg-black rounded-full cursor-grab -translate-x-1/2 -translate-y-1/2 z-10 `,
-                tw`active:cursor-grabbing`,
+                tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
                 `top: ${line.startY}px;`,
                 `left: ${line.startX}px;`,
               ]}
-              onMouseDown={() => {
-                setIsEditing(true)
-                setChangingLine({ ...line, changing: "start" })
-              }}
-              onMouseUp={() => {
-                setIsEditing(false)
+              onClick={() => {
+                setIsDrawing(true)
+                dispatch({
+                  type: "SET_CANVAS",
+                  canvas: {
+                    lines: lines.filter((l) => l.id !== line.id),
+                  },
+                })
+                setCurrentLine({ ...line, isEditing: "start" })
               }}
             ></button>
             <button
               css={[
-                tw`absolute w-2 h-2 bg-black rounded-full cursor-grab -translate-x-1/2 -translate-y-1/2 z-10 `,
-                tw`active:cursor-grabbing`,
+                tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
                 `top: ${line.endY}px;`,
                 `left: ${line.endX}px;`,
               ]}
-              onMouseDown={() => {
-                setIsEditing(true)
-                setChangingLine({ ...line, changing: "end" })
-              }}
-              onMouseUp={() => {
-                setIsEditing(false)
+              onClick={() => {
+                setIsDrawing(true)
+                dispatch({
+                  type: "SET_CANVAS",
+                  canvas: {
+                    lines: lines.filter((l) => l.id !== line.id),
+                  },
+                })
+                setCurrentLine({ ...line, isEditing: "end" })
               }}
             ></button>
           </>
