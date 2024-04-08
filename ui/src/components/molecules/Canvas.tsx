@@ -2,7 +2,7 @@ import type { Line } from "@/types"
 import { useEffect, useRef, useState } from "react"
 import { useGridState } from "@/hooks/useGridState"
 import { GridState } from "@/contexts/GridStateProvider"
-import { clamp } from "@/utils"
+import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
 import React from "react"
 
@@ -15,6 +15,8 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const { state, dispatch } = useGridState()
   const { zoomLevel, mode, canvas } = state as GridState
   const { lines } = canvas
+
+  const scaleFactor = 1 / zoomLevel
 
   const isDrawMode = mode === "draw"
   const isPanMode = mode === "pan"
@@ -34,10 +36,45 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   )
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const blue500Hex = getTailwindColorHex("blue", "500")
 
   useEffect(() => {
     redrawCanvas()
   }, [lines, currentLine])
+
+  useEffect(() => {
+    if (hoveredLine) {
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.id === hoveredLine) {
+              return { ...line, color: blue500Hex }
+            }
+            // Handles case where cursor goes from hovering one line to hovering another
+            if (line.color === blue500Hex && line.id !== hoveredLine) {
+              return { ...line, color: "black" }
+            }
+            return line
+          }),
+        },
+      })
+    }
+
+    return () => {
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.color === blue500Hex) {
+              return { ...line, color: "black" }
+            }
+            return line
+          }),
+        },
+      })
+    }
+  }, [hoveredLine])
 
   const redrawCanvas = () => {
     const canvas = canvasRef.current
@@ -156,7 +193,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
    * if the cursor is hovering over a line.
    */
   const scanForHoveredLines = (x: number, y: number) => {
-    const threshold = 10
+    const threshold = 10 * scaleFactor
     let hoveredLine = null
 
     for (const line of lines) {
@@ -198,6 +235,8 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
     setHoveredLine(hoveredLine)
   }
 
+  const handleSizeBasedOnZoom = 8 * scaleFactor
+
   return (
     <>
       <canvas
@@ -222,9 +261,11 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
             <button
               key={`${line.id} - ${line.startX} - ${line.startY}`}
               css={[
-                tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
+                tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
                 `top: ${line.startY}px;`,
                 `left: ${line.startX}px;`,
+                `width: ${handleSizeBasedOnZoom}px;`,
+                `height: ${handleSizeBasedOnZoom}px;`,
               ]}
               onClick={() => {
                 setIsDrawing(true)
@@ -239,9 +280,11 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
             ></button>
             <button
               css={[
-                tw`absolute w-2 h-2 bg-black rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
+                tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
                 `top: ${line.endY}px;`,
                 `left: ${line.endX}px;`,
+                `width: ${handleSizeBasedOnZoom}px;`,
+                `height: ${handleSizeBasedOnZoom}px;`,
               ]}
               onClick={() => {
                 setIsDrawing(true)
