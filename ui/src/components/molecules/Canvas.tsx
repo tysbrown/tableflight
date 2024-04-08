@@ -96,11 +96,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const handleMouseMove = (event: React.MouseEvent) => {
     const { x, y } = getMousePosition(event)
 
-    const hoveredLineId = getHoveredLineId(x, y)
-    const isALineHovered = !!hoveredLineId
-
-    if (isALineHovered) setHoveredLine(hoveredLineId)
-    else setHoveredLine(null)
+    scanForHoveredLines(x, y)
 
     if (isDrawing) {
       const isDrawingNewLine = !currentLine.isEditing
@@ -142,7 +138,9 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
     }
   }
 
-  // Gets the mouse position relative to the canvas, accounting for zoom level
+  /**
+   * Gets the mouse position relative to the canvas, accounting for zoom level.
+   */
   const getMousePosition = (event: React.MouseEvent) => {
     if (!canvasRef.current) return { x: 0, y: 0 }
 
@@ -153,38 +151,51 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
     return { x, y }
   }
 
-  const getHoveredLineId = (x: number, y: number) => {
-    if (!canvasRef.current) return null
-
+  /**
+   * Uses principles of vector mathematics, geometry, and linear algebra to determine
+   * if the cursor is hovering over a line.
+   */
+  const scanForHoveredLines = (x: number, y: number) => {
     const threshold = 10
+    let hoveredLine = null
 
     for (const line of lines) {
       const { id, startX, startY, endX, endY } = line
 
-      // Calculate the squared distance from the start of the line to the end
+      // Calculate the squared distance from the start of the line to the
+      // end, representing the line as a vector.
       const lineLengthSquared =
         (endX - startX) * (endX - startX) + (endY - startY) * (endY - startY)
 
-      // Calculate the t parameter for the point on the line closest to the cursor
+      // Calculate the t parameter for the point on the line closest to the cursor using
+      // the dot product of the vector from the start of the line to the cursor and the
+      // vector representing the line itself.
       let t =
         ((x - startX) * (endX - startX) + (y - startY) * (endY - startY)) /
         lineLengthSquared
 
-      // Clamp to the confines of the line segment
+      // Clamp t to the range [0, 1] to ensure the point lies within the line segment, not
+      // on its infinite extension.
       t = clamp(t, 0, 1)
 
-      // Calculate the coordinates of the point on the line closest to the cursor
+      // Calculate the coordinates of the point on the line closest to the cursor using the
+      // line equation in vector form.
       const closestX = startX + t * (endX - startX)
       const closestY = startY + t * (endY - startY)
 
-      // Calculate the distance from the cursor to the closest point on the line
+      // Calculate the Euclidean distance from the cursor to the closest point on the line
+      // using the Pythagorean theorem.
       const distanceToLine = Math.hypot(closestX - x, closestY - y)
 
-      // If the distance is less than or equal to the threshold, return the line's id
-      if (distanceToLine <= threshold) return id
+      // If the distance is less than or equal to a defined threshold, conclude that the
+      // cursor is hovering over this line.
+      if (distanceToLine <= threshold) {
+        hoveredLine = id
+        break
+      }
     }
 
-    return null
+    setHoveredLine(hoveredLine)
   }
 
   return (
