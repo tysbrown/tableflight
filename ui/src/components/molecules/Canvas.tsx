@@ -1,7 +1,7 @@
-import type { Line } from "@/types"
-import { useEffect, useRef, useState } from "react"
+import type { Canvas, Line } from "@/types"
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { useGridState } from "@/hooks/useGridState"
-import { GridState } from "@/contexts/GridStateProvider"
+import { GridState, SetCanvasAction } from "@/contexts/GridStateProvider"
 import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
 import React from "react"
@@ -39,6 +39,29 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const blue500Hex = getTailwindColorHex("blue", "500")
 
   useEffect(() => {
+    const cancelDrawingOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsDrawing(false)
+        setCurrentLine({
+          id: "",
+          startX: 0,
+          startY: 0,
+          endX: 0,
+          endY: 0,
+          color: "",
+          lineWidth: 0,
+        })
+      }
+    }
+
+    document.addEventListener("keydown", cancelDrawingOnEscape)
+
+    return () => {
+      document.removeEventListener("keydown", () => cancelDrawingOnEscape)
+    }
+  }, [])
+
+  useEffect(() => {
     redrawCanvas()
   }, [lines, currentLine])
 
@@ -52,16 +75,11 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
               return { ...line, color: blue500Hex }
             }
             // Handles case where cursor goes from hovering one line to hovering another
-            if (line.color === blue500Hex && line.id !== hoveredLine) {
-              return { ...line, color: "black" }
-            }
-            return line
+            return { ...line, color: "black" }
           }),
         },
       })
-    }
-
-    return () => {
+    } else {
       dispatch({
         type: "SET_CANVAS",
         canvas: {
@@ -126,6 +144,15 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         type: "SET_CANVAS",
         canvas: { lines: [...lines, newLine] },
       })
+      setCurrentLine({
+        id: "",
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+        color: "",
+        lineWidth: 0,
+      })
       setIsDrawing(false)
     }
   }
@@ -165,6 +192,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       if (isDrawingNewLine) {
         isCurrentLineStraight =
           currentLine.startX === x || currentLine.startY === y
+
         setCurrentLine({
           ...currentLine,
           endX: x,
@@ -193,8 +221,10 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
    * if the cursor is hovering over a line.
    */
   const scanForHoveredLines = (x: number, y: number) => {
+    if (isDrawing) return
+
     const threshold = 10 * scaleFactor
-    let hoveredLine = null
+    let currentHoveredLine: string | null = null
 
     for (const line of lines) {
       const { id, startX, startY, endX, endY } = line
@@ -227,12 +257,12 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       // If the distance is less than or equal to a defined threshold, conclude that the
       // cursor is hovering over this line.
       if (distanceToLine <= threshold) {
-        hoveredLine = id
+        currentHoveredLine = id
         break
       }
     }
 
-    setHoveredLine(hoveredLine)
+    setHoveredLine(currentHoveredLine)
   }
 
   const handleSizeBasedOnZoom = 8 * scaleFactor
@@ -253,55 +283,86 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           isDrawMode && tw`z-10 cursor-crosshair`,
         ]}
       />
-      {lines.map((line: Line) => {
-        if (line.id !== hoveredLine) return null
-
-        return (
-          <>
-            <button
-              key={`${line.id} - ${line.startX} - ${line.startY}`}
-              css={[
-                tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
-                `top: ${line.startY}px;`,
-                `left: ${line.startX}px;`,
-                `width: ${handleSizeBasedOnZoom}px;`,
-                `height: ${handleSizeBasedOnZoom}px;`,
-              ]}
-              onClick={() => {
-                setIsDrawing(true)
-                dispatch({
-                  type: "SET_CANVAS",
-                  canvas: {
-                    lines: lines.filter((l) => l.id !== line.id),
-                  },
-                })
-                setCurrentLine({ ...line, isEditing: "start" })
-              }}
-            ></button>
-            <button
-              css={[
-                tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-10 `,
-                `top: ${line.endY}px;`,
-                `left: ${line.endX}px;`,
-                `width: ${handleSizeBasedOnZoom}px;`,
-                `height: ${handleSizeBasedOnZoom}px;`,
-              ]}
-              onClick={() => {
-                setIsDrawing(true)
-                dispatch({
-                  type: "SET_CANVAS",
-                  canvas: {
-                    lines: lines.filter((l) => l.id !== line.id),
-                  },
-                })
-                setCurrentLine({ ...line, isEditing: "end" })
-              }}
-            ></button>
-          </>
-        )
-      })}
+      <LineHandles
+        lines={lines}
+        hoveredLine={hoveredLine}
+        handleSizeBasedOnZoom={handleSizeBasedOnZoom}
+        setIsDrawing={setIsDrawing}
+        setHoveredLine={setHoveredLine}
+        setCurrentLine={setCurrentLine}
+        dispatch={dispatch}
+      />
     </>
   )
+}
+
+type LineHandleProps = {
+  lines: Line[]
+  hoveredLine: string | null
+  handleSizeBasedOnZoom: number
+  setIsDrawing: Dispatch<SetStateAction<boolean>>
+  setHoveredLine: Dispatch<SetStateAction<string | null>>
+  setCurrentLine: Dispatch<SetStateAction<Line & { isEditing?: string }>>
+  dispatch: Dispatch<SetCanvasAction>
+}
+
+const LineHandles = ({
+  lines,
+  hoveredLine,
+  handleSizeBasedOnZoom,
+  setIsDrawing,
+  setHoveredLine,
+  setCurrentLine,
+  dispatch,
+}: LineHandleProps) => {
+  return lines.map((line: Line) => {
+    if (line.id !== hoveredLine) return null
+
+    return (
+      <div key={`${line.id} - ${line.startX} - ${line.startY}`}>
+        <button
+          css={[
+            tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-50 `,
+            `top: ${line.startY}px;`,
+            `left: ${line.startX}px;`,
+            `width: ${handleSizeBasedOnZoom}px;`,
+            `height: ${handleSizeBasedOnZoom}px;`,
+          ]}
+          onClick={() => {
+            setIsDrawing(true)
+            setHoveredLine(null)
+            dispatch({
+              type: "SET_CANVAS",
+              canvas: {
+                lines: lines.filter((l) => l.id !== line.id),
+              },
+            })
+            setCurrentLine({ ...line, isEditing: "start" })
+          }}
+        ></button>
+        <button
+          css={[
+            tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-50 `,
+            `top: ${line.endY}px;`,
+            `left: ${line.endX}px;`,
+            `width: ${handleSizeBasedOnZoom}px;`,
+            `height: ${handleSizeBasedOnZoom}px;`,
+          ]}
+          onClick={() => {
+            setIsDrawing(true)
+            setHoveredLine(null)
+            dispatch({
+              type: "SET_CANVAS",
+              canvas: {
+                lines: lines.filter((l) => l.id !== line.id),
+              },
+            })
+            setCurrentLine({ ...line, isEditing: "end" })
+          }}
+        ></button>
+      </div>
+    )
+  })
 }
 
 export default Canvas
