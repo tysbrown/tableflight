@@ -26,50 +26,50 @@ type ActionType =
   | SetModeAction
   | SetCanvasAction
 
-type AddTokenAction = {
+export type AddTokenAction = {
   type: "ADD_TOKEN"
   x: number
   y: number
   token: TokenType
 }
 
-type RemoveTokenAction = {
+export type RemoveTokenAction = {
   type: "REMOVE_TOKEN"
   x: number
   y: number
 }
 
-type SetBackgroundAction = {
+export type SetBackgroundAction = {
   type: "SET_BACKGROUND"
   backgroundImage: string
 }
 
-type SetDimensionsAction = {
+export type SetDimensionsAction = {
   type: "SET_DIMENSIONS"
   dimensions: { width: number; height: number }
 }
 
-type SetCellSizeAction = {
+export type SetCellSizeAction = {
   type: "SET_CELL_SIZE"
   cellSize: number
 }
 
-type SetZoomLevelAction = {
+export type SetZoomLevelAction = {
   type: "SET_ZOOM_LEVEL"
   zoomLevel: number
 }
 
-type SetGameSessionIdAction = {
+export type SetGameSessionIdAction = {
   type: "SET_GAME_SESSION_ID"
   gameSessionId: string
 }
 
-type SetModeAction = {
+export type SetModeAction = {
   type: "SET_MODE"
   mode: "draw" | "pan"
 }
 
-type SetCanvasAction = {
+export type SetCanvasAction = {
   type: "SET_CANVAS"
   canvas: Canvas
 }
