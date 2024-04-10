@@ -41,7 +41,9 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const editedLineOriginal = useRef<Line | null>(null)
+
   const blue500Hex = getTailwindColorHex("blue", "500")
+  const gray500Hex = getTailwindColorHex("gray", "500")
 
   const isEditing = currentLine.isEditing
 
@@ -70,7 +72,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           type: "SET_CANVAS",
           canvas: {
             lines: lines.map((line) => {
-              return { ...line, color: "black" }
+              return { ...line, color: "#000" }
             }),
           },
         })
@@ -108,7 +110,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
               return { ...line, color: blue500Hex }
             }
             // Handles case where cursor goes from hovering one line to hovering another
-            return { ...line, color: "black" }
+            return { ...line, color: "#000" }
           }),
         },
       })
@@ -118,7 +120,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         canvas: {
           lines: lines.map((line) => {
             if (line.color === blue500Hex) {
-              return { ...line, color: "black" }
+              return { ...line, color: "#000" }
             }
             return line
           }),
@@ -164,14 +166,14 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         startY: y,
         endX: x,
         endY: y,
-        color: "black",
+        color: "#000",
         lineWidth: 2,
       })
       setIsDrawing(true)
     } else {
       const newLine = {
         ...currentLine,
-        color: "black",
+        color: "#000",
       }
       dispatch({
         type: "SET_CANVAS",
@@ -199,7 +201,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           ...currentLine,
           startX: x,
           startY: y,
-          color: isCurrentLineStraight ? "blue" : "black",
+          color: isCurrentLineStraight ? gray500Hex : "#000",
         })
       }
 
@@ -210,7 +212,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           ...currentLine,
           endX: x,
           endY: y,
-          color: isCurrentLineStraight ? "blue" : "black",
+          color: isCurrentLineStraight ? gray500Hex : "#000",
         })
       }
 
@@ -222,7 +224,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           ...currentLine,
           endX: x,
           endY: y,
-          color: isCurrentLineStraight ? "blue" : "black",
+          color: isCurrentLineStraight ? gray500Hex : "#000",
         })
       }
     }
@@ -421,7 +423,7 @@ const LineHandles = ({
                 lines: lines.filter((l) => l.id !== line.id),
               },
             })
-            editedLineOriginal.current = { ...line, color: "black" }
+            editedLineOriginal.current = { ...line, color: "#000" }
             setCurrentLine({ ...line, isEditing: "start" })
           }}
         ></button>
@@ -442,7 +444,7 @@ const LineHandles = ({
                 lines: lines.filter((l) => l.id !== line.id),
               },
             })
-            editedLineOriginal.current = { ...line, color: "black" }
+            editedLineOriginal.current = { ...line, color: "#000" }
             setCurrentLine({ ...line, isEditing: "end" })
           }}
         ></button>
