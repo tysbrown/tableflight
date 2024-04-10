@@ -6,6 +6,7 @@ import { GridState, SetCanvasAction } from "@/contexts/GridStateProvider"
 import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
 import React from "react"
+import { useExecuteOnKeyHold } from "@/hooks/useExecuteOnKeyHold"
 
 type CanvasProps = {
   gridWidth: number
@@ -32,6 +33,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const isPanMode = mode === "pan"
 
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
+  const [isHoverDisabled, setIsHoverDisabled] = useState<boolean>(false)
   const [hoveredLine, setHoveredLine] = useState<string | null>(null)
   const [currentLine, setCurrentLine] = useState<Line & { isEditing?: string }>(
     emptyLine,
@@ -58,6 +60,39 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       setCurrentLine(emptyLine)
     }
   })
+
+  useExecuteOnKeyHold(
+    "Shift",
+    () => {
+      if (isDrawMode) {
+        setIsHoverDisabled(true)
+        dispatch({
+          type: "SET_CANVAS",
+          canvas: {
+            lines: lines.map((line) => {
+              return { ...line, color: "black" }
+            }),
+          },
+        })
+      }
+    },
+    () => {
+      if (isDrawMode) {
+        setIsHoverDisabled(false)
+        dispatch({
+          type: "SET_CANVAS",
+          canvas: {
+            lines: lines.map((line) => {
+              if (line.id === hoveredLine) {
+                return { ...line, color: blue500Hex }
+              }
+              return line
+            }),
+          },
+        })
+      }
+    },
+  )
 
   useEffect(() => {
     redrawCanvas()
@@ -213,7 +248,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
    * hovered line if the cursor is near multiple stacked handles.
    */
   const scanForHoveredLines = (x: number, y: number) => {
-    if (isDrawing) return
+    if (isDrawing || isHoverDisabled) return
 
     const threshold = 10 * scaleFactor
 
@@ -329,6 +364,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         hoveredLine={hoveredLine}
         handleSizeBasedOnZoom={handleSizeBasedOnZoom}
         editedLineOriginal={editedLineOriginal}
+        isHoverDisabled={isHoverDisabled}
         setIsDrawing={setIsDrawing}
         setHoveredLine={setHoveredLine}
         setCurrentLine={setCurrentLine}
@@ -343,6 +379,7 @@ type LineHandleProps = {
   hoveredLine: string | null
   handleSizeBasedOnZoom: number
   editedLineOriginal: React.MutableRefObject<Line | null>
+  isHoverDisabled: boolean
   setIsDrawing: Dispatch<SetStateAction<boolean>>
   setHoveredLine: Dispatch<SetStateAction<string | null>>
   setCurrentLine: Dispatch<SetStateAction<Line & { isEditing?: string }>>
@@ -354,11 +391,14 @@ const LineHandles = ({
   hoveredLine,
   handleSizeBasedOnZoom,
   editedLineOriginal,
+  isHoverDisabled,
   setIsDrawing,
   setHoveredLine,
   setCurrentLine,
   dispatch,
 }: LineHandleProps) => {
+  if (isHoverDisabled) return null
+
   return lines.map((line: Line) => {
     if (line.id !== hoveredLine) return null
 
