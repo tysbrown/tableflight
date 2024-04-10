@@ -1,7 +1,7 @@
 import type { Canvas, Line } from "@/types"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { useGridState } from "@/hooks/useGridState"
-import { useExecuteOnEscape } from "@/hooks/useExecuteOnEscape"
+import { useExecuteOnKey } from "@/hooks/useExecuteOnKey"
 import { GridState, SetCanvasAction } from "@/contexts/GridStateProvider"
 import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
@@ -18,6 +18,15 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const { lines } = canvas
 
   const scaleFactor = 1 / zoomLevel
+  const emptyLine: Line = {
+    id: "",
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
+    color: "",
+    lineWidth: 0,
+  }
 
   const isDrawMode = mode === "draw"
   const isPanMode = mode === "pan"
@@ -25,15 +34,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
   const [hoveredLine, setHoveredLine] = useState<string | null>(null)
   const [currentLine, setCurrentLine] = useState<Line & { isEditing?: string }>(
-    {
-      id: "",
-      startX: 0,
-      startY: 0,
-      endX: 0,
-      endY: 0,
-      color: "",
-      lineWidth: 0,
-    },
+    emptyLine,
   )
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -42,18 +43,10 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 
   const isEditing = currentLine.isEditing
 
-  useExecuteOnEscape(() => {
+  useExecuteOnKey("Escape", () => {
     if (isDrawing && !isEditing) {
       setIsDrawing(false)
-      setCurrentLine({
-        id: "",
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
-        color: "",
-        lineWidth: 0,
-      })
+      setCurrentLine(emptyLine)
     }
 
     if (isDrawing && isEditing) {
@@ -62,15 +55,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         type: "SET_CANVAS",
         canvas: { lines: [...lines, editedLineOriginal.current!] },
       })
-      setCurrentLine({
-        id: "",
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
-        color: "",
-        lineWidth: 0,
-      })
+      setCurrentLine(emptyLine)
     }
   })
 
@@ -157,15 +142,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         type: "SET_CANVAS",
         canvas: { lines: [...lines, newLine] },
       })
-      setCurrentLine({
-        id: "",
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
-        color: "",
-        lineWidth: 0,
-      })
+      setCurrentLine(emptyLine)
       setIsDrawing(false)
     }
   }
