@@ -1,7 +1,7 @@
 import type { Canvas, Line } from "@/types"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { useGridState } from "@/hooks/useGridState"
-import { useExecuteOnKey } from "@/hooks/useExecuteOnKey"
+import { useExecuteOnKeyPress } from "@/hooks/useExecuteOnKeyPress"
 import { GridState, SetCanvasAction } from "@/contexts/GridStateProvider"
 import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
@@ -43,7 +43,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 
   const isEditing = currentLine.isEditing
 
-  useExecuteOnKey("Escape", () => {
+  useExecuteOnKeyPress("Escape", () => {
     if (isDrawing && !isEditing) {
       setIsDrawing(false)
       setCurrentLine(emptyLine)
