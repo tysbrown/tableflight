@@ -17,5 +17,5 @@ export const useExecuteOnKeyPress = (key: string, callback: () => void) => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown)
     }
-  }, [callback])
+  }, [key, callback])
 }
