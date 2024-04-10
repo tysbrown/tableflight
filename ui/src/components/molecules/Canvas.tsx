@@ -1,6 +1,7 @@
 import type { Canvas, Line } from "@/types"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { useGridState } from "@/hooks/useGridState"
+import { useExecuteOnEscape } from "@/hooks/useExecuteOnEscape"
 import { GridState, SetCanvasAction } from "@/contexts/GridStateProvider"
 import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
@@ -36,30 +37,42 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   )
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const editedLineOriginal = useRef<Line | null>(null)
   const blue500Hex = getTailwindColorHex("blue", "500")
 
-  useEffect(() => {
-    const cancelDrawingOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsDrawing(false)
-        setCurrentLine({
-          id: "",
-          startX: 0,
-          startY: 0,
-          endX: 0,
-          endY: 0,
-          color: "",
-          lineWidth: 0,
-        })
-      }
+  const isEditing = currentLine.isEditing
+
+  useExecuteOnEscape(() => {
+    if (isDrawing && !isEditing) {
+      setIsDrawing(false)
+      setCurrentLine({
+        id: "",
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+        color: "",
+        lineWidth: 0,
+      })
     }
 
-    document.addEventListener("keydown", cancelDrawingOnEscape)
-
-    return () => {
-      document.removeEventListener("keydown", () => cancelDrawingOnEscape)
+    if (isDrawing && isEditing) {
+      setIsDrawing(false)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: { lines: [...lines, editedLineOriginal.current!] },
+      })
+      setCurrentLine({
+        id: "",
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+        color: "",
+        lineWidth: 0,
+      })
     }
-  }, [])
+  })
 
   useEffect(() => {
     redrawCanvas()
@@ -225,8 +238,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const scanForHoveredLines = (x: number, y: number) => {
     if (isDrawing) return
 
-    const handleThreshold = 10
-    const lineThreshold = 10 * scaleFactor
+    const threshold = 10 * scaleFactor
 
     let nearestHandleDistance = Infinity
     let nearestHandleLineId = null
@@ -240,8 +252,8 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 
       // If this handle is closer than any previously checked and the mouse is over a handle
       if (
-        distanceToStartHandle <= handleThreshold ||
-        distanceToEndHandle <= handleThreshold
+        distanceToStartHandle <= threshold ||
+        distanceToEndHandle <= threshold
       ) {
         handleHovered = true
         if (hoveredLine === id) {
@@ -305,7 +317,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         // cursor is hovering over this line. If this line is closer than any previously checked
         // lines, update the nearest line.
         if (
-          distanceToLine <= lineThreshold &&
+          distanceToLine <= threshold &&
           distanceToLine < nearestLineDistance
         ) {
           nearestLineDistance = distanceToLine
@@ -339,6 +351,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         lines={lines}
         hoveredLine={hoveredLine}
         handleSizeBasedOnZoom={handleSizeBasedOnZoom}
+        editedLineOriginal={editedLineOriginal}
         setIsDrawing={setIsDrawing}
         setHoveredLine={setHoveredLine}
         setCurrentLine={setCurrentLine}
@@ -352,6 +365,7 @@ type LineHandleProps = {
   lines: Line[]
   hoveredLine: string | null
   handleSizeBasedOnZoom: number
+  editedLineOriginal: React.MutableRefObject<Line | null>
   setIsDrawing: Dispatch<SetStateAction<boolean>>
   setHoveredLine: Dispatch<SetStateAction<string | null>>
   setCurrentLine: Dispatch<SetStateAction<Line & { isEditing?: string }>>
@@ -362,6 +376,7 @@ const LineHandles = ({
   lines,
   hoveredLine,
   handleSizeBasedOnZoom,
+  editedLineOriginal,
   setIsDrawing,
   setHoveredLine,
   setCurrentLine,
@@ -389,6 +404,7 @@ const LineHandles = ({
                 lines: lines.filter((l) => l.id !== line.id),
               },
             })
+            editedLineOriginal.current = { ...line, color: "black" }
             setCurrentLine({ ...line, isEditing: "start" })
           }}
         ></button>
@@ -409,6 +425,7 @@ const LineHandles = ({
                 lines: lines.filter((l) => l.id !== line.id),
               },
             })
+            editedLineOriginal.current = { ...line, color: "black" }
             setCurrentLine({ ...line, isEditing: "end" })
           }}
         ></button>
