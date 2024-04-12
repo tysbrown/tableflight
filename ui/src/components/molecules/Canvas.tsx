@@ -217,16 +217,15 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   }
 
   /**
-   * Uses principles of vector mathematics, geometry, and linear algebra to determine
+   * Uses principles of vector math, geometry, and linear algebra to determine
    * if the cursor is hovering over a line. Prioritizes line handles over line bodies,
    * the nearest line if multiple lines are hovered, and the handle of the most recently
-   * hovered line if the cursor is near multiple stacked handles.
+   * hovered line if the cursor is on overlapping line handles.
    */
   const scanForHoveredLines = (x: number, y: number) => {
     if (isDrawing) return
 
-    const handleThreshold = 10
-    const lineThreshold = 10 * scaleFactor
+    const threshold = 10 * scaleFactor
 
     let nearestHandleDistance = Infinity
     let nearestHandleLineId = null
@@ -240,8 +239,8 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 
       // If this handle is closer than any previously checked and the mouse is over a handle
       if (
-        distanceToStartHandle <= handleThreshold ||
-        distanceToEndHandle <= handleThreshold
+        distanceToStartHandle <= threshold ||
+        distanceToEndHandle <= threshold
       ) {
         handleHovered = true
         if (hoveredLine === id) {
@@ -305,7 +304,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         // cursor is hovering over this line. If this line is closer than any previously checked
         // lines, update the nearest line.
         if (
-          distanceToLine <= lineThreshold &&
+          distanceToLine <= threshold &&
           distanceToLine < nearestLineDistance
         ) {
           nearestLineDistance = distanceToLine
