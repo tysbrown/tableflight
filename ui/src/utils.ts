@@ -2,8 +2,8 @@
  * @module Utils
  */
 
+import type { DefaultColors } from "tailwindcss/types/generated/colors"
 import colors from "tailwindcss/colors"
-import { DefaultColors } from "tailwindcss/types/generated/colors"
 
 /**
  * Check's the user agent to determine if the browser is Firefox.

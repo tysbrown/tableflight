@@ -1,10 +1,12 @@
 import type { Canvas, Line } from "@/types"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { useGridState } from "@/hooks/useGridState"
+import { useExecuteOnKeyPress } from "@/hooks/useExecuteOnKeyPress"
 import { GridState, SetCanvasAction } from "@/contexts/GridStateProvider"
 import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
 import React from "react"
+import { useExecuteOnKeyHold } from "@/hooks/useExecuteOnKeyHold"
 
 type CanvasProps = {
   gridWidth: number
@@ -17,49 +19,82 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const { lines } = canvas
 
   const scaleFactor = 1 / zoomLevel
+  const emptyLine: Line = {
+    id: "",
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
+    color: "",
+    lineWidth: 0,
+  }
 
   const isDrawMode = mode === "draw"
   const isPanMode = mode === "pan"
 
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
+  const [isHoverDisabled, setIsHoverDisabled] = useState<boolean>(false)
   const [hoveredLine, setHoveredLine] = useState<string | null>(null)
   const [currentLine, setCurrentLine] = useState<Line & { isEditing?: string }>(
-    {
-      id: "",
-      startX: 0,
-      startY: 0,
-      endX: 0,
-      endY: 0,
-      color: "",
-      lineWidth: 0,
-    },
+    emptyLine,
   )
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const blue500Hex = getTailwindColorHex("blue", "500")
+  const editedLineOriginal = useRef<Line | null>(null)
 
-  useEffect(() => {
-    const cancelDrawingOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsDrawing(false)
-        setCurrentLine({
-          id: "",
-          startX: 0,
-          startY: 0,
-          endX: 0,
-          endY: 0,
-          color: "",
-          lineWidth: 0,
+  const blue500Hex = getTailwindColorHex("blue", "500")
+  const gray500Hex = getTailwindColorHex("gray", "500")
+
+  const isEditing = currentLine.isEditing
+
+  useExecuteOnKeyPress("Escape", () => {
+    if (isDrawing && !isEditing) {
+      setIsDrawing(false)
+      setCurrentLine(emptyLine)
+    }
+
+    if (isDrawing && isEditing) {
+      setIsDrawing(false)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: { lines: [...lines, editedLineOriginal.current!] },
+      })
+      setCurrentLine(emptyLine)
+    }
+  })
+
+  useExecuteOnKeyHold(
+    "Shift",
+    () => {
+      if (isDrawMode) {
+        setIsHoverDisabled(true)
+        dispatch({
+          type: "SET_CANVAS",
+          canvas: {
+            lines: lines.map((line) => {
+              return { ...line, color: "#000" }
+            }),
+          },
         })
       }
-    }
-
-    document.addEventListener("keydown", cancelDrawingOnEscape)
-
-    return () => {
-      document.removeEventListener("keydown", () => cancelDrawingOnEscape)
-    }
-  }, [])
+    },
+    () => {
+      if (isDrawMode) {
+        setIsHoverDisabled(false)
+        dispatch({
+          type: "SET_CANVAS",
+          canvas: {
+            lines: lines.map((line) => {
+              if (line.id === hoveredLine) {
+                return { ...line, color: blue500Hex }
+              }
+              return line
+            }),
+          },
+        })
+      }
+    },
+  )
 
   useEffect(() => {
     redrawCanvas()
@@ -75,7 +110,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
               return { ...line, color: blue500Hex }
             }
             // Handles case where cursor goes from hovering one line to hovering another
-            return { ...line, color: "black" }
+            return { ...line, color: "#000" }
           }),
         },
       })
@@ -85,7 +120,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         canvas: {
           lines: lines.map((line) => {
             if (line.color === blue500Hex) {
-              return { ...line, color: "black" }
+              return { ...line, color: "#000" }
             }
             return line
           }),
@@ -131,28 +166,20 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         startY: y,
         endX: x,
         endY: y,
-        color: "black",
+        color: "#000",
         lineWidth: 2,
       })
       setIsDrawing(true)
     } else {
       const newLine = {
         ...currentLine,
-        color: "black",
+        color: "#000",
       }
       dispatch({
         type: "SET_CANVAS",
         canvas: { lines: [...lines, newLine] },
       })
-      setCurrentLine({
-        id: "",
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
-        color: "",
-        lineWidth: 0,
-      })
+      setCurrentLine(emptyLine)
       setIsDrawing(false)
     }
   }
@@ -174,7 +201,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           ...currentLine,
           startX: x,
           startY: y,
-          color: isCurrentLineStraight ? "blue" : "black",
+          color: isCurrentLineStraight ? gray500Hex : "#000",
         })
       }
 
@@ -185,7 +212,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           ...currentLine,
           endX: x,
           endY: y,
-          color: isCurrentLineStraight ? "blue" : "black",
+          color: isCurrentLineStraight ? gray500Hex : "#000",
         })
       }
 
@@ -197,7 +224,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
           ...currentLine,
           endX: x,
           endY: y,
-          color: isCurrentLineStraight ? "blue" : "black",
+          color: isCurrentLineStraight ? gray500Hex : "#000",
         })
       }
     }
@@ -223,7 +250,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
    * hovered line if the cursor is on overlapping line handles.
    */
   const scanForHoveredLines = (x: number, y: number) => {
-    if (isDrawing) return
+    if (isDrawing || isHoverDisabled) return
 
     const threshold = 10 * scaleFactor
 
@@ -338,6 +365,8 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         lines={lines}
         hoveredLine={hoveredLine}
         handleSizeBasedOnZoom={handleSizeBasedOnZoom}
+        editedLineOriginal={editedLineOriginal}
+        isHoverDisabled={isHoverDisabled}
         setIsDrawing={setIsDrawing}
         setHoveredLine={setHoveredLine}
         setCurrentLine={setCurrentLine}
@@ -351,6 +380,8 @@ type LineHandleProps = {
   lines: Line[]
   hoveredLine: string | null
   handleSizeBasedOnZoom: number
+  editedLineOriginal: React.MutableRefObject<Line | null>
+  isHoverDisabled: boolean
   setIsDrawing: Dispatch<SetStateAction<boolean>>
   setHoveredLine: Dispatch<SetStateAction<string | null>>
   setCurrentLine: Dispatch<SetStateAction<Line & { isEditing?: string }>>
@@ -361,11 +392,15 @@ const LineHandles = ({
   lines,
   hoveredLine,
   handleSizeBasedOnZoom,
+  editedLineOriginal,
+  isHoverDisabled,
   setIsDrawing,
   setHoveredLine,
   setCurrentLine,
   dispatch,
 }: LineHandleProps) => {
+  if (isHoverDisabled) return null
+
   return lines.map((line: Line) => {
     if (line.id !== hoveredLine) return null
 
@@ -388,6 +423,7 @@ const LineHandles = ({
                 lines: lines.filter((l) => l.id !== line.id),
               },
             })
+            editedLineOriginal.current = { ...line, color: "#000" }
             setCurrentLine({ ...line, isEditing: "start" })
           }}
         ></button>
@@ -408,6 +444,7 @@ const LineHandles = ({
                 lines: lines.filter((l) => l.id !== line.id),
               },
             })
+            editedLineOriginal.current = { ...line, color: "#000" }
             setCurrentLine({ ...line, isEditing: "end" })
           }}
         ></button>
@@ -417,3 +454,14 @@ const LineHandles = ({
 }
 
 export default Canvas
+
+const snapMouseCursorToPosition = (x: number, y: number) => {
+  const event = new MouseEvent("mousemove", {
+    view: window,
+    bubbles: true,
+    cancelable: true,
+    clientX: x,
+    clientY: y,
+  })
+  document.dispatchEvent(event)
+}
