@@ -454,3 +454,14 @@ const LineHandles = ({
 }
 
 export default Canvas
+
+const snapMouseCursorToPosition = (x: number, y: number) => {
+  const event = new MouseEvent("mousemove", {
+    view: window,
+    bubbles: true,
+    cancelable: true,
+    clientX: x,
+    clientY: y,
+  })
+  document.dispatchEvent(event)
+}
