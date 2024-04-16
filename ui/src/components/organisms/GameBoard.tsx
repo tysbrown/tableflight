@@ -18,9 +18,16 @@ const GameBoard = () => {
 
   const gridSectionRef = useRef<HTMLDivElement>(null)
   const gridContainerRef = useRef<HTMLDivElement>(null)
+  const isFullyPannedRef = useRef({
+    right: false,
+    down: false,
+    left: false,
+    up: false,
+  })
 
   const { current: gridSection } = gridSectionRef
   const { current: gridContainer } = gridContainerRef
+  const { current: isFullyPanned } = isFullyPannedRef
 
   const viewportWidth = gridSection?.offsetWidth || 0
   const viewportHeight = gridSection?.offsetHeight || 0
@@ -120,6 +127,18 @@ const GameBoard = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if (!gridSection || !gridContainer) return
+
+    const gridSectionRect = gridSection?.getBoundingClientRect()
+    const gridContainerRect = gridContainer?.getBoundingClientRect()
+
+    isFullyPanned.right = gridContainerRect.right - 1 <= gridSectionRect.right
+    isFullyPanned.down = gridContainerRect.bottom <= gridSectionRect.bottom
+    isFullyPanned.left = gridContainerRect.left >= gridSectionRect.left
+    isFullyPanned.up = gridContainerRect.top >= gridSectionRect.top
+  }, [gridSection, gridContainer, gridWidth, gridHeight, position, zoomLevel])
+
   return (
     <section
       ref={gridSectionRef}
@@ -146,7 +165,14 @@ const GameBoard = () => {
             css={[tw`max-w-none w-auto h-auto`]}
           />
         )}
-        <Canvas gridWidth={gridWidth} gridHeight={gridHeight} />
+        <Canvas
+          gridWidth={gridWidth}
+          gridHeight={gridHeight}
+          viewportWidth={viewportWidth}
+          viewportHeight={viewportHeight}
+          isFullyPanned={isFullyPanned}
+          updatePanPosition={updatePanPosition}
+        />
         <Grid />
       </div>
       <ZoomMenu

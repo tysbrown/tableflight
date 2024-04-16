@@ -18,14 +18,26 @@ import { useExecuteOnKeyHold } from "@/hooks/useExecuteOnKeyHold"
 type CanvasProps = {
   gridWidth: number
   gridHeight: number
+  viewportWidth: number
+  viewportHeight: number
+  isFullyPanned: { right: boolean; left: boolean; up: boolean; down: boolean }
+  updatePanPosition: (dx: number, dy: number, isInverted?: boolean) => void
 }
 
-const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
+const Canvas = ({
+  gridWidth,
+  gridHeight,
+  viewportWidth,
+  viewportHeight,
+  isFullyPanned,
+  updatePanPosition,
+}: CanvasProps) => {
   const { state, dispatch } = useGridState()
   const { zoomLevel, mode, canvas } = state as GridState
   const { lines } = canvas
 
   const scaleFactor = 1 / zoomLevel
+  const lineHandleSize = 8 * scaleFactor
   const emptyLine: Line = {
     id: "",
     startX: 0,
@@ -45,96 +57,22 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
   const [currentLine, setCurrentLine] = useState<Line & { isEditing?: string }>(
     emptyLine,
   )
+  const [isAutoPanning, setIsAutoPanning] = useState<boolean>(false)
+  const [isInBounds, setIsInBounds] = useState({
+    right: false,
+    left: false,
+    up: false,
+    down: false,
+  })
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const editedLineOriginal = useRef<Line | null>(null)
+  const autoPanSpeed = useRef<number>(10)
 
   const blue500Hex = getTailwindColorHex("blue", "500")
   const gray500Hex = getTailwindColorHex("gray", "500")
 
   const isEditing = currentLine.isEditing
-
-  useExecuteOnKeyPress("Escape", () => {
-    if (isDrawing && !isEditing) {
-      setIsDrawing(false)
-      setCurrentLine(emptyLine)
-    }
-
-    if (isDrawing && isEditing) {
-      setIsDrawing(false)
-      dispatch({
-        type: "SET_CANVAS",
-        canvas: { lines: [...lines, editedLineOriginal.current!] },
-      })
-      setCurrentLine(emptyLine)
-    }
-  })
-
-  useExecuteOnKeyHold(
-    "Shift",
-    () => {
-      if (isDrawMode) {
-        setIsHoverDisabled(true)
-        dispatch({
-          type: "SET_CANVAS",
-          canvas: {
-            lines: lines.map((line) => {
-              return { ...line, color: "#000" }
-            }),
-          },
-        })
-      }
-    },
-    () => {
-      if (isDrawMode) {
-        setIsHoverDisabled(false)
-        dispatch({
-          type: "SET_CANVAS",
-          canvas: {
-            lines: lines.map((line) => {
-              if (line.id === hoveredLine) {
-                return { ...line, color: blue500Hex }
-              }
-              return line
-            }),
-          },
-        })
-      }
-    },
-  )
-
-  useEffect(() => {
-    redrawCanvas()
-  }, [lines, currentLine])
-
-  useEffect(() => {
-    if (hoveredLine) {
-      dispatch({
-        type: "SET_CANVAS",
-        canvas: {
-          lines: lines.map((line) => {
-            if (line.id === hoveredLine) {
-              return { ...line, color: blue500Hex }
-            }
-            // Handles case where cursor goes from hovering one line to hovering another
-            return { ...line, color: "#000" }
-          }),
-        },
-      })
-    } else {
-      dispatch({
-        type: "SET_CANVAS",
-        canvas: {
-          lines: lines.map((line) => {
-            if (line.color === blue500Hex) {
-              return { ...line, color: "#000" }
-            }
-            return line
-          }),
-        },
-      })
-    }
-  }, [hoveredLine])
 
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -305,6 +243,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
         })
         setCurrentLine(emptyLine)
         setIsDrawing(false)
+        setIsAutoPanning(false)
       }
     },
     [getMousePosition, isDrawing, currentLine, lines, dispatch],
@@ -355,12 +294,165 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
             color: isCurrentLineStraight ? gray500Hex : "#000",
           })
         }
+
+        // Auto pan if the cursor is near the edge of the viewport
+        const threshold = 50
+        const isInRightBounds = event.clientX >= viewportWidth - threshold
+        const isInLeftBounds = event.clientX <= threshold
+        const isInTopBounds = event.clientY <= threshold
+        const isInBottomBounds = event.clientY >= viewportHeight - threshold
+
+        const shouldAutoPan =
+          isInRightBounds || isInLeftBounds || isInTopBounds || isInBottomBounds
+
+        // Pan faster the closer the cursor is to the edge of the viewport
+        if (isInRightBounds)
+          autoPanSpeed.current =
+            Math.abs((event.clientX - viewportWidth + threshold) / threshold) *
+            10
+        if (isInBottomBounds)
+          autoPanSpeed.current =
+            Math.abs((event.clientY - viewportHeight + threshold) / threshold) *
+            10
+        if (isInLeftBounds)
+          autoPanSpeed.current =
+            Math.abs((event.clientX - threshold) / threshold) * 10
+        if (isInTopBounds)
+          autoPanSpeed.current =
+            Math.abs((event.clientY - threshold) / threshold) * 10
+
+        setIsInBounds({
+          right: isInRightBounds,
+          left: isInLeftBounds,
+          up: isInTopBounds,
+          down: isInBottomBounds,
+        })
+
+        if (shouldAutoPan) setIsAutoPanning(true)
+        else setIsAutoPanning(false)
       }
     },
     [scanForHoveredLines, isDrawing, currentLine, gray500Hex],
   )
 
-  const handleSizeBasedOnZoom = 8 * scaleFactor
+  useExecuteOnKeyPress("Escape", () => {
+    if (isDrawing && !isEditing) {
+      setIsDrawing(false)
+      setCurrentLine(emptyLine)
+    }
+
+    if (isDrawing && isEditing) {
+      setIsDrawing(false)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: { lines: [...lines, editedLineOriginal.current!] },
+      })
+      setCurrentLine(emptyLine)
+    }
+  })
+
+  useExecuteOnKeyHold(
+    "Shift",
+    () => {
+      if (isDrawMode) {
+        setIsHoverDisabled(true)
+        dispatch({
+          type: "SET_CANVAS",
+          canvas: {
+            lines: lines.map((line) => {
+              return { ...line, color: "#000" }
+            }),
+          },
+        })
+      }
+    },
+    () => {
+      if (isDrawMode) {
+        setIsHoverDisabled(false)
+        dispatch({
+          type: "SET_CANVAS",
+          canvas: {
+            lines: lines.map((line) => {
+              if (line.id === hoveredLine) {
+                return { ...line, color: blue500Hex }
+              }
+              return line
+            }),
+          },
+        })
+      }
+    },
+  )
+
+  useEffect(() => {
+    redrawCanvas()
+  }, [lines, currentLine])
+
+  useEffect(() => {
+    if (hoveredLine) {
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.id === hoveredLine) {
+              return { ...line, color: blue500Hex }
+            }
+            // Handles case where cursor goes from hovering one line to hovering another
+            return { ...line, color: "#000" }
+          }),
+        },
+      })
+    } else {
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.color === blue500Hex) {
+              return { ...line, color: "#000" }
+            }
+            return line
+          }),
+        },
+      })
+    }
+  }, [hoveredLine])
+
+  useEffect(() => {
+    const shouldPanRight = isInBounds.right && !isFullyPanned.right
+    const shouldPanLeft = isInBounds.left && !isFullyPanned.left
+    const shouldPanUp = isInBounds.up && !isFullyPanned.up
+    const shouldPanDown = isInBounds.down && !isFullyPanned.down
+
+    const rate = autoPanSpeed.current
+
+    if (isAutoPanning) {
+      let dx = shouldPanRight ? rate : shouldPanLeft ? -rate : 0
+      let dy = shouldPanUp ? -rate : shouldPanDown ? rate : 0
+
+      const intervalId = setInterval(() => {
+        updatePanPosition(dx, dy)
+        setCurrentLine({
+          ...currentLine,
+          endX: currentLine.endX + dx,
+          endY: currentLine.endY + dy,
+        })
+
+        dx = shouldPanRight ? dx + rate : shouldPanLeft ? dx - rate : 0
+        dy = shouldPanUp ? dy - rate : shouldPanDown ? dy + rate : 0
+      }, 10)
+
+      return () => clearInterval(intervalId)
+    }
+
+    return () => {}
+  }, [
+    isInBounds,
+    currentLine,
+    autoPanSpeed,
+    isAutoPanning,
+    isFullyPanned,
+    updatePanPosition,
+  ])
 
   return (
     <>
@@ -381,7 +473,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
       <LineHandles
         lines={lines}
         hoveredLine={hoveredLine}
-        handleSizeBasedOnZoom={handleSizeBasedOnZoom}
+        lineHandleSize={lineHandleSize}
         editedLineOriginal={editedLineOriginal}
         isHoverDisabled={isHoverDisabled}
         setIsDrawing={setIsDrawing}
@@ -396,7 +488,7 @@ const Canvas = ({ gridWidth, gridHeight }: CanvasProps) => {
 type LineHandleProps = {
   lines: Line[]
   hoveredLine: string | null
-  handleSizeBasedOnZoom: number
+  lineHandleSize: number
   editedLineOriginal: React.MutableRefObject<Line | null>
   isHoverDisabled: boolean
   setIsDrawing: Dispatch<SetStateAction<boolean>>
@@ -408,7 +500,7 @@ type LineHandleProps = {
 const LineHandles = ({
   lines,
   hoveredLine,
-  handleSizeBasedOnZoom,
+  lineHandleSize,
   editedLineOriginal,
   isHoverDisabled,
   setIsDrawing,
@@ -426,10 +518,10 @@ const LineHandles = ({
         <button
           css={[
             tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-50`,
-            `top: ${line.startY}px;`,
-            `left: ${line.startX}px;`,
-            `width: ${handleSizeBasedOnZoom}px;`,
-            `height: ${handleSizeBasedOnZoom}px;`,
+            `top: ${line.startY}px;
+             left: ${line.startX}px;
+             width: ${lineHandleSize}px;
+             height: ${lineHandleSize}px;`,
           ]}
           onClick={() => {
             setIsDrawing(true)
@@ -447,10 +539,10 @@ const LineHandles = ({
         <button
           css={[
             tw`absolute bg-blue-500 rounded-full cursor-move -translate-x-1/2 -translate-y-1/2 z-50`,
-            `top: ${line.endY}px;`,
-            `left: ${line.endX}px;`,
-            `width: ${handleSizeBasedOnZoom}px;`,
-            `height: ${handleSizeBasedOnZoom}px;`,
+            `top: ${line.endY}px;
+             left: ${line.endX}px;
+             width: ${lineHandleSize}px;
+             height: ${lineHandleSize}px;`,
           ]}
           onClick={() => {
             setIsDrawing(true)
