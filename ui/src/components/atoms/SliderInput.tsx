@@ -141,9 +141,9 @@ const SliderInput = ({
       <div
         css={[
           tw`absolute bottom-[-18px] -translate-x-1/2 bg-primary opacity-0 w-10 h-10 rounded-full transition-opacity duration-200 ease-in-out z-0`,
-          tw`peer-hover:peer-not-disabled:opacity-[0.08]`,
-          tw`peer-focus:peer-not-disabled:opacity-[0.12]`,
-          tw`peer-active:peer-not-disabled:opacity-[0.12]`,
+          tw`peer-hover:opacity-[0.08]`,
+          tw`peer-focus:opacity-[0.12]`,
+          tw`peer-active:opacity-[0.12]`,
           `left: ${percentage}%;`,
         ]}
       />
@@ -153,8 +153,8 @@ const SliderInput = ({
         <div
           css={[
             tw`flex justify-center items-center absolute bottom-6 w-7 h-7 -translate-x-1/2 bg-primary rounded-full text-onPrimary text-xs leading-5 z-20 transition transform scale-0 origin-bottom ease-in-out duration-200`,
-            tw`peer-hover:peer-not-disabled:scale-100`,
-            tw`peer-focus:peer-not-disabled:(scale-100)`,
+            tw`peer-hover:scale-100`,
+            tw`peer-focus:scale-100`,
             tw`after:(content-[""] font-medium absolute bottom-[-7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] 
             border-l-transparent border-r-[10px] border-r-transparent border-t-[11px] border-t-primary z-10)`,
             `left: ${percentage}%;`,
