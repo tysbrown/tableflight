@@ -167,9 +167,7 @@ const Canvas = ({
         let nearestLineDistance = Infinity
         let nearestLineId = null
 
-        lines.forEach((line) => {
-          const { id, startX, startY, endX, endY } = line
-
+        lines.forEach(({ id, startX, startY, endX, endY }) => {
           // Calculate the squared distance from the start of the line to the
           // end, representing the line as a vector.
           const lineLengthSquared = (endX - startX) ** 2 + (endY - startY) ** 2
@@ -429,12 +427,23 @@ const Canvas = ({
       let dx = shouldPanRight ? rate : shouldPanLeft ? -rate : 0
       let dy = shouldPanUp ? -rate : shouldPanDown ? rate : 0
 
+      const isEditingStartHandle = isEditing === "start"
+
       const intervalId = setInterval(() => {
         updatePanPosition(dx, dy)
-        setCurrentLine({
-          ...currentLine,
-          endX: currentLine.endX + dx,
-          endY: currentLine.endY + dy,
+        setCurrentLine((prev) => {
+          if (isEditingStartHandle) {
+            return {
+              ...prev,
+              startX: prev.startX + dx,
+              startY: prev.startY + dy,
+            }
+          }
+          return {
+            ...prev,
+            endX: prev.endX + dx,
+            endY: prev.endY + dy,
+          }
         })
 
         dx = shouldPanRight ? dx + rate : shouldPanLeft ? dx - rate : 0
