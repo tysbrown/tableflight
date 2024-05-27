@@ -328,8 +328,7 @@ const Canvas = ({
           down: isInBottomBounds,
         })
 
-        if (shouldAutoPan) setIsAutoPanning(true)
-        else setIsAutoPanning(false)
+        setIsAutoPanning(shouldAutoPan ? true : false)
       }
     },
     [scanForHoveredLines, isDrawing, currentLine, gray500Hex],
@@ -394,9 +393,8 @@ const Canvas = ({
         type: "SET_CANVAS",
         canvas: {
           lines: lines.map((line) => {
-            if (line.id === hoveredLine) {
-              return { ...line, color: blue500Hex }
-            }
+            if (line.id === hoveredLine) return { ...line, color: blue500Hex }
+
             // Handles case where cursor goes from hovering one line to hovering another
             return { ...line, color: "#000" }
           }),
@@ -407,9 +405,8 @@ const Canvas = ({
         type: "SET_CANVAS",
         canvas: {
           lines: lines.map((line) => {
-            if (line.color === blue500Hex) {
-              return { ...line, color: "#000" }
-            }
+            if (line.color === blue500Hex) return { ...line, color: "#000" }
+
             return line
           }),
         },
