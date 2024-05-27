@@ -95,7 +95,7 @@ const GameBoard = () => {
   }
 
   const handleZoom = (deltaY: number) => {
-    const zoomDelta = -deltaY * 0.001
+    const zoomDelta = -deltaY * 0.01
     const newZoom = clamp(zoomLevel + zoomDelta, 0.1, 5)
 
     const scale = newZoom / zoomLevel
