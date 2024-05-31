@@ -98,10 +98,7 @@ const Canvas = ({
     context.stroke()
   }
 
-  /**
-   * Gets the mouse position relative to the canvas, accounting for zoom level.
-   */
-  const getMousePosition = (event: React.MouseEvent) => {
+  const getMousePositionOnCanvas = (event: React.MouseEvent) => {
     if (!canvasRef.current) return { x: 0, y: 0 }
 
     const rect = canvasRef.current.getBoundingClientRect()
@@ -123,100 +120,75 @@ const Canvas = ({
 
       const threshold = 10 * scaleFactor
 
-      let nearestHandleDistance = Infinity
-      let nearestHandleLineId = null
-      let handleHovered = false
+      const nearestHandle = lines.reduce(
+        (acc, line) => {
+          const { id, startX, startY, endX, endY } = line
+          const distanceToStartHandle = Math.hypot(x - startX, y - startY)
+          const distanceToEndHandle = Math.hypot(x - endX, y - endY)
 
-      // Handles
-      lines.forEach((line) => {
-        const { id, startX, startY, endX, endY } = line
-        const distanceToStartHandle = Math.hypot(x - startX, y - startY)
-        const distanceToEndHandle = Math.hypot(x - endX, y - endY)
-
-        // If this handle is closer than any previously checked and the mouse is over a handle
-        if (
-          distanceToStartHandle <= threshold ||
-          distanceToEndHandle <= threshold
-        ) {
-          handleHovered = true
-          if (hoveredLine === id) {
-            // If the current line is already hovered, prioritize its handle
-            nearestHandleLineId = id
-            nearestHandleDistance = 0 // Ensure this handle is prioritized
-          } else if (
-            distanceToStartHandle < nearestHandleDistance ||
-            distanceToEndHandle < nearestHandleDistance
+          if (
+            distanceToStartHandle <= threshold ||
+            distanceToEndHandle <= threshold
           ) {
-            // Update the nearest handle if closer and not already prioritizing another handle
-            nearestHandleDistance = Math.min(
+            if (hoveredLine === id) {
+              return { id, distance: 0, handleHovered: true }
+            }
+            const distance = Math.min(
               distanceToStartHandle,
               distanceToEndHandle,
             )
-            nearestHandleLineId = id
+            if (distance < acc.distance) {
+              return { id, distance, handleHovered: true }
+            }
           }
-        }
-      })
+          return acc
+        },
+        { id: null, distance: Infinity, handleHovered: false },
+      )
 
-      if (nearestHandleLineId) {
-        setHoveredLine(nearestHandleLineId)
+      if (nearestHandle.id) {
+        setHoveredLine(nearestHandle.id)
         return
       }
 
-      // Line bodies
-      if (!handleHovered) {
-        let nearestLineDistance = Infinity
-        let nearestLineId = null
+      if (!nearestHandle.handleHovered) {
+        const nearestLine = lines.reduce(
+          (acc, line) => {
+            const { id, startX, startY, endX, endY } = line
+            const lineLengthSquared =
+              (endX - startX) ** 2 + (endY - startY) ** 2
 
-        lines.forEach(({ id, startX, startY, endX, endY }) => {
-          // Calculate the squared distance from the start of the line to the
-          // end, representing the line as a vector.
-          const lineLengthSquared = (endX - startX) ** 2 + (endY - startY) ** 2
+            if (lineLengthSquared === 0) return acc
 
-          if (lineLengthSquared === 0) return
+            let t =
+              ((x - startX) * (endX - startX) +
+                (y - startY) * (endY - startY)) /
+              lineLengthSquared
+            t = clamp(t, 0, 1)
 
-          // Calculate the t parameter for the point on the line closest to the cursor using
-          // the dot product of the vector from the start of the line to the cursor and the
-          // vector representing the line itself.
-          let t =
-            ((x - startX) * (endX - startX) + (y - startY) * (endY - startY)) /
-            lineLengthSquared
+            const closestX = startX + t * (endX - startX)
+            const closestY = startY + t * (endY - startY)
+            const distanceToLine = Math.hypot(closestX - x, closestY - y)
 
-          // Clamp t to the range [0, 1] to ensure the point lies within the line segment, not
-          // on its infinite extension.
-          t = clamp(t, 0, 1)
+            if (distanceToLine <= threshold && distanceToLine < acc.distance) {
+              return { id, distance: distanceToLine }
+            }
+            return acc
+          },
+          { id: null, distance: Infinity },
+        )
 
-          // Calculate the coordinates of the point on the line closest to the cursor using the
-          // line equation in vector form.
-          const closestX = startX + t * (endX - startX)
-          const closestY = startY + t * (endY - startY)
-
-          // Calculate the Euclidean distance from the cursor to the closest point on the line
-          // using the Pythagorean theorem.
-          const distanceToLine = Math.hypot(closestX - x, closestY - y)
-
-          // If the distance is less than or equal to a defined threshold, conclude that the
-          // cursor is hovering over this line. If this line is closer than any previously checked
-          // lines, update the nearest line.
-          if (
-            distanceToLine <= threshold &&
-            distanceToLine < nearestLineDistance
-          ) {
-            nearestLineDistance = distanceToLine
-            nearestLineId = id
-          }
-        })
-
-        setHoveredLine(nearestLineId)
+        setHoveredLine(nearestLine.id)
       }
     },
-    [isDrawing, isHoverDisabled, hoveredLine],
+    [isDrawing, isHoverDisabled, hoveredLine, lines, scaleFactor],
   )
-
+  
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       if (!canvasRef.current) return
 
-      const { x, y } = getMousePosition(event)
+      const { x, y } = getMousePositionOnCanvas(event)
 
       // User is drawing a new line
       if (!isDrawing) {
@@ -244,12 +216,12 @@ const Canvas = ({
         setIsAutoPanning(false)
       }
     },
-    [getMousePosition, isDrawing, currentLine, lines, dispatch],
+    [getMousePositionOnCanvas, isDrawing, currentLine, lines, dispatch],
   )
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent) => {
-      const { x, y } = getMousePosition(event)
+      const { x, y } = getMousePositionOnCanvas(event)
 
       scanForHoveredLines(x, y)
 
@@ -333,60 +305,7 @@ const Canvas = ({
     [scanForHoveredLines, isDrawing, currentLine, gray500Hex],
   )
 
-  useExecuteOnKeyPress("Escape", () => {
-    if (isDrawing && !isEditing) {
-      setIsDrawing(false)
-      setCurrentLine(emptyLine)
-    }
-
-    if (isDrawing && isEditing) {
-      setIsDrawing(false)
-      dispatch({
-        type: "SET_CANVAS",
-        canvas: { lines: [...lines, editedLineOriginal.current!] },
-      })
-      setCurrentLine(emptyLine)
-    }
-  })
-
-  useExecuteOnKeyHold(
-    "Shift",
-    () => {
-      if (isDrawMode) {
-        setIsHoverDisabled(true)
-        dispatch({
-          type: "SET_CANVAS",
-          canvas: {
-            lines: lines.map((line) => {
-              return { ...line, color: "#000" }
-            }),
-          },
-        })
-      }
-    },
-    () => {
-      if (isDrawMode) {
-        setIsHoverDisabled(false)
-        dispatch({
-          type: "SET_CANVAS",
-          canvas: {
-            lines: lines.map((line) => {
-              if (line.id === hoveredLine) {
-                return { ...line, color: blue500Hex }
-              }
-              return line
-            }),
-          },
-        })
-      }
-    },
-  )
-
-  useEffect(() => {
-    redrawCanvas()
-  }, [lines, currentLine])
-
-  useEffect(() => {
+  const handleLineHover = () => {
     if (hoveredLine) {
       dispatch({
         type: "SET_CANVAS",
@@ -413,6 +332,71 @@ const Canvas = ({
         },
       })
     }
+  }
+
+  const cancelCurrentLineDraw = () => {
+    if (isDrawing && !isEditing) {
+      setIsDrawing(false)
+      setCurrentLine(emptyLine)
+    }
+
+    if (isDrawing && isEditing) {
+      setIsDrawing(false)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: { lines: [...lines, editedLineOriginal.current!] },
+      })
+      setCurrentLine(emptyLine)
+    }
+  }
+
+  const disableHover = () => {
+    if (isDrawMode) {
+      setIsHoverDisabled(true)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            return { ...line, color: "#000" }
+          }),
+        },
+      })
+    }
+  }
+
+  const enableHover = () => {
+    if (isDrawMode) {
+      setIsHoverDisabled(false)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.id === hoveredLine) {
+              return { ...line, color: blue500Hex }
+            }
+            return line
+          }),
+        },
+      })
+    }
+  }
+
+  useExecuteOnKeyPress("Escape", () => {
+    cancelCurrentLineDraw()
+  })
+
+  useExecuteOnKeyHold(
+    "Shift",
+    () => disableHover(),
+    () => enableHover(),
+  )
+
+  useEffect(() => {
+    redrawCanvas()
+  }, [lines, currentLine])
+
+  useEffect(() => {
+    handleLineHover()
   }, [hoveredLine])
 
   useEffect(() => {
