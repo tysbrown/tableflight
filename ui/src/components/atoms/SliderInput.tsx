@@ -160,7 +160,7 @@ const SliderInput = ({
             `left: ${percentage}%;`,
           ]}
         >
-          {value}
+          {Math.round(value)}
         </div>
       )}
     </div>

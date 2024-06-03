@@ -120,70 +120,95 @@ const Canvas = ({
 
       const threshold = 10 * scaleFactor
 
-      const nearestHandle = lines.reduce(
-        (acc, line) => {
-          const { id, startX, startY, endX, endY } = line
-          const distanceToStartHandle = Math.hypot(x - startX, y - startY)
-          const distanceToEndHandle = Math.hypot(x - endX, y - endY)
+      let nearestHandleDistance = Infinity
+      let nearestHandleLineId = null
+      let handleHovered = false
 
-          if (
-            distanceToStartHandle <= threshold ||
-            distanceToEndHandle <= threshold
+      // Handles
+      lines.forEach((line) => {
+        const { id, startX, startY, endX, endY } = line
+        const distanceToStartHandle = Math.hypot(x - startX, y - startY)
+        const distanceToEndHandle = Math.hypot(x - endX, y - endY)
+
+        // If this handle is closer than any previously checked and the mouse is over a handle
+        if (
+          distanceToStartHandle <= threshold ||
+          distanceToEndHandle <= threshold
+        ) {
+          handleHovered = true
+          if (hoveredLine === id) {
+            // If the current line is already hovered, prioritize its handle
+            nearestHandleLineId = id
+            nearestHandleDistance = 0 // Ensure this handle is prioritized
+          } else if (
+            distanceToStartHandle < nearestHandleDistance ||
+            distanceToEndHandle < nearestHandleDistance
           ) {
-            if (hoveredLine === id) {
-              return { id, distance: 0, handleHovered: true }
-            }
-            const distance = Math.min(
+            // Update the nearest handle if closer and not already prioritizing another handle
+            nearestHandleDistance = Math.min(
               distanceToStartHandle,
               distanceToEndHandle,
             )
-            if (distance < acc.distance) {
-              return { id, distance, handleHovered: true }
-            }
+            nearestHandleLineId = id
           }
-          return acc
-        },
-        { id: null, distance: Infinity, handleHovered: false },
-      )
+        }
+      })
 
-      if (nearestHandle.id) {
-        setHoveredLine(nearestHandle.id)
+      if (nearestHandleLineId) {
+        setHoveredLine(nearestHandleLineId)
         return
       }
 
-      if (!nearestHandle.handleHovered) {
-        const nearestLine = lines.reduce(
-          (acc, line) => {
-            const { id, startX, startY, endX, endY } = line
-            const lineLengthSquared =
-              (endX - startX) ** 2 + (endY - startY) ** 2
+      // Line bodies
+      if (!handleHovered) {
+        let nearestLineDistance = Infinity
+        let nearestLineId = null
 
-            if (lineLengthSquared === 0) return acc
+        lines.forEach(({ id, startX, startY, endX, endY }) => {
+          // Calculate the squared distance from the start of the line to the
+          // end, representing the line as a vector.
+          const lineLengthSquared = (endX - startX) ** 2 + (endY - startY) ** 2
 
-            let t =
-              ((x - startX) * (endX - startX) +
-                (y - startY) * (endY - startY)) /
-              lineLengthSquared
-            t = clamp(t, 0, 1)
+          if (lineLengthSquared === 0) return
 
-            const closestX = startX + t * (endX - startX)
-            const closestY = startY + t * (endY - startY)
-            const distanceToLine = Math.hypot(closestX - x, closestY - y)
+          // Calculate the t parameter for the point on the line closest to the cursor using
+          // the dot product of the vector from the start of the line to the cursor and the
+          // vector representing the line itself.
+          let t =
+            ((x - startX) * (endX - startX) + (y - startY) * (endY - startY)) /
+            lineLengthSquared
 
-            if (distanceToLine <= threshold && distanceToLine < acc.distance) {
-              return { id, distance: distanceToLine }
-            }
-            return acc
-          },
-          { id: null, distance: Infinity },
-        )
+          // Clamp t to the range [0, 1] to ensure the point lies within the line segment, not
+          // on its infinite extension.
+          t = clamp(t, 0, 1)
 
-        setHoveredLine(nearestLine.id)
+          // Calculate the coordinates of the point on the line closest to the cursor using the
+          // line equation in vector form.
+          const closestX = startX + t * (endX - startX)
+          const closestY = startY + t * (endY - startY)
+
+          // Calculate the Euclidean distance from the cursor to the closest point on the line
+          // using the Pythagorean theorem.
+          const distanceToLine = Math.hypot(closestX - x, closestY - y)
+
+          // If the distance is less than or equal to a defined threshold, conclude that the
+          // cursor is hovering over this line. If this line is closer than any previously checked
+          // lines, update the nearest line.
+          if (
+            distanceToLine <= threshold &&
+            distanceToLine < nearestLineDistance
+          ) {
+            nearestLineDistance = distanceToLine
+            nearestLineId = id
+          }
+        })
+
+        setHoveredLine(nearestLineId)
       }
     },
-    [isDrawing, isHoverDisabled, hoveredLine, lines, scaleFactor],
+    [isDrawing, isHoverDisabled, hoveredLine],
   )
-  
+
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       if (!canvasRef.current) return
@@ -298,7 +323,8 @@ const Canvas = ({
           down: isInBottomBounds,
         })
 
-        setIsAutoPanning(shouldAutoPan ? true : false)
+        if (shouldAutoPan) setIsAutoPanning(true)
+        else setIsAutoPanning(false)
       }
     },
     [scanForHoveredLines, isDrawing, currentLine, gray500Hex],
@@ -310,8 +336,9 @@ const Canvas = ({
         type: "SET_CANVAS",
         canvas: {
           lines: lines.map((line) => {
-            if (line.id === hoveredLine) return { ...line, color: blue500Hex }
-
+            if (line.id === hoveredLine) {
+              return { ...line, color: blue500Hex }
+            }
             // Handles case where cursor goes from hovering one line to hovering another
             return { ...line, color: "#000" }
           }),
@@ -322,8 +349,9 @@ const Canvas = ({
         type: "SET_CANVAS",
         canvas: {
           lines: lines.map((line) => {
-            if (line.color === blue500Hex) return { ...line, color: "#000" }
-
+            if (line.color === blue500Hex) {
+              return { ...line, color: "#000" }
+            }
             return line
           }),
         },
