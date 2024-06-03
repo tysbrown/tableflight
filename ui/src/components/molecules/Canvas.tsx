@@ -218,8 +218,8 @@ const Canvas = ({
 
       const { x, y } = getMousePosition(event)
 
-      // User is drawing a new line
       if (!isDrawing) {
+        // User is drawing a new line
         setCurrentLine({
           id: `line-${x}-${y}-${lines.length}`,
           startX: x,
