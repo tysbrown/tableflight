@@ -52,6 +52,7 @@ const HomeView = () => {
           setValue={setCellSize}
           min={10}
           max={100}
+          step={0.001}
           onChange={(e) =>
             dispatch({
               type: "SET_CELL_SIZE",

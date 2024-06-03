@@ -98,10 +98,7 @@ const Canvas = ({
     context.stroke()
   }
 
-  /**
-   * Gets the mouse position relative to the canvas, accounting for zoom level.
-   */
-  const getMousePosition = (event: React.MouseEvent) => {
+  const getMousePositionOnCanvas = (event: React.MouseEvent) => {
     if (!canvasRef.current) return { x: 0, y: 0 }
 
     const rect = canvasRef.current.getBoundingClientRect()
@@ -216,7 +213,7 @@ const Canvas = ({
     (event: React.MouseEvent) => {
       if (!canvasRef.current) return
 
-      const { x, y } = getMousePosition(event)
+      const { x, y } = getMousePositionOnCanvas(event)
 
       if (!isDrawing) {
         // User is drawing a new line
@@ -244,12 +241,12 @@ const Canvas = ({
         setIsAutoPanning(false)
       }
     },
-    [getMousePosition, isDrawing, currentLine, lines, dispatch],
+    [getMousePositionOnCanvas, isDrawing, currentLine, lines, dispatch],
   )
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent) => {
-      const { x, y } = getMousePosition(event)
+      const { x, y } = getMousePositionOnCanvas(event)
 
       scanForHoveredLines(x, y)
 
@@ -326,13 +323,43 @@ const Canvas = ({
           down: isInBottomBounds,
         })
 
-        setIsAutoPanning(shouldAutoPan ? true : false)
+        if (shouldAutoPan) setIsAutoPanning(true)
+        else setIsAutoPanning(false)
       }
     },
     [scanForHoveredLines, isDrawing, currentLine, gray500Hex],
   )
 
-  useExecuteOnKeyPress("Escape", () => {
+  const handleLineHover = () => {
+    if (hoveredLine) {
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.id === hoveredLine) {
+              return { ...line, color: blue500Hex }
+            }
+            // Handles case where cursor goes from hovering one line to hovering another
+            return { ...line, color: "#000" }
+          }),
+        },
+      })
+    } else {
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.color === blue500Hex) {
+              return { ...line, color: "#000" }
+            }
+            return line
+          }),
+        },
+      })
+    }
+  }
+
+  const cancelCurrentLineDraw = () => {
     if (isDrawing && !isEditing) {
       setIsDrawing(false)
       setCurrentLine(emptyLine)
@@ -346,39 +373,47 @@ const Canvas = ({
       })
       setCurrentLine(emptyLine)
     }
+  }
+
+  const disableHover = () => {
+    if (isDrawMode) {
+      setIsHoverDisabled(true)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            return { ...line, color: "#000" }
+          }),
+        },
+      })
+    }
+  }
+
+  const enableHover = () => {
+    if (isDrawMode) {
+      setIsHoverDisabled(false)
+      dispatch({
+        type: "SET_CANVAS",
+        canvas: {
+          lines: lines.map((line) => {
+            if (line.id === hoveredLine) {
+              return { ...line, color: blue500Hex }
+            }
+            return line
+          }),
+        },
+      })
+    }
+  }
+
+  useExecuteOnKeyPress("Escape", () => {
+    cancelCurrentLineDraw()
   })
 
   useExecuteOnKeyHold(
     "Shift",
-    () => {
-      if (isDrawMode) {
-        setIsHoverDisabled(true)
-        dispatch({
-          type: "SET_CANVAS",
-          canvas: {
-            lines: lines.map((line) => {
-              return { ...line, color: "#000" }
-            }),
-          },
-        })
-      }
-    },
-    () => {
-      if (isDrawMode) {
-        setIsHoverDisabled(false)
-        dispatch({
-          type: "SET_CANVAS",
-          canvas: {
-            lines: lines.map((line) => {
-              if (line.id === hoveredLine) {
-                return { ...line, color: blue500Hex }
-              }
-              return line
-            }),
-          },
-        })
-      }
-    },
+    () => disableHover(),
+    () => enableHover(),
   )
 
   useEffect(() => {
@@ -386,30 +421,7 @@ const Canvas = ({
   }, [lines, currentLine])
 
   useEffect(() => {
-    if (hoveredLine) {
-      dispatch({
-        type: "SET_CANVAS",
-        canvas: {
-          lines: lines.map((line) => {
-            if (line.id === hoveredLine) return { ...line, color: blue500Hex }
-
-            // Handles case where cursor goes from hovering one line to hovering another
-            return { ...line, color: "#000" }
-          }),
-        },
-      })
-    } else {
-      dispatch({
-        type: "SET_CANVAS",
-        canvas: {
-          lines: lines.map((line) => {
-            if (line.color === blue500Hex) return { ...line, color: "#000" }
-
-            return line
-          }),
-        },
-      })
-    }
+    handleLineHover()
   }, [hoveredLine])
 
   useEffect(() => {
