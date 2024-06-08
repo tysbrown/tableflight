@@ -2,14 +2,8 @@ import type { User } from "@/types"
 import type { Request, Response } from "express"
 import { PrismaClient } from "@prisma/client"
 import { withAccelerate } from "@prisma/extension-accelerate"
-import {
-  DefaultArgs,
-  PrismaClientOptions,
-} from "@prisma/client/runtime/library"
 
-const prisma = new PrismaClient().$extends(
-  withAccelerate(),
-) as unknown as PrismaClient<PrismaClientOptions, never, DefaultArgs>
+const prisma = new PrismaClient().$extends(withAccelerate()) as unknown
 
 export interface Context {
   prisma: PrismaClient
