@@ -4,12 +4,15 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "dependencies": {},
   "devDependencies": {
+    "@nrwl/node": "^19.2.2",
+    "@nrwl/react": "^19.2.2",
+    "@nrwl/vite": "^19.2.2",
     "@nx/js": "19.2.2",
     "nx": "19.2.2"
   },
   "workspaces": [
-    "packages/*"
+    "apps/*",
+    "libs/*"
   ]
 }
