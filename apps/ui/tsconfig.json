@@ -5,10 +5,12 @@
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": ["vite/client", "vitest"]
+    "skipLibCheck": true,
+    "jsxImportSource": "@emotion/react",
+    "types": ["vite/client", "vitest"],
   },
   "files": [],
-  "include": [],
+  "include": ["src", "types"],
   "references": [
     {
       "path": "./tsconfig.app.json"

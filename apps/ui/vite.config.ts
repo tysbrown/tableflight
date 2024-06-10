@@ -1,15 +1,22 @@
 /// <reference types='vitest' />
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
+import macrosPlugin from 'vite-plugin-babel-macros'
 
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/ui',
 
   server: {
-    port: 4200,
-    host: 'localhost',
+    proxy: {
+      '/refresh_token': {
+        target: 'http://localhost:1337/refresh_token',
+      },
+      '/graphql': {
+        target: 'http://localhost:1337/graphql',
+      },
+    },
   },
 
   preview: {
@@ -17,7 +24,30 @@ export default defineConfig({
     host: 'localhost',
   },
 
-  plugins: [react(), nxViteTsPaths()],
+  plugins: [
+    react({
+      babel: {
+        plugins: [
+          'babel-plugin-macros',
+          [
+            '@emotion/babel-plugin-jsx-pragmatic',
+            {
+              export: 'jsx',
+              import: '__cssprop',
+              module: '@emotion/react',
+            },
+          ],
+          [
+            '@babel/plugin-transform-react-jsx',
+            { pragma: '__cssprop' },
+            'twin.macro',
+          ],
+        ],
+      },
+    }),
+    macrosPlugin(),
+    nxViteTsPaths(),
+  ],
 
   // Uncomment this if you are using workers.
   // worker: {
@@ -48,4 +78,4 @@ export default defineConfig({
       provider: 'v8',
     },
   },
-});
+})

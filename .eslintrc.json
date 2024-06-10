@@ -10,7 +10,17 @@
           "error",
           {
             "enforceBuildableLibDependency": true,
-            "allow": [],
+            "allow": [
+              "@/atoms",
+              "@/molecules",
+              "@/organisms",
+              "@/typography",
+              "@/views",
+              "@/hooks",
+              "@/contexts",
+              "@/styles",
+              "@/utils"
+            ],
             "depConstraints": [
               {
                 "sourceTag": "*",
@@ -18,7 +28,8 @@
               }
             ]
           }
-        ]
+        ],
+        "react/style-prop-object": "off"
       }
     },
     {

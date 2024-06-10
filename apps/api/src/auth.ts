@@ -1,5 +1,5 @@
 import type { Context } from "./context"
-import type { User } from "@/types"
+import type { User } from "~common"
 import type { Response } from "express"
 import pkg from "jsonwebtoken"
 const { sign } = pkg
