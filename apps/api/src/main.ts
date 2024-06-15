@@ -1,16 +1,11 @@
-import {
-  YogaSchemaDefinition,
-  YogaInitialContext,
-  createSchema,
-  createYoga,
-} from 'graphql-yoga'
+import { YogaSchemaDefinition, createSchema, createYoga } from 'graphql-yoga'
 import { mergeResolvers } from '@graphql-tools/merge'
 import { loadFilesSync } from '@graphql-tools/load-files'
 import express, { Request, Response } from 'express'
 import path from 'path'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import { Context, context } from './context.js'
+import { context } from './context.js'
 import {
   createAccessToken,
   createRefreshToken,
@@ -20,12 +15,12 @@ import {
 import pkg, { JwtPayload } from 'jsonwebtoken'
 import cookieParser from 'cookie-parser'
 import { typeDefs } from './graphql/typeDefs.js'
-import { InitialContext } from '~common'
+import type { InitialContext } from '~common'
 const { verify } = pkg
 
 const app = express()
 
-const generateSchema = () => {
+const generateSchema = (): YogaSchemaDefinition<object, InitialContext> => {
   const modulesPath = path.join(__dirname, './graphql')
   const resolvers = loadFilesSync(modulesPath, { extensions: ['js'] })
 
@@ -35,21 +30,23 @@ const generateSchema = () => {
   })
 }
 
-const createContext = (req: Request, res: Response) => {
+const createContext = (req: Request, res: Response): InitialContext => {
   const { authorization } = req.headers
 
   if (authorization) {
     const token = authorization.split(' ')[1]
 
-    if (!token) throw new Error('No token found')
+    if (!token) throw new Error('Token not found!')
 
     if (!process.env.ACCESS_TOKEN_SECRET)
-      throw new Error('No token secret found')
+      throw new Error('Token secret not found!')
 
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET) as JwtPayload
     const user = getUser(context, payload.userId)
 
-    return { ...context, req, res, user }
+    if (!user) throw new Error('Failed to find user!')
+
+    return { ...context, req, res, user } as InitialContext
   }
 
   return { ...context, req, res }
@@ -57,13 +54,15 @@ const createContext = (req: Request, res: Response) => {
 
 const yoga = createYoga({
   schema: generateSchema(),
-  context: ({ req, res }) => createContext(req, res),
+  context: ({ req, res }: any) => createContext(req, res),
 })
 
 const handleRefreshToken = async (req: Request, res: Response) => {
   const refreshToken = req.cookies.jid
 
   if (!refreshToken) return res.send({ ok: false, accessToken: '' })
+  if (!process.env.REFRESH_TOKEN_SECRET)
+    throw new Error('Refresh token secret not found!')
 
   try {
     const payload = verify(

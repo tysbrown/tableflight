@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import tw from "twin.macro"
 import { clamp } from "@/utils"
 import { Canvas, ZoomMenu, Grid } from "@/molecules"
-import { useGridState } from "@/hooks/useGridState"
+import { useGridState } from "@/hooks"
 import { type GridState } from "@/contexts"
 
 /**
@@ -41,7 +41,7 @@ const GameBoard = () => {
   const updatePanPosition = (
     dx: number,
     dy: number,
-    isInverted: boolean = false,
+    isInverted = false,
   ) => {
     const newX = isInverted ? position.x + dx : position.x - dx
     const newY = isInverted ? position.y + dy : position.y - dy

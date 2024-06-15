@@ -1,8 +1,18 @@
+import { YogaInitialContext } from 'graphql-yoga'
+import { type PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
-
-export type InitialContext = {
+export interface InitialContext extends Partial<YogaInitialContext> {
   req: Request
   res: Response
+  user?: Promise<User>
+  prisma?: PrismaClient
+}
+
+export type Context = {
+  req?: Request
+  res?: Response
+  user?: User
+  prisma?: PrismaClient
 }
 
 export type LoginResponse = {

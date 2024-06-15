@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "jsxImportSource": "@emotion/react",
     "types": ["vite/client", "vitest"],
+    "composite": true
   },
   "files": [],
   "include": ["src", "types"],
