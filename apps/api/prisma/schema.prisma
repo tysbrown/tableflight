@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 Int              @id @default(autoincrement())
+  tokenVersion       Int              @default(0)
+  email              String           @unique
+  password           String
+  firstName          String
+  lastName           String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  gamesCreated       Game[]
+  gamesParticipating Game[]           @relation("GamesParticipating")
+  characterSheets    CharacterSheet[]
+}
+
+model Game {
+  id                   Int        @id @default(autoincrement())
+  name                 String
+  description          String
+  image                String     @default("placeholder")
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  user                 User       @relation(fields: [createdById], references: [id])
+  createdById          Int
+  playersParticipating User[]     @relation("GamesParticipating")
+  gridState            GridState?
+}
+
+model GridState {
+  gameSessionID   Int     @id
+  grid            Json
+  rows            Int
+  cols            Int
+  cellSize        Int
+  dimensions      Json
+  backgroundImage String?
+  lineWidth       Float?
+  zoomLevel       Float?
+  position        Json
+  game            Game    @relation(fields: [gameSessionID], references: [id], onDelete: Cascade)
+}
+
+model CharacterSheet {
+  id     Int  @id @default(autoincrement())
+  data   Json // Data structure for character sheet
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

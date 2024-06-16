@@ -1,0 +1,43 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
+    "paths": {
+      "~api/*": ["apps/api/src/*"],
+      "~ui/*": ["apps/ui/src/*"],
+      "~common": ["libs/common/src/index.ts"],
+      "@/atoms": ["apps/ui/src/components/atoms"],
+      "@/molecules": ["apps/ui/src/components/molecules"],
+      "@/organisms": ["apps/ui/src/components/organisms"],
+      "@/typography": ["apps/ui/src/components/typography"],
+      "@/views": ["apps/ui/src/components/views"],
+      "@/hooks": ["apps/ui/src/hooks"],
+      "@/contexts": ["apps/ui/src/contexts"],
+      "@/styles": ["apps/ui/src/styles"],
+      "@/utils": ["apps/ui/src/utils"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
