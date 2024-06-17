@@ -4,15 +4,13 @@ import { Request, Response } from 'express'
 export interface InitialContext extends Partial<YogaInitialContext> {
   req: Request
   res: Response
-  user?: Promise<User>
-  prisma?: PrismaClient
 }
 
 export type Context = {
-  req?: Request
-  res?: Response
+  req: Request
+  res: Response
   user?: User
-  prisma?: PrismaClient
+  prisma: PrismaClient
 }
 
 export type LoginResponse = {
