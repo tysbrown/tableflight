@@ -1,15 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
-import { DefaultArgs } from '@prisma/client/runtime/library'
+import { Context } from '~common'
 
 const prisma = new PrismaClient().$extends(
-  withAccelerate()
-) as unknown as PrismaClient<any, never, DefaultArgs>
+  withAccelerate(),
+) as unknown as PrismaClient
 
-type Context = {
-  prisma: PrismaClient
-}
-
-export const context: Context = {
+export const context: Partial<Context> = {
   prisma: prisma,
 }

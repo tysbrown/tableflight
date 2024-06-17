@@ -21,13 +21,11 @@ export const createRefreshToken = (user: User) => {
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: '7d',
-    }
+    },
   )
 }
 
-export const getUser = async (context: Context, userId: number) => {
-  const { prisma } = context
-
+export const getUser = async ({ prisma }: Partial<Context>, userId: number) => {
   const user = await prisma?.user.findUnique({
     where: {
       id: userId,

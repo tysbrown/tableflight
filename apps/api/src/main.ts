@@ -30,8 +30,10 @@ const generateSchema = (): YogaSchemaDefinition<object, InitialContext> => {
   })
 }
 
-const createContext = (req: Request, res: Response): InitialContext => {
-  const { authorization } = req.headers
+const createContext = (req: globalThis.Request): InitialContext => {
+  const { authorization } = req.headers as globalThis.Headers & {
+    authorization: string
+  }
 
   if (authorization) {
     const token = authorization.split(' ')[1]
@@ -46,15 +48,15 @@ const createContext = (req: Request, res: Response): InitialContext => {
 
     if (!user) throw new Error('Failed to find user!')
 
-    return { ...context, req, res, user } as InitialContext
+    return { ...context, user } as InitialContext
   }
 
-  return { ...context, req, res }
+  return { ...context } as InitialContext
 }
 
 const yoga = createYoga({
   schema: generateSchema(),
-  context: ({ req, res }: any) => createContext(req, res),
+  context: ({ request }) => createContext(request),
 })
 
 const handleRefreshToken = async (req: Request, res: Response) => {
@@ -67,7 +69,7 @@ const handleRefreshToken = async (req: Request, res: Response) => {
   try {
     const payload = verify(
       refreshToken,
-      process.env.REFRESH_TOKEN_SECRET
+      process.env.REFRESH_TOKEN_SECRET,
     ) as JwtPayload
 
     const user = await getUser(context, payload.userId)
@@ -93,7 +95,7 @@ app.use(
       'https://sandbox.embed.apollographql.com',
     ],
     credentials: true,
-  })
+  }),
 )
 app.use(bodyParser.json())
 app.use(yoga.graphqlEndpoint, yoga)
