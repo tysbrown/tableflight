@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "npx nx run-many --target=serve --projects=api,ui",
-    "dev": "concurrently \"npx nx run-many --target=serve --projects=api,ui\" \"prisma studio --schema=apps/api/prisma/schema.prisma\"",
+    "dev": "concurrently \"npx nx run-many --target=serve --projects=api,ui --output-style=stream\" \"prisma studio --schema=apps/api/prisma/schema.prisma\"",
     "prisma:generate": "prisma generate --schema=apps/api/prisma/schema.prisma",
     "prisma:migrate:dev": "prisma migrate dev --name init --schema=apps/api/prisma/schema.prisma"
   },
@@ -68,7 +68,7 @@
     "jsonwebtoken": "^9.0.2",
     "nx": "19.2.2",
     "postcss": "^8.4.38",
-    "prettier": "^2.6.2",
+    "prettier": "^3.3.2",
     "prisma": "^5.15.0",
     "tailwindcss": "^3.4.4",
     "ts-jest": "^29.1.0",
