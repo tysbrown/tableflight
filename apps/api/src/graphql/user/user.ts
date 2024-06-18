@@ -8,7 +8,7 @@ import {
   createRefreshToken,
   setRefreshTokenCookie,
   clearRefreshTokenCookie,
-} from '~api/auth.js'
+} from '~api/auth'
 
 export default {
   Mutation: {
@@ -166,10 +166,12 @@ export default {
       const token = req?.cookies.jid
 
       if (!token) throw new Error('No refresh token found.')
+      if (!process.env.REFRESH_TOKEN_SECRET)
+        throw new Error('No refresh token secret found.')
 
       const { userId, tokenVersion } = verify(
         token,
-        process.env.REFRESH_TOKEN_SECRET!,
+        process.env.REFRESH_TOKEN_SECRET,
       ) as JwtPayload
 
       const user = await getUser(context, userId)

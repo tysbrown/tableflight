@@ -36,7 +36,8 @@
       "@/hooks": ["apps/ui/src/hooks"],
       "@/contexts": ["apps/ui/src/contexts"],
       "@/styles": ["apps/ui/src/styles"],
-      "@/utils": ["apps/ui/src/utils"]
+      "@/utils": ["apps/ui/src/utils"],
+      "@/graphql/*": ["apps/api/src/graphql/*"],
     }
   },
   "exclude": ["node_modules", "tmp"]

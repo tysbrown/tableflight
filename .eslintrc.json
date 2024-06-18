@@ -11,6 +11,8 @@
           {
             "enforceBuildableLibDependency": true,
             "allow": [
+              "~api/*",
+              "~ui/*",
               "@/atoms",
               "@/molecules",
               "@/organisms",

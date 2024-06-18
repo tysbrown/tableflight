@@ -1,39 +1,31 @@
 import { YogaSchemaDefinition, createSchema, createYoga } from 'graphql-yoga'
-import { mergeResolvers } from '@graphql-tools/merge'
-import { loadFilesSync } from '@graphql-tools/load-files'
-import express, { Request, Response } from 'express'
-import path from 'path'
+import express, { Request, RequestHandler, Response } from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import { context } from './context.js'
+import { context } from './context'
 import {
   createAccessToken,
   createRefreshToken,
   getUser,
   setRefreshTokenCookie,
-} from './auth.js'
+} from './auth'
 import pkg, { JwtPayload } from 'jsonwebtoken'
 import cookieParser from 'cookie-parser'
-import { typeDefs } from './graphql/typeDefs.js'
-import type { InitialContext } from '~common'
+import type { Context, InitialContext } from '~common'
+import { resolvers, typeDefs } from './graphql'
+import { IResolvers } from '@graphql-tools/utils'
 const { verify } = pkg
 
 const app = express()
 
-const generateSchema = (): YogaSchemaDefinition<object, InitialContext> => {
-  const modulesPath = path.join(__dirname, './graphql')
-  const resolvers = loadFilesSync(modulesPath, { extensions: ['js'] })
-
-  return createSchema({
+const generateSchema = (): YogaSchemaDefinition<unknown, InitialContext> =>
+  createSchema({
     typeDefs,
-    resolvers: mergeResolvers(resolvers),
+    resolvers: resolvers as IResolvers<unknown, Context>,
   })
-}
 
-const createContext = (req: globalThis.Request): InitialContext => {
-  const { authorization } = req.headers as globalThis.Headers & {
-    authorization: string
-  }
+const generateContext = (req: Request): InitialContext => {
+  const { authorization } = req.headers
 
   if (authorization) {
     const token = authorization.split(' ')[1]
@@ -56,7 +48,7 @@ const createContext = (req: globalThis.Request): InitialContext => {
 
 const yoga = createYoga({
   schema: generateSchema(),
-  context: ({ request }) => createContext(request),
+  context: ({ req }: { req: Request }) => generateContext(req),
 })
 
 const handleRefreshToken = async (req: Request, res: Response) => {
@@ -98,7 +90,7 @@ app.use(
   }),
 )
 app.use(bodyParser.json())
-app.use(yoga.graphqlEndpoint, yoga)
+app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 
 app.post('/refresh_token', handleRefreshToken)
 

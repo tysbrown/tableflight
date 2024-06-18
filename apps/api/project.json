@@ -6,24 +6,18 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@nx/webpack:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
-        "platform": "node",
+        "target": "node",
+        "compiler": "swc",
         "outputPath": "dist/apps/api",
-        "format": ["cjs"],
-        "bundle": false,
         "main": "apps/api/src/main.ts",
         "tsConfig": "apps/api/tsconfig.app.json",
-        "assets": ["apps/api/src/assets"],
-        "generatePackageJson": true,
-        "esbuildOptions": {
-          "sourcemap": true,
-          "outExtension": {
-            ".js": ".js"
-          }
-        }
+        "webpackConfig": "apps/api/webpack.config.ts"
       },
       "configurations": {
         "development": {},
@@ -50,6 +44,20 @@
         "production": {
           "buildTarget": "api:build:production"
         }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/api/src/**/*.ts"
+        ]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p apps/api/tsconfig.app.json --noEmit"
       }
     }
   }
