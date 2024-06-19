@@ -52,6 +52,6 @@ type Mutation {
 }
 
 type Query {
-  games: [Game]
-  gameList: [Game]
+  allGames: [Game]
+  userGameList: [Game]
 }
