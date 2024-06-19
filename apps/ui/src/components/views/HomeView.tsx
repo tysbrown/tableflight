@@ -1,17 +1,21 @@
-import { gql, useQuery } from "urql"
-import tw from "twin.macro"
-import { Button, SliderInput } from "@/atoms"
-import { ControlPanel, NewTokenPanel, GameSelectModal } from "@/molecules"
-import { GameBoard } from "@/organisms"
-import { LoadingView } from "@/views"
-import { useGridState } from "@/hooks/useGridState"
-import { GridState } from "@/contexts/GridStateProvider"
-import { Game } from "@/types"
-import UploadMapPanel from "../molecules/UploadMapPanel"
+import { gql, useQuery } from 'urql'
+import tw from 'twin.macro'
+import { Button, SliderInput } from '@/atoms'
+import {
+  ControlPanel,
+  NewTokenPanel,
+  GameSelectModal,
+  UploadMapPanel,
+} from '@/molecules'
+import { GameBoard } from '@/organisms'
+import { LoadingView } from '@/views'
+import { useGridState } from '@/hooks'
+import { GridState } from '@/contexts'
+import { Game } from '~common'
 
 const gameListQuery = gql`
-  query gameList {
-    gameList {
+  query userGameList {
+    userGameList {
       id
       name
       description
@@ -26,7 +30,7 @@ const gameListQuery = gql`
  * The main view of the application when the user logs in.
  */
 const HomeView = () => {
-  const [{ data, fetching, error }] = useQuery<{ gameList: Game[] }>({
+  const [{ data, fetching, error }] = useQuery<{ userGameList: Game[] }>({
     query: gameListQuery,
   })
 
@@ -34,7 +38,7 @@ const HomeView = () => {
   const { cellSize, mode } = state as GridState
 
   const setCellSize = (cellSize: number) => {
-    dispatch({ type: "SET_CELL_SIZE", cellSize })
+    dispatch({ type: 'SET_CELL_SIZE', cellSize })
   }
 
   if (fetching) return <LoadingView />
@@ -55,7 +59,7 @@ const HomeView = () => {
           step={0.001}
           onChange={(e) =>
             dispatch({
-              type: "SET_CELL_SIZE",
+              type: 'SET_CELL_SIZE',
               cellSize: parseInt(e.target.value),
             })
           }
@@ -73,21 +77,21 @@ const HomeView = () => {
           <Button
             type="button"
             style="primary"
-            onClick={() => dispatch({ type: "SET_MODE", mode: "draw" })}
+            onClick={() => dispatch({ type: 'SET_MODE', mode: 'draw' })}
           >
             Draw
           </Button>
           <Button
             type="button"
             style="primary"
-            onClick={() => dispatch({ type: "SET_MODE", mode: "pan" })}
+            onClick={() => dispatch({ type: 'SET_MODE', mode: 'pan' })}
           >
             Pan
           </Button>
         </section>
       </ControlPanel>
 
-      <GameSelectModal games={data?.gameList} />
+      <GameSelectModal games={data?.userGameList} />
     </main>
   )
 }

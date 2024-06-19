@@ -1,17 +1,17 @@
-import { useState } from "react"
-import tw from "twin.macro"
-import type { Game } from "@/types"
-import { Button, List, ListItem, Modal } from "@/atoms"
-import { HeadlineSmall, BodyMedium } from "@/typography"
-import { useGridState } from "@/hooks/useGridState"
-import { GridState } from "@/contexts/GridStateProvider"
+import { useState } from 'react'
+import tw from 'twin.macro'
+import type { Game } from '~common'
+import { Button, List, ListItem, Modal } from '@/atoms'
+import { HeadlineSmall, BodyMedium } from '@/typography'
+import { useGridState } from '@/hooks'
+import { GridState } from '@/contexts'
 
 type GameSelectModalProps = {
   games: Game[] | undefined
 }
 
 const GameSelectModal = ({ games }: GameSelectModalProps) => {
-  const [selected, setSelected] = useState<string>("")
+  const [selected, setSelected] = useState<string>('')
   const { state, dispatch } = useGridState()
   const { gameSessionId } = state as GridState
 
@@ -24,8 +24,8 @@ const GameSelectModal = ({ games }: GameSelectModalProps) => {
     >
       <HeadlineSmall>Games</HeadlineSmall>
       <BodyMedium>
-        Welcome back! Please select the game session you&apos;d like to load from the
-        list below, or create a new one.
+        Welcome back! Please select the game session you&apos;d like to load
+        from the list below, or create a new one.
       </BodyMedium>
       <List css={[tw`my-6`]}>
         {games?.map(({ id, image, name, description }, index) => (
@@ -51,7 +51,7 @@ const GameSelectModal = ({ games }: GameSelectModalProps) => {
         </Button>
         <Button
           onClick={() =>
-            dispatch({ type: "SET_GAME_SESSION_ID", gameSessionId: selected })
+            dispatch({ type: 'SET_GAME_SESSION_ID', gameSessionId: selected })
           }
           style="primary"
           type="button"

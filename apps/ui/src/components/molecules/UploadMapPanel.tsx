@@ -1,7 +1,7 @@
-import tw from "twin.macro"
-import { FileInput } from "@/atoms"
-import { useGridState } from "@/hooks/useGridState"
-import { GridState } from "@/contexts/GridStateProvider"
+import tw from 'twin.macro'
+import { FileInput } from '@/atoms'
+import { useGridState } from '@/hooks'
+import { GridState } from '@/contexts'
 
 const UploadMapPanel = () => {
   const { state, dispatch } = useGridState()
@@ -13,7 +13,7 @@ const UploadMapPanel = () => {
       const reader = new FileReader()
       reader.onloadend = () => {
         dispatch({
-          type: "SET_BACKGROUND",
+          type: 'SET_BACKGROUND',
           backgroundImage: reader.result as string,
         })
       }
