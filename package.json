@@ -84,7 +84,6 @@
     "@graphql-tools/load-files": "^7.0.0",
     "@graphql-tools/merge": "^9.0.4",
     "@graphql-tools/utils": "^10.2.2",
-    "@luckycatfactory/esbuild-graphql-loader": "^3.8.1",
     "@nx/webpack": "^19.3.0",
     "@urql/exchange-auth": "^2.2.0",
     "@urql/exchange-graphcache": "^7.1.1",
