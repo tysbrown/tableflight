@@ -1,6 +1,14 @@
+import { ReactNode } from 'react'
+import { TwStyle } from 'twin.macro';
 import { YogaInitialContext } from 'graphql-yoga'
 import { type PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
+
+export type ComponentProps = {
+  children?: ReactNode
+  css?: TwStyle[]
+}
+
 export interface InitialContext extends Partial<YogaInitialContext> {
   req: Request
   res: Response

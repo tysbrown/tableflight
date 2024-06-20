@@ -1,8 +1,9 @@
-import tw from "twin.macro"
+import tw from 'twin.macro'
+import { ComponentProps } from '~common'
 
-const BodyLarge = ({ children, ...props }: { children: React.ReactNode }) => {
+const BodyLarge = ({ children, ...css }: ComponentProps) => {
   return (
-    <p css={[tw`text-base font-normal tracking-[0.5px]`]} {...props}>
+    <p css={[tw`text-base font-normal tracking-[0.5px]`]} {...css}>
       {children}
     </p>
   )

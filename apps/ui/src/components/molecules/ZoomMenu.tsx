@@ -1,8 +1,8 @@
-import React, { useRef, useState } from "react"
-import tw from "twin.macro"
-import { Menu, MenuItem, SliderInput, Button } from "@/atoms"
-import { useGridState } from "@/hooks/useGridState"
-import { GridState } from "@/contexts/GridStateProvider"
+import React, { useRef, useState } from 'react'
+import tw from 'twin.macro'
+import { Menu, MenuItem, SliderInput, Button } from '@/atoms'
+import { useGridState } from '@/hooks/useGridState'
+import { GridState } from '@/contexts/GridStateProvider'
 
 type ZoomMenuProps = {
   viewportWidth: number
@@ -37,7 +37,7 @@ const ZoomMenu = ({
     const heightRatio = viewportHeight / originalHeight
     const newZoom = Math.min(widthRatio, heightRatio)
 
-    dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
+    dispatch({ type: 'SET_ZOOM_LEVEL', zoomLevel: newZoom })
   }
 
   const setZoomLevel = (newZoom: number) => {
@@ -47,7 +47,7 @@ const ZoomMenu = ({
     const newY = position.y * scale + ((1 - scale) * viewportHeight) / 2
 
     setPosition({ x: newX, y: newY })
-    dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
+    dispatch({ type: 'SET_ZOOM_LEVEL', zoomLevel: newZoom })
   }
 
   return (

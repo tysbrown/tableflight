@@ -1,5 +1,6 @@
-import tw from "twin.macro"
-import { BodyMedium, BodyLarge } from "@/typography"
+import tw from 'twin.macro'
+import { BodyMedium, BodyLarge } from '@/typography'
+import { ComponentProps } from '~common'
 
 export const List = ({ children, ...props }: { children: React.ReactNode }) => {
   return (
@@ -61,20 +62,20 @@ export const ListItem = ({
   )
 }
 
-const Image = ({ image, ...props }: { image: string }) => {
-  const hasImage = image !== "placeholder"
+const Image = ({ image, ...css }: ComponentProps & { image: string }) => {
+  const hasImage = image !== 'placeholder'
 
-  if (hasImage) return <img src={image} alt="Game Image" />
+  if (hasImage) return <img src={image} alt="Game" {...css} />
 
   return (
     <svg
+      {...css}
       width="56"
       height="56"
       viewBox="0 0 56 56"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      {...props}
     >
       <rect width="56" height="56" fill="url(#pattern0)" />
       <defs>

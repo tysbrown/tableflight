@@ -1,8 +1,9 @@
-import { useRef } from "react"
-import { isFirefox, clamp } from "@/utils"
-import tw from "twin.macro"
+import type { ComponentProps } from '~common'
+import { useRef } from 'react'
+import { isFirefox, clamp } from '@/utils'
+import tw from 'twin.macro'
 
-type SliderInputProps = {
+type SliderInputProps = ComponentProps & {
   name: string
   label?: string
   value: number
@@ -36,13 +37,15 @@ const SliderInput = ({
   disabled = false,
   hideValueLabel = false,
   onChange,
-  ...props
+  ...css
 }: SliderInputProps) => {
   const sliderRef = useRef<HTMLInputElement | null>(null)
   const percentage = ((value - min) / (max - min)) * 100
 
   const handleMouseMove = (e: MouseEvent) => {
-    const rect = sliderRef.current!.getBoundingClientRect()
+    if (!sliderRef.current) return
+
+    const rect = sliderRef.current.getBoundingClientRect()
 
     const newValueToPercentage =
       ((e.clientX - rect.left) / rect.width) * (max - min) + min
@@ -56,16 +59,18 @@ const SliderInput = ({
   }
 
   const handleMouseUp = () => {
-    document.removeEventListener("mousemove", handleMouseMove)
+    document.removeEventListener('mousemove', handleMouseMove)
   }
 
   const handleMouseDown = () => {
-    document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mouseup", handleMouseUp, { once: true })
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp, { once: true })
   }
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = sliderRef.current!.getBoundingClientRect()
+    if (!sliderRef.current) return
+
+    const rect = sliderRef.current.getBoundingClientRect()
     const clickPosition = e.clientX - rect.left
     const width = rect.width
 
@@ -89,7 +94,7 @@ const SliderInput = ({
       aria-valuemax={max}
       aria-valuenow={value}
       aria-disabled={disabled}
-      {...props}
+      {...css}
     >
       <label htmlFor={name} tw="mb-4">
         {label}

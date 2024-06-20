@@ -1,8 +1,9 @@
+import type { ComponentProps } from "~common"
 import React from "react"
 import { useRef } from "react"
 import { Button } from "@/atoms"
 
-type FileInputProps = {
+type FileInputProps = ComponentProps & {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
