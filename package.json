@@ -6,7 +6,8 @@
     "start": "npx nx run-many --target=serve --projects=api,ui",
     "dev": "concurrently \"npx nx run-many --target=serve --projects=api,ui --output-style=stream\" \"prisma studio --schema=apps/api/prisma/schema.prisma\"",
     "prisma:generate": "prisma generate --schema=apps/api/prisma/schema.prisma",
-    "prisma:migrate:dev": "prisma migrate dev --name init --schema=apps/api/prisma/schema.prisma"
+    "prisma:migrate:dev": "prisma migrate dev --name init --schema=apps/api/prisma/schema.prisma",
+    "ui:test": "npx nx run ui:test"
   },
   "private": true,
   "devDependencies": {
@@ -15,6 +16,7 @@
     "@nrwl/node": "^19.2.2",
     "@nrwl/react": "^19.2.2",
     "@nrwl/vite": "^19.2.2",
+    "@nx-tools/nx-container": "^6.0.1",
     "@nx/cypress": "19.2.2",
     "@nx/esbuild": "19.2.2",
     "@nx/eslint": "19.2.2",
