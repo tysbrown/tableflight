@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  ui:
+    build:
+      context: .
+      dockerfile: apps/ui/Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=tableflight-api:1337/graphql
+      - VITE_REFRESH_TOKEN_URL=tableflight-api:1337/refresh-token
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "1337:1337"
+    environment:
+      - NODE_ENV=development
+
+  # Uncomment this to enable a PostgreSQL database
+  # db:
+  #   image: postgres:13
+  #   environment:
+  #     POSTGRES_USER: tableflight
+  #     POSTGRES_PASSWORD: tableflight
+  #     POSTGRES_DB: tableflight
+  #   ports:
+  #     - "5432:5432"

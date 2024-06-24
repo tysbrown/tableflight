@@ -25,19 +25,19 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "~api/*": ["apps/api/src/*"],
-      "~ui/*": ["apps/ui/src/*"],
-      "~common": ["libs/common/src/index.ts"],
       "@/atoms": ["apps/ui/src/components/atoms"],
+      "@/contexts": ["apps/ui/src/contexts"],
+      "@/graphql/*": ["apps/api/src/graphql/*"],
+      "@/hooks": ["apps/ui/src/hooks"],
       "@/molecules": ["apps/ui/src/components/molecules"],
       "@/organisms": ["apps/ui/src/components/organisms"],
-      "@/typography": ["apps/ui/src/components/typography"],
-      "@/views": ["apps/ui/src/components/views"],
-      "@/hooks": ["apps/ui/src/hooks"],
-      "@/contexts": ["apps/ui/src/contexts"],
       "@/styles": ["apps/ui/src/styles"],
+      "@/typography": ["apps/ui/src/components/typography"],
       "@/utils": ["apps/ui/src/utils"],
-      "@/graphql/*": ["apps/api/src/graphql/*"],
+      "@/views": ["apps/ui/src/components/views"],
+      "~api/*": ["apps/api/src/*"],
+      "~common": ["libs/common/src/index.ts"],
+      "~ui/*": ["apps/ui/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

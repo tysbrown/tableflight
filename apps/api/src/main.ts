@@ -82,8 +82,8 @@ app.use(cookieParser())
 app.use(
   cors({
     origin: [
-      'http://localhost:5173',
-      'https://localhost:5173',
+      'http://localhost',
+      'https://localhost',
       'https://sandbox.embed.apollographql.com',
     ],
     credentials: true,
@@ -96,7 +96,7 @@ app.post('/refresh_token', handleRefreshToken)
 
 app.listen(1337, () => {
   serverMessage([
-    '✨ http://localhost:5173                     UI',
+    '✨ http://localhost:80                       UI',
     '✨ http://localhost:1337/graphql       GraphiQL',
     '✨ http://localhost:5555          Prisma Studio',
   ])

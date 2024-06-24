@@ -5,7 +5,6 @@
   },
   "extends": "nx/presets/npm.json",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "nxCloudAccessToken": "NDYzYWYzN2EtNTZkYi00MTc5LTg5MzgtYzBmY2YxZmJjODMzfHJlYWQtd3JpdGU=",
   "plugins": [
     {
       "plugin": "@nx/vite/plugin",

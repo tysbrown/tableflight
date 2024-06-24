@@ -4,21 +4,35 @@
   "sourceRoot": "apps/ui/src",
   "projectType": "application",
   "tags": [],
-  "// targets": "to see all targets run: nx show project ui --web",
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "apps/ui/src/**/*.ts",
-          "apps/ui/src/**/*.tsx"
-        ]
+        "lintFilePatterns": ["apps/ui/src/**/*.ts", "apps/ui/src/**/*.tsx"]
       }
     },
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "tsc -p apps/ui/tsconfig.app.json --noEmit"
+      }
+    },
+    "container": {
+      "executor": "@nx-tools/nx-container:build",
+      "dependsOn": ["build"],
+      "options": {
+        "engine": "docker",
+        "metadata": {
+          "images": ["ui"],
+          "load": true,
+          "tags": [
+            "type=schedule",
+            "type=ref,event=branch",
+            "type=ref,event=tag",
+            "type=ref,event=pr",
+            "type=sha,prefix=sha-"
+          ]
+        }
       }
     }
   }
