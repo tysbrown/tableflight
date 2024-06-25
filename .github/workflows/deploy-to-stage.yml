@@ -67,10 +67,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
         run: |
-          helm upgrade --install --timeout 180 ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=latest
+          helm upgrade --install --timeout 180s ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=latest
 
       - name: Deploy API
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
         run: |
-          helm upgrade --install --timeout 180 api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=latest
+          helm upgrade --install --timeout 180s api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=latest
