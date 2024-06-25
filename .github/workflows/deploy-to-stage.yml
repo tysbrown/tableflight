@@ -61,7 +61,7 @@ jobs:
 
       - name: Install Nginx Ingress Controller
         run: |
-          helm install nginx-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace
+          helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace
 
       - name: Deploy UI
         env:
