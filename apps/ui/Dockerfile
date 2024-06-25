@@ -13,6 +13,7 @@ RUN npm install
 COPY . .
 
 # Build the app
+RUN npx nx reset
 RUN npm run ui:build
 
 # Stage 2: Serve the app
