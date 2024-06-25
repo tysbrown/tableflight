@@ -54,9 +54,23 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
 
-      - name: Deploy with Helm
+      - name: Add Helm repo and update
+        run: |
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo update
+
+      - name: Install Nginx Ingress Controller
+        run: |
+          helm install nginx-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace
+
+      - name: Deploy UI
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
         run: |
-          helm upgrade --install ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=latest
-          helm upgrade --install api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=latest
+          helm upgrade --install --timeout 180 ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=latest
+
+      - name: Deploy API
+        env:
+          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+        run: |
+          helm upgrade --install --timeout 180 api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=latest

@@ -5,3 +5,7 @@ image:
 service:
   type: LoadBalancer
   port: 80
+ingress:
+  enabled: true
+  host: stage.tableflight.com
+  certIssuer: letsencrypt-prod
