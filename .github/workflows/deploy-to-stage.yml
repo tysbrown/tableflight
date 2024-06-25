@@ -63,6 +63,14 @@ jobs:
         run: |
           helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace
 
+      - name: Install Cert-Manager CRDs
+        run: |
+          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.crds.yaml
+
+      - name: Deploy Cert-Manager
+        run: |
+          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+
       - name: Deploy UI
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
