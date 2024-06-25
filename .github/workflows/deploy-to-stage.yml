@@ -67,9 +67,19 @@ jobs:
         run: |
           kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.crds.yaml
 
-      - name: Deploy Cert-Manager
+      - name: Install Cert-Manager
         run: |
           kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+
+      - name: Wait for Cert-Manager to be ready
+        run: |
+          kubectl rollout status deployment/cert-manager -n cert-manager
+          kubectl rollout status deployment/cert-manager-webhook -n cert-manager
+          kubectl rollout status deployment/cert-manager-cainjector -n cert-manager
+
+      - name: Create ClusterIssuer
+        run: |
+          kubectl apply -f cluster-issuer.yaml
 
       - name: Deploy UI
         env:
