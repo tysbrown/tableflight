@@ -65,11 +65,11 @@ jobs:
 
       - name: Install Cert-Manager CRDs
         run: |
-          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.crds.yml
+          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.crds.yaml
 
       - name: Install Cert-Manager
         run: |
-          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yml
+          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
 
       - name: Wait for Cert-Manager to be ready
         run: |
