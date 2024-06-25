@@ -79,7 +79,7 @@ jobs:
 
       - name: Create ClusterIssuer
         run: |
-          kubectl apply -f cluster-issuer.yaml
+          kubectl apply -f cluster-issuer.yml
 
       - name: Deploy UI
         env:
