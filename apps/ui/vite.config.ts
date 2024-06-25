@@ -11,10 +11,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/refresh_token': {
-        target: import.meta.env.VITE_REFRESH_TOKEN_URL,
+        target: process.env.VITE_REFRESH_TOKEN_URL,
       },
       '/graphql': {
-        target: import.meta.env.VITE_API_URL,
+        target: process.env.VITE_API_URL,
       },
     },
   },
