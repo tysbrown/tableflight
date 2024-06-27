@@ -5,6 +5,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
+    nginx.ingress.kubernetes.io/ingress.class: nginx
 spec:
   rules:
     - host: {{ .Values.ingress.host }}
@@ -14,20 +15,10 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Release.Name }}-api
+                name: api
                 port:
-                  number: 80
+                  number: 1337
   tls:
     - hosts:
         - {{ .Values.ingress.host }}
       secretName: {{ .Release.Name }}-api-tls
-
-# apiVersion: v1
-# kind: Secret
-# metadata:
-# name: example-tls
-# namespace: foo
-# data:
-# tls.crt: <base64 encoded cert>
-# tls.key: <base64 encoded key>
-# type: kubernetes.io/tls
