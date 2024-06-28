@@ -84,6 +84,7 @@ app.use(
     origin: [
       'http://localhost',
       'https://localhost',
+      'http://localhost:5173',
       'https://sandbox.embed.apollographql.com',
     ],
     credentials: true,
