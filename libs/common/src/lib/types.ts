@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { TwStyle } from 'twin.macro';
+import { TwStyle } from 'twin.macro'
 import { YogaInitialContext } from 'graphql-yoga'
 import { type PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
@@ -70,7 +70,7 @@ export type DroppedToken = {
   col: number
 }
 
-export type GridType = (TokenType | null | undefined)[][]
+export type GridType = (TokenType | null)[][]
 
 export type Line = {
   startX: number
