@@ -6,6 +6,7 @@ import { GridStateProvider } from './contexts/GridStateProvider'
 import URQLProvider from './contexts/URQLProvider'
 import GlobalStyles from './styles/GlobalStyles'
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <GlobalStateProvider>
@@ -16,5 +17,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </URQLProvider>
       </GridStateProvider>
     </GlobalStateProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 )
