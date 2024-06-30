@@ -23,7 +23,8 @@ const loginMutation = gql`
 
 const LoginBox = () => {
   const [{ fetching }, login] = useMutation(loginMutation)
-
+  console.log('process env Node env:', process.env.NODE_ENV)
+  console.log('vite env Node env: ', import.meta.env.NODE_ENV)
   const {
     register,
     handleSubmit,
