@@ -20,7 +20,8 @@ const loginMutation = gql`
     }
   }
 `
-
+console.log('process env Node env:', process.env.NODE_ENV)
+console.log('vite env Node env: ', import.meta.env.NODE_ENV)
 const LoginBox = () => {
   const [{ fetching }, login] = useMutation(loginMutation)
   console.log('process env Node env:', process.env.NODE_ENV)
@@ -59,7 +60,7 @@ const LoginBox = () => {
       ]}
     >
       <h1 css={[tw`text-5xl font-bold mb-6 text-center tracking-tighter`]}>
-        TableFlight
+        TableFlight x
       </h1>
 
       <hr css={[tw`mb-8 border-outlineVariant`]} />
