@@ -44,6 +44,9 @@ const HomeView = () => {
   if (fetching) return <LoadingView />
   if (error) return <p>Oh no... {error.message}</p>
 
+  console.log('process env Node env:', process.env.NODE_ENV)
+  console.log('vite env Node env: ', import.meta.env.NODE_ENV)
+
   return (
     <main css={[tw`flex overflow-hidden`]}>
       <GameBoard />
