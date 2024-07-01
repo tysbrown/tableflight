@@ -8,7 +8,10 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/ui/src/**/*.ts", "apps/ui/src/**/*.tsx"]
+        "lintFilePatterns": [
+          "apps/ui/src/**/*.ts",
+          "apps/ui/src/**/*.tsx"
+        ]
       }
     },
     "type-check": {
@@ -17,13 +20,31 @@
         "command": "tsc -p apps/ui/tsconfig.app.json --noEmit"
       }
     },
+    "build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "outputPath": "dist/apps/ui"
+      },
+      "configurations": {
+        "dev": {
+          "envFile": ".env.dev"
+        },
+        "prod": {
+          "envFile": ".env.prod"
+        }
+      }
+    },
     "container": {
       "executor": "@nx-tools/nx-container:build",
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "options": {
         "engine": "docker",
         "metadata": {
-          "images": ["ui"],
+          "images": [
+            "ui"
+          ],
           "load": true,
           "tags": [
             "type=schedule",

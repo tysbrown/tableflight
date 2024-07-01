@@ -1,4 +1,4 @@
-import { User } from "@/types"
+import { User } from "~common"
 import { useGlobalState } from "./useGlobalState"
 
 export const useRefreshToken = () => {
@@ -6,7 +6,7 @@ export const useRefreshToken = () => {
 
   return async () => {
     try {
-      const response = await fetch(`http://localhost:1337/refresh_token`, {
+      const response = await fetch(`/refresh_token`, {
         method: "POST",
         credentials: "include",
       })
