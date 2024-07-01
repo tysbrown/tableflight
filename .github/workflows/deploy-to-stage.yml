@@ -39,11 +39,12 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
         run: |
+          TAG=${GITHUB_SHA}
           docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }}:latest -f apps/ui/Dockerfile .
           docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }}:latest -f apps/api/Dockerfile .
 
-          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }}:latest
-          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }}:latest
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }}:$TAG
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }}:$TAG
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
@@ -85,10 +86,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
         run: |
-          helm upgrade --install --timeout 180s ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=latest
+          helm upgrade --install --timeout 180s ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=${GITHUB_SHA}
 
       - name: Deploy API
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
         run: |
-          helm upgrade --install --timeout 180s api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=latest
+          helm upgrade --install --timeout 180s api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=${GITHUB_SHA}
