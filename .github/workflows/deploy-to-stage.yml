@@ -34,6 +34,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
         with:
           region: ${{ env.AWS_REGION }}
+
+      - name: Cleanup Docker images
+        run: docker system prune -f
       
       - name: Check System Resources
         run: |
@@ -99,5 +102,3 @@ jobs:
         run: |
           helm upgrade --install --timeout 180s api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=${GITHUB_SHA}
 
-      - name: Cleanup Docker images
-        run: docker system prune -f
