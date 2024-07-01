@@ -1,4 +1,4 @@
-import type { User } from "@/types"
+import type { User } from "~common"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useMutation, gql } from "urql"

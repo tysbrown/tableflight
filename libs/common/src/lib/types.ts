@@ -6,7 +6,7 @@ import { Request, Response } from 'express'
 
 export type ComponentProps = {
   children?: ReactNode
-  css?: TwStyle[]
+  css?: (false | TwStyle)[] // false covers conditional styles
 }
 
 export interface InitialContext extends Partial<YogaInitialContext> {

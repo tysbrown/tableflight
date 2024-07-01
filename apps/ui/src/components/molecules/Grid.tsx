@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react"
 import tw from "twin.macro"
 import { Token } from "@/atoms"
-import { useGridState } from "@/hooks/useGridState"
-import { GridState } from "@/contexts/GridStateProvider"
-import { DroppedToken } from "@/types"
+import { useGridState } from "@/hooks"
+import { GridState } from "@/contexts"
+import { DroppedToken } from "~common"
 
 /**
  * Dynamic SVG grid component that renders a grid of cells based on the dimensions

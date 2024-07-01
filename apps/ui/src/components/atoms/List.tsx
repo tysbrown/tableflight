@@ -2,7 +2,7 @@ import tw from 'twin.macro'
 import { BodyMedium, BodyLarge } from '@/typography'
 import { ComponentProps } from '~common'
 
-export const List = ({ children, ...props }: { children: React.ReactNode }) => {
+export const List = ({ children, ...props }: ComponentProps & { children: React.ReactNode }) => {
   return (
     <ul css={[tw`flex flex-col w-full`]} {...props}>
       {children}
@@ -10,7 +10,7 @@ export const List = ({ children, ...props }: { children: React.ReactNode }) => {
   )
 }
 
-type ListItemProps = {
+type ListItemProps = ComponentProps & {
   key: string
   image: string
   title: string

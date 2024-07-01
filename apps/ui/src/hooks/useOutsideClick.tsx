@@ -3,7 +3,7 @@ import { useEffect } from "react"
 /**
  * Hook that executes a callback when a click occurs outside of the provided ref.
  */
-const useOutsideClick = (
+export const useOutsideClick = (
   ref: React.MutableRefObject<HTMLElement | null>,
   anchorElement: React.MutableRefObject<HTMLElement | null>,
   callback: () => void,
@@ -26,5 +26,3 @@ const useOutsideClick = (
     }
   }, [ref, callback])
 }
-
-export default useOutsideClick

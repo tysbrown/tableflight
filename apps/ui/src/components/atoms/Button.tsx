@@ -1,7 +1,8 @@
 import { forwardRef, LegacyRef } from "react"
 import tw from "twin.macro"
+import { ComponentProps } from "~common"
 
-type ButtonProps = {
+type ButtonProps = ComponentProps & {
   style: "primary" | "secondary" | "tertiary" | "outline" | "link" | "text"
   type: "submit" | "reset" | "button"
   disabled?: boolean

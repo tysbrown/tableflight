@@ -1,6 +1,6 @@
 import React from "react"
-import { Global } from "@emotion/react"
-import tw, { css, theme, GlobalStyles as BaseStyles } from "twin.macro"
+import { Global, css } from "@emotion/react"
+import tw, { theme, GlobalStyles as BaseStyles } from "twin.macro"
 import "../../assets/fonts/fonts.css"
 
 const customStyles = css({

@@ -1,6 +1,7 @@
 import { useRef, type ReactNode, type RefObject } from "react"
-import useOutsideClick from "@/hooks/useOutsideClick"
+import { useOutsideClick } from "@/hooks"
 import tw from "twin.macro"
+import type { ComponentProps } from "~common"
 
 type MenuProps = {
   isOpen: boolean
@@ -62,7 +63,7 @@ export const Menu = ({
   )
 }
 
-export const MenuItem = ({ children, ...props }: { children: ReactNode }) => {
+export const MenuItem = ({ children, ...props }: ComponentProps & { children: ReactNode }) => {
   return (
     <li
       css={[

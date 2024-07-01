@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react'
 import tw from 'twin.macro'
 import { Menu, MenuItem, SliderInput, Button } from '@/atoms'
-import { useGridState } from '@/hooks/useGridState'
-import { GridState } from '@/contexts/GridStateProvider'
+import { useGridState } from '@/hooks'
+import { GridState } from '@/contexts'
 
 type ZoomMenuProps = {
   viewportWidth: number

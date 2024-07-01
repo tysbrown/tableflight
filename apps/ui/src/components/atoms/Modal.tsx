@@ -1,9 +1,10 @@
 import React from "react"
 import { createPortal } from "react-dom"
-import { useDisableScroll } from "@/hooks/useDisableScroll"
+import { useDisableScroll } from "@/hooks"
 import tw from "twin.macro"
+import { ComponentProps } from "~common"
 
-type Props = {
+type Props = ComponentProps & {
   isOpen: boolean
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
   heading?: string

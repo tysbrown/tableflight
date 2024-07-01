@@ -7,13 +7,12 @@ import {
   useState,
   useCallback,
 } from "react"
-import { useGridState } from "@/hooks/useGridState"
-import { useExecuteOnKeyPress } from "@/hooks/useExecuteOnKeyPress"
+import { useExecuteOnKeyPress, useGridState } from "@/hooks"
 import { GridState, SetCanvasAction } from "@/contexts"
 import { clamp, getTailwindColorHex } from "@/utils"
 import tw from "twin.macro"
 import React from "react"
-import { useExecuteOnKeyHold } from "@/hooks/useExecuteOnKeyHold"
+import { useExecuteOnKeyHold } from "@/hooks"
 
 type CanvasProps = {
   gridWidth: number

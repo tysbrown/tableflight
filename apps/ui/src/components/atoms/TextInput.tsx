@@ -7,8 +7,9 @@ import {
 } from "react-hook-form"
 import type { SignUpFormValues } from "@/molecules"
 import tw from "twin.macro"
+import { ComponentProps } from "~common"
 
-type TextInputProps = {
+type TextInputProps = ComponentProps & {
   name: string
   type: "text" | "email" | "password"
   label: string

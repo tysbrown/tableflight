@@ -1,4 +1,4 @@
-import type { TokenType } from "@/types"
+import type { TokenType } from "~common"
 import tw from "twin.macro"
 
 const NewTokenPanel = () => {
