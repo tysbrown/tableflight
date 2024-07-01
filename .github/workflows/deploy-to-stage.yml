@@ -40,8 +40,8 @@ jobs:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
         run: |
           TAG=${GITHUB_SHA}
-          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }}:latest -f apps/ui/Dockerfile .
-          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }}:latest -f apps/api/Dockerfile .
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }}:$TAG -f apps/ui/Dockerfile .
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }}:$TAG -f apps/api/Dockerfile .
 
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }}:$TAG
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }}:$TAG
