@@ -3,6 +3,8 @@ import type { Response } from 'express'
 import pkg from 'jsonwebtoken'
 const { sign } = pkg
 
+const isProd = process.env.NODE_ENV === 'production'
+
 export const createAccessToken = (user: User) => {
   if (!process.env.ACCESS_TOKEN_SECRET)
     throw new Error('Access token secret not found!')
@@ -41,7 +43,7 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
       httpOnly: true,
       path: '/',
       secure: true,
-      sameSite: 'strict',
+      sameSite: isProd ? 'none' : 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
@@ -54,6 +56,6 @@ export const clearRefreshTokenCookie = (res: Response) => {
     httpOnly: true,
     path: '/refresh_token',
     secure: true,
-    sameSite: 'strict',
+    sameSite: isProd ? 'none' : 'strict',
   })
 }
