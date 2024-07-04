@@ -17,8 +17,10 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
   const { state } = useGlobalState()
   const { accessToken } = state || {}
 
+
+
   const client = new Client({
-    url: '/graphql',
+    url: import.meta.env.VITE_API_URL,
     exchanges: [
       cacheExchange({}),
       authExchange((utils) => {

@@ -6,7 +6,7 @@ export const useRefreshToken = () => {
 
   return async () => {
     try {
-      const response = await fetch(`/refresh_token`, {
+      const response = await fetch(import.meta.env.VITE_REFRESH_TOKEN_URL, {
         method: "POST",
         credentials: "include",
       })
