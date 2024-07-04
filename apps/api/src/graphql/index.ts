@@ -6,7 +6,6 @@ import {
   login,
   logout,
   changePassword,
-  refreshToken,
   revokeRefreshTokens,
 } from './user/resolvers'
 import {
@@ -23,7 +22,6 @@ export const resolvers = mergeResolvers([
   login,
   logout,
   changePassword,
-  refreshToken,
   revokeRefreshTokens,
   allGames,
   userGameList,
