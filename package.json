@@ -5,7 +5,7 @@
   "scripts": {
     "dev:container": "docker-compose up",
     "start": "npx nx run-many --target=serve --projects=api,ui",
-    "dev": "concurrently \"npx nx run-many --target=serve --projects=api,ui --output-style=stream --configuration=dev\" \"prisma studio --schema=apps/api/prisma/schema.prisma\"",
+    "dev": "npx nx run-many --target=serve --projects=api,ui --output-style=stream --configuration=dev",
     "lint": "npx nx run-many --target=lint --projects=api,ui",
     "typecheck": "npx nx run-many --target=typecheck --projects=api,ui",
     "test": "npx nx run-many --target=test --projects=api,ui",
@@ -24,6 +24,7 @@
     "api:container": "npx nx run api:container",
     "api:prisma:generate:dev": "prisma generate --schema=apps/api/prisma/schema.prisma",
     "api:prisma:generate:prod": "prisma generate --schema=apps/api/prisma/schema.prisma --no-engine",
+    "api:prisma:studio": "prisma studio --schema=apps/api/prisma/schema.prisma",
     "prisma:migrate:dev": "prisma migrate dev --name init --schema=apps/api/prisma/schema.prisma"
   },
   "private": true,

@@ -20,6 +20,22 @@
         "command": "tsc -p apps/ui/tsconfig.app.json --noEmit"
       }
     },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "port": 5173
+      },
+      "configurations": {
+        "dev": {
+          "buildTarget": "ui:build:dev",
+          "envFile": ".env.dev"
+        },
+        "prod": {
+          "buildTarget": "ui:build:prod",
+          "envFile": ".env.prod"
+        }
+      }
+    },
     "build": {
       "executor": "@nx/vite:build",
       "options": {

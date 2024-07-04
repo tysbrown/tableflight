@@ -1,10 +1,10 @@
-import type { Operation } from "urql"
-import type { ReactNode } from "react"
-import { Client, Provider, fetchExchange } from "urql"
-import { authExchange } from "@urql/exchange-auth"
-import { cacheExchange } from "@urql/exchange-graphcache"
-import { useRefreshToken, useGlobalState } from "@/hooks"
-import { GraphQLError } from "graphql"
+import type { Operation } from 'urql'
+import type { ReactNode } from 'react'
+import { Client, Provider, fetchExchange } from 'urql'
+import { authExchange } from '@urql/exchange-auth'
+import { cacheExchange } from '@urql/exchange-graphcache'
+import { useRefreshToken, useGlobalState } from '@/hooks'
+import { GraphQLError } from 'graphql'
 
 /**
  * Provider for the URQL GraphQL client
@@ -17,8 +17,6 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
   const { state } = useGlobalState()
   const { accessToken } = state || {}
 
-
-
   const client = new Client({
     url: import.meta.env.VITE_API_URL,
     exchanges: [
@@ -29,14 +27,14 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
             if (accessToken) {
               return utils.appendHeaders(operation, {
                 Authorization: `Bearer ${accessToken}`,
-                "Apollo-Require-Preflight": "true",
+                'Apollo-Require-Preflight': 'true',
               })
             }
             return operation
           },
           didAuthError: (error: { graphQLErrors: GraphQLError[] }) => {
             return error.graphQLErrors.some(
-              (e) => e.extensions?.code === "UNAUTHORIZED",
+              (e) => e.extensions?.code === 'UNAUTHORIZED',
             )
           },
           refreshAuth: async () => {

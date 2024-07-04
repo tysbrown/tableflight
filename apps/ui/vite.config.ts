@@ -12,10 +12,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/refresh_token': {
-        target: process.env.VITE_REFRESH_TOKEN_URL,
+        target: 'http://localhost:1337/refresh_token',
       },
       '/graphql': {
-        target: process.env.VITE_API_URL,
+        target: 'http://localhost:1337/graphql',
       },
     },
   },
