@@ -50,7 +50,7 @@
         "lintFilePatterns": ["apps/api/src/**/*.ts"]
       }
     },
-    "type-check": {
+    "typecheck": {
       "executor": "nx:run-commands",
       "options": {
         "command": "tsc -p apps/api/tsconfig.app.json --noEmit"

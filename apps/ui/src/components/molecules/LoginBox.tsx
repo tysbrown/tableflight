@@ -20,12 +20,18 @@ const loginMutation = gql`
     }
   }
 `
+
 console.log('process env Node env:', process.env.NODE_ENV)
 console.log('vite env Node env: ', import.meta.env.NODE_ENV)
+
+// console.log('process env refresh token env: ', process.env.VITE_REFRESH_TOKEN_URL)
+// console.log('process env api url env: ', process.env.VITE_API_URL)
+
+console.log('vite refresh token env: ', import.meta.env.VITE_REFRESH_TOKEN_URL)
+console.log('vite api url env: ', import.meta.env.VITE_API_URL)
+
 const LoginBox = () => {
   const [{ fetching }, login] = useMutation(loginMutation)
-  console.log('process env Node env:', process.env.NODE_ENV)
-  console.log('vite env Node env: ', import.meta.env.NODE_ENV)
   const {
     register,
     handleSubmit,
