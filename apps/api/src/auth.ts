@@ -43,7 +43,8 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
       httpOnly: true,
       path: '/',
       secure: true,
-      sameSite: isProd ? 'none' : 'strict',
+      sameSite: 'none',
+      domain: isProd ? '.tableflight.com' : 'localhost',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
@@ -56,6 +57,7 @@ export const clearRefreshTokenCookie = (res: Response) => {
     httpOnly: true,
     path: '/refresh_token',
     secure: true,
-    sameSite: isProd ? 'none' : 'strict',
+    sameSite: 'none',
+    domain: isProd ? '.tableflight.com' : 'localhost',
   })
 }
