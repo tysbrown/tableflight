@@ -14,7 +14,7 @@ COPY . .
 
 # Build the app
 RUN npx nx reset
-RUN npm run ui:build
+RUN npm run ui:build:prod
 
 # Stage 2: Serve the app
 FROM nginx:alpine
