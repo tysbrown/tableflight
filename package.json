@@ -12,7 +12,8 @@
     "e2e": "npx nx run-many --target=e2e --projects=api-e2e,ui-e2e",
     "nuke": "rm -rf node_modules && rm -rf package-lock.json && rm -rf dist && npm cache clean --force",
     "ui:test": "npx nx run ui:test",
-    "ui:build": "npx nx run ui:build --configuration=prod",
+    "ui:build:prod": "npx nx run ui:build --configuration=prod",
+    "ui:build:stage": "npx nx run ui:build --configuration=stage",
     "ui:lint": "npx nx run ui:lint",
     "ui:typecheck": "npx nx run ui:typecheck",
     "ui:container": "npx nx run ui:container",
@@ -94,6 +95,7 @@
     "twin.macro": "^3.4.1",
     "typescript": "~5.4.2",
     "vite": "^5.0.0",
+    "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.3.1"
   },
   "dependencies": {
