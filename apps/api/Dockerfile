@@ -9,7 +9,7 @@ RUN npm install
 COPY . .
 
 RUN npx nx reset
-RUN npm run api:build
+RUN npm run api:build:prod
 RUN npm run api:prisma:generate:prod
 
 EXPOSE 1337

@@ -7,7 +7,9 @@
   "targets": {
     "build": {
       "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "target": "node",
@@ -18,8 +20,8 @@
         "webpackConfig": "apps/api/webpack.config.ts"
       },
       "configurations": {
-        "development": {},
-        "production": {
+        "dev": {},
+        "prod": {
           "esbuildOptions": {
             "sourcemap": false,
             "outExtension": {
@@ -36,18 +38,20 @@
         "buildTarget": "api:build"
       },
       "configurations": {
-        "development": {
-          "buildTarget": "api:build:development"
+        "dev": {
+          "buildTarget": "api:build:dev"
         },
-        "production": {
-          "buildTarget": "api:build:production"
+        "prod": {
+          "buildTarget": "api:build:prod"
         }
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/api/src/**/*.ts"]
+        "lintFilePatterns": [
+          "apps/api/src/**/*.ts"
+        ]
       }
     },
     "typecheck": {
@@ -58,11 +62,15 @@
     },
     "container": {
       "executor": "@nx-tools/nx-container:build",
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "options": {
         "engine": "docker",
         "metadata": {
-          "images": ["api"],
+          "images": [
+            "api"
+          ],
           "load": true,
           "tags": [
             "type=schedule",
