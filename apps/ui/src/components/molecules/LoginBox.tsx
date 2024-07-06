@@ -1,11 +1,11 @@
-import type { LoginResponse, User } from "~common"
-import { OperationResult, gql, useMutation } from "urql"
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import { useGlobalState } from "@/hooks"
-import tw from "twin.macro"
-import { Button, TextInput } from "@/atoms"
-import { SignUpModal } from "@/molecules"
+import type { LoginResponse, User } from '~common'
+import { OperationResult, gql, useMutation } from 'urql'
+import { useForm } from 'react-hook-form'
+import { useState } from 'react'
+import { useGlobalState } from '@/hooks'
+import tw from 'twin.macro'
+import { Button, TextInput } from '@/atoms'
+import { SignUpModal } from '@/molecules'
 
 const loginMutation = gql`
   mutation Login($email: String!, $password: String!) {
@@ -57,7 +57,7 @@ const LoginBox = () => {
       ]}
     >
       <h1 css={[tw`text-5xl font-bold mb-6 text-center tracking-tighter`]}>
-        TableFlight x
+        TableFlight
       </h1>
 
       <hr css={[tw`mb-8 border-outlineVariant`]} />
@@ -88,13 +88,13 @@ const LoginBox = () => {
             disabled={fetching}
             css={[tw`mr-2`]}
           >
-            {fetching ? "Loading..." : "Login"}
+            {fetching ? 'Loading...' : 'Login'}
           </Button>
 
           <Button
             style="outline"
             type="button"
-            onClick={() => console.log("Handle this button.")}
+            onClick={() => console.log('Handle this button.')}
           >
             Forgot password?
           </Button>
