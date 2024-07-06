@@ -41,6 +41,7 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
   console.log('Setting refresh token cookie...')
   console.log('isProd: ', isProd)
   console.log('token: ', token)
+  console.log('NODE_ENV: ', process.env.NODE_ENV)
   try {
     res.cookie('jid', token, {
       httpOnly: true,
