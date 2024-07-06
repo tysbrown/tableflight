@@ -20,14 +20,17 @@
         "webpackConfig": "apps/api/webpack.config.ts"
       },
       "configurations": {
-        "dev": {},
+        "dev": {
+          "envFile": ".env.dev"
+        },
         "prod": {
           "esbuildOptions": {
             "sourcemap": false,
             "outExtension": {
               ".js": ".js"
             }
-          }
+          },
+          "envFile": ".env.prod"
         }
       }
     },
