@@ -3,7 +3,7 @@ import type { Response } from 'express'
 import pkg from 'jsonwebtoken'
 const { sign } = pkg
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'prod'
 
 export const createAccessToken = (user: User) => {
   if (!process.env.ACCESS_TOKEN_SECRET)
