@@ -44,7 +44,7 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
       secure: true,
       sameSite: 'none',
       path: '/',
-      domain: '.stage.tableflight.com',
+      domain: '.tableflight.com',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
