@@ -47,7 +47,8 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      domain: isProd ? 'tableflight.com' : 'localhost',
+      // domain: isProd ? 'tableflight.com' : 'localhost',
+      domain: 'tableflight.com',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
