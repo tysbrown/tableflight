@@ -9,3 +9,9 @@ ingress:
   enabled: true
   host: api-stage.tableflight.com
   certIssuer: letsencrypt-prod
+env:
+  - NODE_ENV
+  - DATABASE_URL
+  - DIRECT_URL
+  - ACCESS_TOKEN_SECRET
+  - REFRESH_TOKEN_SECRET
