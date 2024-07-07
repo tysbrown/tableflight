@@ -38,16 +38,12 @@ export const getUser = async ({ prisma }: Partial<Context>, userId: number) => {
 }
 
 export const setRefreshTokenCookie = async (res: Response, token: string) => {
-  console.log('Setting refresh token cookie...')
-  console.log('isProd: ', isProd)
-  console.log('token: ', token)
-  console.log('NODE_ENV: ', process.env.NODE_ENV)
   try {
     res.cookie('jid', token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      domain: isProd ? '.stage.tableflight.com' : 'localhost',
+      sameSite: 'strict',
+      secure: true,
+      domain: '.stage.tableflight.com',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
