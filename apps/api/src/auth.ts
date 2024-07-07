@@ -42,15 +42,12 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
   console.log('isProd: ', isProd)
   console.log('token: ', token)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
-  console.log('ACCESS_TOKEN', process.env.ACCESS_TOKEN_SECRET)
-  console.log(process.env)
   try {
     res.cookie('jid', token, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      // domain: isProd ? 'tableflight.com' : 'localhost',
-      domain: '.tableflight.com',
+      domain: isProd ? 'tableflight.com' : 'localhost',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
