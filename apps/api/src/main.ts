@@ -81,14 +81,14 @@ const handleRefreshToken = async (req: Request, res: Response) => {
 app.use(cookieParser())
 app.use(
   cors({
-    // origin: [
-    //   'http://localhost',
-    //   'https://localhost',
-    //   'http://localhost:5173',
-    //   'https://sandbox.embed.apollographql.com',
-    //   'https://stage.tableflight.com',
-    // ],
-    origin: '*',
+    origin: [
+      'http://localhost',
+      'https://localhost',
+      'http://localhost:5173',
+      'https://sandbox.embed.apollographql.com',
+      'https://stage.tableflight.com',
+      'https://tableflight.com',
+    ],
     credentials: true,
   }),
 )
