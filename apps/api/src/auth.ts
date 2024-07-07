@@ -40,8 +40,6 @@ export const getUser = async ({ prisma }: Partial<Context>, userId: number) => {
 export const setRefreshTokenCookie = async (res: Response, token: string) => {
   try {
     res.cookie('jid', token, {
-      path: '/',
-      partitioned: true,
       httpOnly: true,
       secure: true,
       sameSite: 'none',
