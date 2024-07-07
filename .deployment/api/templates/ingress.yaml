@@ -23,3 +23,12 @@ spec:
     - hosts:
         - {{ .Values.ingress.host }}
       secretName: {{ .Release.Name }}-api-tls
+annotations:
+  nginx.ingress.kubernetes.io/rewrite-target: /
+  cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
+  nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  nginx.ingress.kubernetes.io/secure-backends: "true"
+  nginx.ingress.kubernetes.io/proxy-cookie-path: "/ /"
+  nginx.ingress.kubernetes.io/proxy-cookie-domain: {{ .Values.ingress.host }} {{ .Values.ingress.host }}
+  nginx.ingress.kubernetes.io/configuration-snippet: |
+    more_set_headers "Set-Cookie: JID=; Path=/; Domain={{ .Values.ingress.host }}; HttpOnly; Secure; SameSite=None";
