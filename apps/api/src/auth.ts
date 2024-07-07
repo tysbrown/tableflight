@@ -47,6 +47,41 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
       domain: 'stage.tableflight.com',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
+    res.cookie('test1', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+      domain: '.tableflight.com',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    res.cookie('test2', token, {
+      httpOnly: true,
+      domain: '.tableflight.com',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    res.cookie('test3', token, {
+      httpOnly: true,
+      domain: '.stage.tableflight.com',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    res.cookie('test4', token, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    res.cookie('test5', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.tableflight.com',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    res.cookie('test6', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      domain: '.tableflight.com',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
   } catch (err) {
     console.error('Error setting refresh token cookie: ', err)
   }
