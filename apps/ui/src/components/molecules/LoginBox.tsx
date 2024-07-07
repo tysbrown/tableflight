@@ -57,7 +57,7 @@ const LoginBox = () => {
       ]}
     >
       <h1 css={[tw`text-5xl font-bold mb-6 text-center tracking-tighter`]}>
-        TableFlight ttt
+        TableFlight
       </h1>
 
       <hr css={[tw`mb-8 border-outlineVariant`]} />
