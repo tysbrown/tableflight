@@ -41,9 +41,8 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
   try {
     res.cookie('jid', token, {
       httpOnly: true,
-      sameSite: 'strict',
       secure: true,
-      domain: '.stage.tableflight.com',
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
