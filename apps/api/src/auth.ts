@@ -3,7 +3,7 @@ import type { Response } from 'express'
 import pkg from 'jsonwebtoken'
 const { sign } = pkg
 
-const isProd = process.env.NODE_ENV === 'prod'
+// const isProd = process.env.NODE_ENV === 'prod'
 
 export const createAccessToken = (user: User) => {
   if (!process.env.ACCESS_TOKEN_SECRET)
@@ -43,8 +43,7 @@ export const setRefreshTokenCookie = async (res: Response, token: string) => {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      path: '/',
-      domain: '.tableflight.com',
+      domain: 'tableflight.com',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
   } catch (err) {
@@ -57,6 +56,6 @@ export const clearRefreshTokenCookie = (res: Response) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    domain: '.tableflight.com',
+    domain: 'tableflight.com',
   })
 }
