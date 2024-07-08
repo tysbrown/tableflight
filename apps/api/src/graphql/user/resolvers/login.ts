@@ -21,7 +21,7 @@ export default {
             httpStatus: 400,
           },
         })
-
+      console.log('email', email)
       const user = await prisma.user.findUnique({
         where: {
           email,
