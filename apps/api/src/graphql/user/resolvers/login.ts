@@ -22,6 +22,7 @@ export default {
           },
         })
       console.log('email', email)
+      console.log('database url', process.env.DATABASE_URL)
       const user = await prisma.user.findUnique({
         where: {
           email,
