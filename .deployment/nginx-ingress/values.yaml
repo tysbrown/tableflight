@@ -1,0 +1,12 @@
+ingress-nginx:
+  controller:
+    service:
+      type: LoadBalancer
+    metrics:
+      enabled: true
+    admissionWebhooks:
+      enabled: true
+
+cert-manager:
+  installCRDs: true
+  extraArgs: ["--enable-certificate-owner-ref"]
