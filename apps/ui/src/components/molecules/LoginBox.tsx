@@ -100,7 +100,7 @@ const LoginBox = () => {
           </Button>
         </div>
 
-        <hr css={[tw`mt-8 mb-4 border-outlineVariant`]} />
+        {/* <hr css={[tw`mt-8 mb-4 border-outlineVariant`]} />
 
         <Button
           type="button"
@@ -109,7 +109,7 @@ const LoginBox = () => {
           css={[tw`justify-self-center`]}
         >
           Create new account
-        </Button>
+        </Button> */}
       </form>
       <SignUpModal isOpen={modalIsOpen} setIsOpen={setModalIsOpen} />
     </section>
