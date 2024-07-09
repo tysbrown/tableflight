@@ -28,6 +28,7 @@ export default function URQLProvider({ children }: { children: ReactNode }) {
               return utils.appendHeaders(operation, {
                 Authorization: `Bearer ${accessToken}`,
                 'Apollo-Require-Preflight': 'true',
+                'withCredentials': 'true',
               })
             }
             return operation
