@@ -81,6 +81,7 @@ const handleRefreshToken = async (req: Request, res: Response) => {
 app.use(cookieParser())
 app.use(
   cors({
+    credentials: true,
     origin: [
       'http://localhost',
       'https://localhost',
@@ -90,7 +91,6 @@ app.use(
       'https://api.stage.tableflight.com',
       'https://tableflight.com',
     ],
-    credentials: true,
   }),
 )
 app.use(bodyParser.json())
