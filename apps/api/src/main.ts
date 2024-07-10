@@ -79,18 +79,7 @@ const handleRefreshToken = async (req: Request, res: Response) => {
 }
 
 app.use(cookieParser())
-app.use(
-  cors({
-    credentials: true,
-    origin: [
-      'http://localhost:5173',
-      'https://sandbox.embed.apollographql.com',
-      'https://stage.tableflight.com',
-      'https://api.stage.tableflight.com',
-      'https://tableflight.com',
-    ],
-  }),
-)
+app.use(cors())
 app.use(bodyParser.json())
 app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 
