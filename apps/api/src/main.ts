@@ -92,6 +92,12 @@ app.use(
 )
 
 app.use((_, res, next) => {
+  res.header('Access-Control-Allow-Origin', [
+    'https://stage.tableflight.com',
+    'https://api.stage.tableflight.com',
+    'https://tableflight.com',
+    'https://api.tableflight.com',
+  ])
   res.header('Access-Control-Allow-Credentials', 'true')
   next()
 })
