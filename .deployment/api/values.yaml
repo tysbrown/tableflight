@@ -4,7 +4,7 @@ image:
   tag: ''
 service:
   type: LoadBalancer
-  port: 80
+  port: 1337
 ingress:
   enabled: true
   host: api.stage.tableflight.com

@@ -78,31 +78,18 @@ const handleRefreshToken = async (req: Request, res: Response) => {
   }
 }
 
-const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'https://sandbox.embed.apollographql.com',
-    'https://stage.tableflight.com',
-    'https://api.stage.tableflight.com',
-    'https://tableflight.com',
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
-}
-
-app.use(cors(corsOptions))
-app.options('*', cors(corsOptions))
-
-app.use((_, res, next) => {
-  res.header('Access-Control-Allow-Origin', [
-    'https://stage.tableflight.com',
-    'https://api.stage.tableflight.com',
-    'https://tableflight.com',
-    'https://api.tableflight.com',
-  ])
-  res.header('Access-Control-Allow-Credentials', 'true')
-  next()
-})
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',
+      'https://sandbox.embed.apollographql.com',
+      'https://stage.tableflight.com',
+      'https://api.stage.tableflight.com',
+      'https://tableflight.com',
+    ],
+    credentials: true,
+  }),
+)
 
 app.use(cookieParser())
 app.use(bodyParser.json())
