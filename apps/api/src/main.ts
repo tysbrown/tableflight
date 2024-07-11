@@ -104,16 +104,17 @@ app.post('/refresh_token', handleRefreshToken)
 
 // Function to list all routes
 const listRoutes = (app: Express) => {
-  const routes: { method: string; path: any }[] = []
+  const routes: { method: string; path: string }[] = []
   app._router.stack.forEach(
     (middleware: {
-      route: { methods: {}; path: any }
+      route: { methods: object; path: string }
       name: string
-      handle: { stack: any[] }
+      handle: { stack: { route: { path: string; methods: string[] } }[] }
     }) => {
       if (middleware.route) {
         // Routes registered directly on the app
-        const method = Object.keys(middleware.route.methods)[0].toUpperCase()
+        const method =
+          Object.keys(middleware.route.methods)[0]?.toUpperCase() ?? ''
         const path = middleware.route.path
         routes.push({ method, path })
       } else if (middleware.name === 'router') {
@@ -121,7 +122,7 @@ const listRoutes = (app: Express) => {
         middleware.handle.stack.forEach((handler) => {
           const route = handler.route
           if (route) {
-            const method = Object.keys(route.methods)[0].toUpperCase()
+            const method = Object.keys(route.methods)[0]?.toUpperCase() ?? ''
             const path = route.path
             routes.push({ method, path })
           }
