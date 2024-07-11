@@ -11,13 +11,6 @@ spec:
     - host: stage.tableflight.com
       http:
         paths:
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: api
-                port:
-                  number: 1337
           - path: /
             pathType: Prefix
             backend:
@@ -25,6 +18,13 @@ spec:
                 name: ui
                 port:
                   number: 80
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 1337
   tls:
     - hosts:
         - {{ .Values.ingress.host }}
