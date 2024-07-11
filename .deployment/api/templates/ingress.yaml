@@ -3,30 +3,30 @@ kind: Ingress
 metadata:
   name: tableflight-stage-ingress
   annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    cert-manager.io/cluster-issuer: { { .Values.ingress.certIssuer } }
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ .Values.ingress.host }}
+    - host: { { .Values.ingress.host } }
       http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ui
-                port:
-                  number: 80
-          - path: /api
-            pathType: Prefix
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: api
                 port:
                   number: 1337
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ui
+                port:
+                  number: 80
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
+        - { { .Values.ingress.host } }
       secretName: tableflight-stage-tls
-
