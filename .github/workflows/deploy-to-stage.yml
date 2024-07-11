@@ -97,27 +97,19 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
 
-      - name: Delete existing cert-manager ClusterRoles and ClusterRoleBindings
-        run: |
-          kubectl delete clusterrole cert-manager-cainjector cert-manager cert-manager-view cert-manager-edit || true
-          kubectl delete clusterrolebinding cert-manager-cainjector cert-manager cert-manager-view cert-manager-edit || true
-
       - name: Install cert-manager CRDs
         run: |
           kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
 
-      - name: Add Jetstack Helm repository
+      - name: Deploy cert-manager
         run: |
           helm repo add jetstack https://charts.jetstack.io
           helm repo update
-
-      - name: Install cert-manager
-        run: |
-          helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.8.0
+          helm update --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.8.0 --force
 
       - name: Apply ClusterIssuer
         run: |
-          kubectl apply -f ../../cluster-issuer.yaml
+          kubectl apply -f cluster-issuer.yaml
 
       - name: Deploy Nginx Ingress Controller
         run: |
