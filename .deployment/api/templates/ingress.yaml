@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: tableflight-stage-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /api/$1
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
     nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
 spec:
