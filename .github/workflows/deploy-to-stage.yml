@@ -128,7 +128,7 @@ jobs:
 
       - name: Deploy API
         run: |
-          helm upgrade --install --timeout 180s api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=${GITHUB_SHA}
+          helm upgrade --install --timeout 180s api .deployment/api --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_API }},image.tag=${GITHUB_SHA} --set ingress.host=api.stage.tableflight.com
 
   deploy-ui:
     runs-on: ubuntu-latest
@@ -156,4 +156,4 @@ jobs:
 
       - name: Deploy UI
         run: |
-          helm upgrade --install --timeout 180s ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=${GITHUB_SHA}
+          helm upgrade --install --timeout 180s ui .deployment/ui --set image.repository=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_UI }},image.tag=${GITHUB_SHA} --set ingress.host=stage.tableflight.com

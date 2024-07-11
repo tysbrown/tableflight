@@ -6,7 +6,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-cookie-domain: "tableflight.com"
+    nginx.ingress.kubernetes.io/proxy-cookie-domain: "api.stage.tableflight.com"
     nginx.ingress.kubernetes.io/proxy-cookie-path: "/"
 spec:
   ingressClassName: nginx
