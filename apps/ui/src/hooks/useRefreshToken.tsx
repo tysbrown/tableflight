@@ -1,29 +1,21 @@
 import { User } from '~common'
 import { useGlobalState } from './useGlobalState'
-// import axios from 'axios'
+import axios from 'axios'
 
 export const useRefreshToken = () => {
   const { state, setState } = useGlobalState()
 
   return async () => {
     try {
-      // const { data } = await axios.post(
-      //   import.meta.env.VITE_REFRESH_TOKEN_URL,
-      //   {},
-      //   {
-      //     withCredentials: true,
-      //   },
-      // )
+      const { data } = await axios.post(
+        import.meta.env.VITE_REFRESH_TOKEN_URL,
+        {},
+        {
+          withCredentials: true,
+        },
+      )
 
-      // const { accessToken, user, ok } = data as RefreshTokenResponse
-
-      const response = await fetch(import.meta.env.VITE_REFRESH_TOKEN_URL, {
-        method: 'POST',
-        credentials: 'include',
-      })
-
-      const { accessToken, user, ok } =
-        (await response.json()) as RefreshTokenResponse
+      const { accessToken, user, ok } = data as RefreshTokenResponse
 
       if (!ok) {
         setState({ ...state, isLoggedIn: false })
