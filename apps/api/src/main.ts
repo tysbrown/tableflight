@@ -94,7 +94,7 @@ app.use(cookieParser())
 app.use(bodyParser.json())
 
 app.use('/api' + yoga.graphqlEndpoint, yoga as RequestHandler)
-app.post('api/refresh_token', handleRefreshToken)
+app.post('/api/refresh_token', handleRefreshToken)
 
 app.listen(1337, () => {
   serverMessage([
