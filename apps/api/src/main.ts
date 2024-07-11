@@ -98,12 +98,12 @@ app.use((req, _, next) => {
   next()
 })
 
-app.use('/api' + yoga.graphqlEndpoint, yoga as RequestHandler)
-app.post('/api/refresh_token', handleRefreshToken)
+app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
+app.post('/refresh_token', handleRefreshToken)
 
 app.listen(1337, () => {
   serverMessage([
-    '✨ http://localhost:80                       UI',
+    '✨ http://localhost:5173                     UI',
     '✨ http://localhost:1337/api/graphql   GraphiQL',
     '✨ http://localhost:5555          Prisma Studio',
   ])
