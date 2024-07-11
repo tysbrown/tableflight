@@ -17,6 +17,7 @@ import { IResolvers } from '@graphql-tools/utils'
 const { verify } = pkg
 
 const app = express()
+const apiRouter = express.Router()
 
 const generateSchema = (): YogaSchemaDefinition<unknown, InitialContext> =>
   createSchema({
@@ -78,7 +79,7 @@ const handleRefreshToken = async (req: Request, res: Response) => {
   }
 }
 
-app.use(
+apiRouter.use(
   cors({
     origin: [
       'http://localhost:5173',
@@ -88,19 +89,20 @@ app.use(
       'https://tableflight.com',
     ],
     credentials: true,
-  }),
+  })
 )
+apiRouter.use(cookieParser())
+apiRouter.use(bodyParser.json())
 
-app.use(cookieParser())
-app.use(bodyParser.json())
-app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
+apiRouter.use(yoga.graphqlEndpoint, yoga as RequestHandler)
+apiRouter.post('/refresh_token', handleRefreshToken)
 
-app.post('/refresh_token', handleRefreshToken)
+app.use('/api', apiRouter)
 
 app.listen(1337, () => {
   serverMessage([
     '✨ http://localhost:80                       UI',
-    '✨ http://localhost:1337/graphql       GraphiQL',
+    '✨ http://localhost:1337/api/graphql   GraphiQL',
     '✨ http://localhost:5555          Prisma Studio',
   ])
 })
