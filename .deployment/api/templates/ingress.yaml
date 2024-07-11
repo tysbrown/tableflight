@@ -6,8 +6,6 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/secure-backends: "true"
-    nginx.ingress.kubernetes.io/proxy-cookie-domain: tableflight.com tableflight.com
 spec:
   ingressClassName: nginx
   rules:
@@ -20,7 +18,7 @@ spec:
               service:
                 name: api
                 port:
-                  number: 1337
+                  number: 80
   tls:
     - hosts:
         - {{ .Values.ingress.host }}
