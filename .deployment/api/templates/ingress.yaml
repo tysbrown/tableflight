@@ -4,11 +4,11 @@ metadata:
   name: tableflight-stage-ingress
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
-    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   rules:
-    - host: stage.tableflight.com
+    - host: {{ .Values.ingress.host }}
       http:
         paths:
           - path: /
