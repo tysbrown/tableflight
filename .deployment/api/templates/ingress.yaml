@@ -16,6 +16,13 @@ spec:
             pathType: Prefix
             backend:
               service:
+                name: ui
+                port:
+                  number: 80
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
                 name: api
                 port:
                   number: 1337
@@ -23,3 +30,4 @@ spec:
     - hosts:
         - {{ .Values.ingress.host }}
       secretName: {{ .Release.Name }}-api-tls
+

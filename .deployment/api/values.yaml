@@ -7,7 +7,7 @@ service:
   port: 1337
 ingress:
   enabled: true
-  host: api.stage.tableflight.com
+  host: stage.tableflight.com
   certIssuer: letsencrypt-prod
 env:
   - NODE_ENV
