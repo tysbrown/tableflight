@@ -93,7 +93,7 @@ app.use(
 app.use(cookieParser())
 app.use(bodyParser.json())
 
-app.use((req, res, next) => {
+app.use((req, _, next) => {
   console.log(`Incoming request: ${req.method} ${req.path}`)
   next()
 })
