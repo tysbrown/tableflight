@@ -25,6 +25,3 @@ spec:
                 name: api
                 key: {{ $value }}
         {{- end }}
-
-
-
