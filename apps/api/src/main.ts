@@ -103,6 +103,8 @@ app.use('/graphql', yoga as RequestHandler)
 app.post('/refresh_token', handleRefreshToken)
 app.use('/api/graphql', yoga as RequestHandler)
 app.post('/api/refresh_token', handleRefreshToken)
+app.post('/graphql', yoga as RequestHandler)
+app.post('/api/graphql', yoga as RequestHandler)
 
 // Function to list all routes
 const listRoutes = (app: Express) => {
