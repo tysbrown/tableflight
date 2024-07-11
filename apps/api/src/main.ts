@@ -14,6 +14,7 @@ import cookieParser from 'cookie-parser'
 import type { Context, InitialContext } from '~common'
 import { resolvers, typeDefs } from './graphql'
 import { IResolvers } from '@graphql-tools/utils'
+import { Express } from 'express-serve-static-core'
 const { verify } = pkg
 
 const app = express()
@@ -101,7 +102,43 @@ app.use((req, _, next) => {
 app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 app.post('/refresh_token', handleRefreshToken)
 
+// Function to list all routes
+const listRoutes = (app: Express) => {
+  const routes: { method: string; path: any }[] = []
+  app._router.stack.forEach(
+    (middleware: {
+      route: { methods: {}; path: any }
+      name: string
+      handle: { stack: any[] }
+    }) => {
+      if (middleware.route) {
+        // Routes registered directly on the app
+        const method = Object.keys(middleware.route.methods)[0].toUpperCase()
+        const path = middleware.route.path
+        routes.push({ method, path })
+      } else if (middleware.name === 'router') {
+        // Routes registered on a router
+        middleware.handle.stack.forEach((handler) => {
+          const route = handler.route
+          if (route) {
+            const method = Object.keys(route.methods)[0].toUpperCase()
+            const path = route.path
+            routes.push({ method, path })
+          }
+        })
+      }
+    },
+  )
+  return routes
+}
+
 app.listen(1337, () => {
+  const routes = listRoutes(app)
+  console.log('Available Routes:')
+  routes.forEach((route) => {
+    console.log(`${route.method} ${route.path}`)
+  })
+
   serverMessage([
     '✨ http://localhost:5173                     UI',
     '✨ http://localhost:1337/api/graphql   GraphiQL',
