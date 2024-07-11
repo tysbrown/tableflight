@@ -29,5 +29,5 @@ spec:
   tls:
     - hosts:
         - {{ .Values.ingress.host }}
-      secretName: {{ .Release.Name }}-api-tls
+      secretName: tableflight-stage-tls
 
