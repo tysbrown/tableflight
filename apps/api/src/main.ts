@@ -93,6 +93,11 @@ app.use(
 app.use(cookieParser())
 app.use(bodyParser.json())
 
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.path}`)
+  next()
+})
+
 app.use('/api' + yoga.graphqlEndpoint, yoga as RequestHandler)
 app.post('/api/refresh_token', handleRefreshToken)
 
