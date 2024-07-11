@@ -99,7 +99,7 @@ app.use((req, _, next) => {
   next()
 })
 
-app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
+app.use('/graphql', yoga as RequestHandler)
 app.post('/refresh_token', handleRefreshToken)
 
 // Function to list all routes
