@@ -97,8 +97,46 @@ jobs:
 
       - name: Delete existing cert-manager ClusterRoles and ClusterRoleBindings
         run: |
-          kubectl delete clusterrole cert-manager cert-manager-cainjector cert-manager-controller-issuers cert-manager-controller-clusterissuers cert-manager-controller-certificates cert-manager-controller-orders cert-manager-controller-challenges cert-manager-controller-ingress-shim || true
-          kubectl delete clusterrolebinding cert-manager cert-manager-cainjector cert-manager-controller-issuers cert-manager-controller-clusterissuers cert-manager-controller-certificates cert-manager-controller-orders cert-manager-controller-challenges cert-manager-controller-ingress-shim || true
+          CLUSTER_ROLES=(
+            cert-manager
+            cert-manager-cainjector
+            cert-manager-controller-issuers
+            cert-manager-controller-clusterissuers
+            cert-manager-controller-certificates
+            cert-manager-controller-orders
+            cert-manager-controller-challenges
+            cert-manager-controller-ingress-shim
+            cert-manager-controller-approve:cert-manager-io
+            cert-manager-controller-certificates:cert-manager-io
+            cert-manager-controller-challenges:cert-manager-io
+            cert-manager-controller-clusterissuers:cert-manager-io
+            cert-manager-controller-ingress-shim:cert-manager-io
+            cert-manager-controller-issuers:cert-manager-io
+            cert-manager-controller-orders:cert-manager-io
+          )
+          CLUSTER_ROLE_BINDINGS=(
+            cert-manager
+            cert-manager-cainjector
+            cert-manager-controller-issuers
+            cert-manager-controller-clusterissuers
+            cert-manager-controller-certificates
+            cert-manager-controller-orders
+            cert-manager-controller-challenges
+            cert-manager-controller-ingress-shim
+            cert-manager-controller-approve:cert-manager-io
+            cert-manager-controller-certificates:cert-manager-io
+            cert-manager-controller-challenges:cert-manager-io
+            cert-manager-controller-clusterissuers:cert-manager-io
+            cert-manager-controller-ingress-shim:cert-manager-io
+            cert-manager-controller-issuers:cert-manager-io
+            cert-manager-controller-orders:cert-manager-io
+          )
+          for role in "${CLUSTER_ROLES[@]}"; do
+            kubectl delete clusterrole "$role" || true
+          done
+          for binding in "${CLUSTER_ROLE_BINDINGS[@]}"; do
+            kubectl delete clusterrolebinding "$binding" || true
+          done
 
       - name: Install cert-manager CRDs
         run: |
