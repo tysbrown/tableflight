@@ -97,6 +97,11 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
 
+      - name: Delete existing cert-manager ClusterRoles and ClusterRoleBindings
+        run: |
+          kubectl delete clusterrole cert-manager-cainjector cert-manager cert-manager-view cert-manager-edit || true
+          kubectl delete clusterrolebinding cert-manager-cainjector cert-manager cert-manager-view cert-manager-edit || true
+
       - name: Install cert-manager CRDs
         run: |
           kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
