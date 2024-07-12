@@ -15,7 +15,6 @@ import type { Context, InitialContext } from '~common'
 import { resolvers, typeDefs } from './graphql'
 import { IResolvers } from '@graphql-tools/utils'
 const { verify } = pkg
-import { Express } from 'express'
 
 const app = express()
 
