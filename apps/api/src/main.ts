@@ -95,6 +95,8 @@ app.use(bodyParser.json())
 
 app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 app.post('/refresh_token', handleRefreshToken)
+app.use('/api' + yoga.graphqlEndpoint, yoga as RequestHandler)
+app.post('/api/refresh_token', handleRefreshToken)
 app.post('/api/test', (_, res) => res.send('test! /api/test'))
 app.post('/test', (_, res) => res.send('test! /test'))
 
