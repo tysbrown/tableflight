@@ -97,7 +97,7 @@ app.use(bodyParser.json())
 app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 app.post('/api/refresh_token', handleRefreshToken)
 app.post('/api/test', () => console.log('test! /api/test'))
-app.post('/test', () => console.log('test! /test')
+app.post('/test', () => console.log('test! /test'))
 
 // Function to list all routes
 const listRoutes = (app: Express) => {
