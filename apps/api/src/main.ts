@@ -94,49 +94,12 @@ app.use(
 app.use(cookieParser())
 app.use(bodyParser.json())
 
-app.post('/graphql', yoga as RequestHandler)
-app.post('/api/refresh_token', handleRefreshToken)
-app.post('/api/test', () => console.log('test! /api/test'))
-app.post('/test', () => console.log('test! /test'))
-
-// Function to list all routes
-const listRoutes = (app: Express) => {
-  const routes: { method: string; path: string }[] = []
-  app._router.stack.forEach(
-    (middleware: {
-      route: { methods: object; path: string }
-      name: string
-      handle: { stack: { route: { path: string; methods: string[] } }[] }
-    }) => {
-      if (middleware.route) {
-        // Routes registered directly on the app
-        const method =
-          Object.keys(middleware.route.methods)[0]?.toUpperCase() ?? ''
-        const path = middleware.route.path
-        routes.push({ method, path })
-      } else if (middleware.name === 'router') {
-        // Routes registered on a router
-        middleware.handle.stack.forEach((handler) => {
-          const route = handler.route
-          if (route) {
-            const method = Object.keys(route.methods)[0]?.toUpperCase() ?? ''
-            const path = route.path
-            routes.push({ method, path })
-          }
-        })
-      }
-    },
-  )
-  return routes
-}
+app.use(yoga.graphqlEndpoint, yoga as RequestHandler)
+app.post('/refresh_token', handleRefreshToken)
+app.post('/api/test', (_, res) => res.send('test! /api/test'))
+app.post('/test', (_, res) => res.send('test! /test'))
 
 app.listen(1337, () => {
-  const routes = listRoutes(app)
-  console.log('Available Routes:')
-  routes.forEach((route) => {
-    console.log(`${route.method} ${route.path}`)
-  })
-
   serverMessage([
     '✨ http://localhost:5173                     UI',
     '✨ http://localhost:1337/api/graphql   GraphiQL',
