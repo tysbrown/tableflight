@@ -94,7 +94,7 @@ app.use(
 app.use(cookieParser())
 app.use(bodyParser.json())
 
-app.use('/graphql', yoga as RequestHandler)
+app.post('/graphql', yoga as RequestHandler)
 app.post('/api/refresh_token', handleRefreshToken)
 app.post('/api/test', () => console.log('test! /api/test'))
 app.post('/test', () => console.log('test! /test'))
