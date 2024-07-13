@@ -85,7 +85,6 @@ app.use(
       'http://localhost:5173',
       'https://sandbox.embed.apollographql.com',
       'https://stage.tableflight.com',
-      'https://api.stage.tableflight.com',
       'https://tableflight.com',
     ],
     credentials: true,
