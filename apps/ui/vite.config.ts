@@ -9,17 +9,6 @@ export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/ui',
 
-  server: {
-    proxy: {
-      '/refresh_token': {
-        target: 'http://localhost:1337/refresh_token',
-      },
-      '/graphql': {
-        target: 'http://localhost:1337/graphql',
-      },
-    },
-  },
-
   preview: {
     port: 4300,
     host: 'localhost',
