@@ -4,11 +4,11 @@ A modern, web-based VTT with AI integrations.
 
 ### Stack Info
 
-- Frontend: Vite, React, TypeScript, Tailwind (Twin Macro), URQL
-- Backend: Node, Express, TypeScript, GraphQL, Drizzle
+- Frontend: TypeScript, Vite, React, Tailwind (Twin Macro), URQL
+- Backend: TypeScript, Node, Express, GraphQL, Drizzle, Postgres
 - Infrastructure: Kubernetes + Helm, AWS EKS, EC2, RDS, S3, Docker
 
-The frontend is a Single Page App, the backend is a system of Node + GraphQL microservices and PostgreSQL databases.
+The frontend is a React SPA, the backend is a system of Node + GraphQL microservices.
 
 ### Local Dev
 
