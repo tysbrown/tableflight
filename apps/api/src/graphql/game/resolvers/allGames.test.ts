@@ -1,14 +1,5 @@
-// import axios from 'axios'
-
-// describe('Auth layer', () => {
-//   it('should return health check message', async () => {
-//     const response = await axios.get('/api/health-check')
-//     expect(response.data).toEqual({ message: 'Hello world' })
-//   })
-// })
-
 import { Game } from '~common'
-import { graphQLRequest } from '../support/graphQLRequest'
+import { graphQLRequest } from '../../../util'
 
 const allGamesMock = [
   {
@@ -37,6 +28,6 @@ it('should return an array of customers', async () => {
     }
     `,
   )
-
+  
   expect(allGames).toMatchObject(allGamesMock)
 })

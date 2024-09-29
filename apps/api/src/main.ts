@@ -14,7 +14,6 @@ import cookieParser from 'cookie-parser'
 import type { Context, InitialContext } from '~common'
 import { resolvers, typeDefs } from './graphql'
 import { IResolvers } from '@graphql-tools/utils'
-import { stat } from 'fs'
 const { verify } = pkg
 
 const app = express()
@@ -80,24 +79,26 @@ const handleRefreshToken = async (req: Request, res: Response) => {
   }
 }
 
-// app.use(
-//   cors({
-//     origin: [
-//       'http://localhost:5173',
-//       'https://sandbox.embed.apollographql.com',
-//       'https://stage.tableflight.com',
-//       'https://tableflight.com',
-//     ],
-//     credentials: true,
-//   }),
-// )
-app.use(cors())
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',
+      'https://sandbox.embed.apollographql.com',
+      'https://stage.tableflight.com',
+      'https://tableflight.com',
+    ],
+    credentials: true,
+  }),
+)
+
 app.use(cookieParser())
 app.use(bodyParser.json())
 
 apiRouter.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 apiRouter.post('/refresh_token', handleRefreshToken)
-apiRouter.use('/health-check', (_req, res) => res.send({ message: 'Hello world' }))
+apiRouter.use('/health-check', (_req, res) =>
+  res.send({ message: 'Hello world' }),
+)
 
 app.use('/api', apiRouter)
 
@@ -122,3 +123,5 @@ const serverMessage = (messages: string[]) => {
 
   console.log(bottomBorder)
 }
+
+export default app
