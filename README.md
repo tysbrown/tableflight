@@ -1,6 +1,6 @@
 # TableFlight (In Development)
 
-A modern, web-based VTT with AI integrations.
+An open-source, web-based VTT with AI integrations.
 
 ### Stack Info
 
@@ -8,7 +8,21 @@ A modern, web-based VTT with AI integrations.
 - Backend: TypeScript, Node, Express, GraphQL, Drizzle, Postgres
 - Infrastructure: Kubernetes + Helm, AWS EKS, EC2, RDS, S3, Docker
 
-The frontend is a React SPA, the backend is a system of Node + GraphQL microservices.
+The frontend is a Single Page App, the backend is a system of Node services that communicate in-process via function calls. As the project grows, we will likely move to a microservices architecture with a message broker.
+
+### Services
+
+- common - Shared types, interfaces, and utilities
+- auth - Authentication and authorization
+- games - CRUD operations for games
+- game-session - Websocket connection for game session
+- characters - CRUD operations for characters
+- ai-tools - AI tools for game
+- chat - Chat functionality
+- notifications - Notification system
+- video - Video streaming
+- payments - Payment processing
+- analytics - Analytics tracking
 
 ### Local Dev
 
