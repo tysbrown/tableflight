@@ -90,11 +90,15 @@ app.use(
     credentials: true,
   }),
 )
+
 app.use(cookieParser())
 app.use(bodyParser.json())
 
 apiRouter.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 apiRouter.post('/refresh_token', handleRefreshToken)
+apiRouter.use('/health-check', (_req, res) =>
+  res.send({ message: 'Hello world' }),
+)
 
 app.use('/api', apiRouter)
 
@@ -119,3 +123,5 @@ const serverMessage = (messages: string[]) => {
 
   console.log(bottomBorder)
 }
+
+export default app
