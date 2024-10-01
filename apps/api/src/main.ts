@@ -99,23 +99,12 @@ apiRouter.post('/refresh_token', handleRefreshToken)
 app.use('/api', apiRouter)
 
 app.listen(1337, () => {
-  serverMessage([
-    '✨ http://localhost:5173                     UI',
-    '✨ http://localhost:1337/api/graphql   GraphiQL',
-    '✨ http://localhost:5555          Prisma Studio',
-  ])
+  if (process.env.NODE_ENV === 'dev') {
+    const icon = '\x1b[32m➜\x1b[0m'
+    console.log(`  ${icon}  UI: http://localhost:5137`)
+    console.log(`  ${icon}  GraphiQL: http://localhost:1337/api/graphql`)
+    console.log(`  ${icon}  Prisma Studio: http://localhost:5555`)
+  }
 })
 
-const serverMessage = (messages: string[]) => {
-  const maxLength = Math.max(...messages.map((msg) => msg.length))
-  const topBorder = `┌${'─'.repeat(maxLength + 3)}┐`
-  const bottomBorder = `└${'─'.repeat(maxLength + 3)}┘`
-
-  console.log(topBorder)
-
-  messages.forEach((msg: string) => {
-    console.log(`│ ${msg} │`)
-  })
-
-  console.log(bottomBorder)
-}
+export default app

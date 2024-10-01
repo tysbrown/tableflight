@@ -1,3 +1,4 @@
+const gameTypeDefs = `#graphql
 type Game {
   id: ID!
   name: String!
@@ -54,4 +55,8 @@ type Mutation {
 type Query {
   allGames: [Game]
   userGameList: [Game]
+  test: String
 }
+`
+
+export default gameTypeDefs

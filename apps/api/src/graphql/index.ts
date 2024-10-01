@@ -1,6 +1,6 @@
 import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge'
-import gameTypeDefs from './game/game.gql'
-import userTypeDefs from './user/user.gql'
+import gameTypeDefs from './game/typeDefs'
+import userTypeDefs from './user/typeDefs'
 import {
   signUp,
   login,
@@ -14,6 +14,7 @@ import {
   createGame,
   editGame,
   deleteGame,
+  test,
 } from './game/resolvers'
 
 export const typeDefs = mergeTypeDefs([gameTypeDefs, userTypeDefs])
@@ -28,4 +29,5 @@ export const resolvers = mergeResolvers([
   createGame,
   editGame,
   deleteGame,
+  test,
 ])

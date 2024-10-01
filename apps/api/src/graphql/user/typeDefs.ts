@@ -1,3 +1,4 @@
+const userTypeDefs = `#graphql
 type User {
   id: ID!
   tokenVersion: Int!
@@ -41,3 +42,6 @@ type Mutation {
   changePassword(currentPassword: String!, newPassword: String!): User!
   revokeRefreshTokens(id: ID!): revokeRefreshTokens
 }
+`
+
+export default userTypeDefs

@@ -6,6 +6,5 @@
     "types": ["node"]
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.ts", "src/**/*.gql", "gql.d.ts"],
-  "composite": true
+  "include": ["src/**/*.ts", "gql.d.ts"]
 }
