@@ -38,9 +38,8 @@ export default {
 
       const isMatch = await compare(password, user?.password)
 
-      const refreshToken = createRefreshToken(user)
-
       if (isMatch) {
+        const refreshToken = createRefreshToken(user)
         setRefreshTokenCookie(res, refreshToken)
 
         return {
