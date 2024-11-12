@@ -44,6 +44,7 @@
       "games": ["libs/games/src/index.ts"],
       "notifications": ["libs/notifications/src/index.ts"],
       "payments": ["libs/payments/src/index.ts"],
+      "profile": ["libs/profile/src/index.ts"],
       "video": ["libs/video/src/index.ts"],
       "~api/*": ["apps/api/src/*"],
       "~common": ["libs/common/src/index.ts"],
