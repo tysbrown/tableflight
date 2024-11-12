@@ -14,7 +14,6 @@ import {
   createGame,
   editGame,
   deleteGame,
-  test,
 } from './game/resolvers'
 
 export const typeDefs = mergeTypeDefs([gameTypeDefs, userTypeDefs])
@@ -29,5 +28,4 @@ export const resolvers = mergeResolvers([
   createGame,
   editGame,
   deleteGame,
-  test,
 ])
