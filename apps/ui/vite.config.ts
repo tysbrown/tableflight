@@ -61,6 +61,7 @@ export default defineConfig({
       dir: '../../node_modules/.vitest/apps/ui',
     },
     environment: 'jsdom',
+    setupFiles: ['src/test-setup.ts'],
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
 
     reporters: ['default'],
