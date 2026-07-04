@@ -8,8 +8,8 @@ export default {
       { name, description }: Partial<Game>,
       { prisma, user }: Context,
     ) => {
-      if (!name || !description)
-        throw new GraphQLError('All fields are required.', {
+      if (!name)
+        throw new GraphQLError('A game name is required.', {
           extensions: {
             code: 'BAD_USER_INPUT',
             http: {
@@ -31,8 +31,11 @@ export default {
       const game = await prisma.game.create({
         data: {
           name,
-          description,
+          description: description ?? '',
           createdById: user.id,
+          playersParticipating: {
+            connect: { id: user.id },
+          },
         },
       })
       return game
