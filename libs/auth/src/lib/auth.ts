@@ -1,5 +1,5 @@
 import type { Context, User } from '~common'
-import type { Request, Response } from 'express'
+import type { Response } from 'express'
 import { sign, verify, type JwtPayload } from 'jsonwebtoken'
 
 const isProd = process.env.NODE_ENV === 'prod'
