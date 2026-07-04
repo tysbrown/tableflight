@@ -27,7 +27,25 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      # Rust toolchain for libs/board-engine (compiled to wasm via wasm-pack).
+      # GitHub's ubuntu runners ship rustup but no default toolchain.
+      - name: Install Rust + wasm-pack
+        run: |
+          rustup toolchain install stable --profile minimal --target wasm32-unknown-unknown
+          rustup default stable
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            libs/board-engine/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('libs/board-engine/Cargo.lock') }}
+
       - run: npm ci
+      - run: npx prisma generate --schema=apps/api/prisma/schema.prisma
       - uses: nrwl/nx-set-shas@v4
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud

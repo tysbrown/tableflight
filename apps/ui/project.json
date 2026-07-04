@@ -18,7 +18,10 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "tsc -p apps/ui/tsconfig.app.json --noEmit"
-      }
+      },
+      "dependsOn": [
+        "board-engine:build"
+      ]
     },
     "serve": {
       "executor": "@nx/vite:dev-server",
@@ -34,7 +37,10 @@
           "buildTarget": "ui:build:prod",
           "envFile": ".env.prod"
         }
-      }
+      },
+      "dependsOn": [
+        "board-engine:build"
+      ]
     },
     "build": {
       "executor": "@nx/vite:build",
@@ -48,7 +54,10 @@
         "prod": {
           "envFile": ".env.prod"
         }
-      }
+      },
+      "dependsOn": [
+        "^build"
+      ]
     },
     "container": {
       "executor": "@nx-tools/nx-container:build",
@@ -71,6 +80,14 @@
           ]
         }
       }
+    },
+    "test": {
+      "dependsOn": [
+        "board-engine:build"
+      ]
     }
-  }
+  },
+  "implicitDependencies": [
+    "board-engine"
+  ]
 }

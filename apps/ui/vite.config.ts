@@ -9,6 +9,14 @@ export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/ui',
 
+  server: {
+    fs: {
+      // The board engine's .wasm binary lives outside the app root and is
+      // fetched at runtime, so the dev server must be allowed to serve it.
+      allow: [__dirname, '../../libs/board-engine/pkg'],
+    },
+  },
+
   preview: {
     port: 4300,
     host: 'localhost',

@@ -1,190 +1,131 @@
-import { useEffect, useRef, useState } from "react"
-import tw from "twin.macro"
-import { clamp } from "@/utils"
-import { Canvas, ZoomMenu, Grid } from "@/molecules"
-import { useGridState } from "@/hooks"
-import { type GridState } from "@/contexts"
+import { useEffect, useRef } from 'react'
+import tw from 'twin.macro'
+import type { TokenType } from '~common'
+import { ZoomMenu } from '@/molecules'
+import { useBoard, useExecuteOnKeyHold, useExecuteOnKeyPress } from '@/hooks'
+import type { TokenKind } from '@/contexts'
 
 /**
- * Gridded game board with panning and zooming functionality.
+ * The game board: a canvas driven by the headless wasm engine
+ * (libs/board-engine) and rendered by PixiJS (src/board/PixiStage). React
+ * owns a host element the stage injects its canvas into (the stage owns the
+ * canvas because destroying a renderer kills the canvas's WebGL context);
+ * the engine owns all board state and interactions; the stage owns the
+ * frame loop and drawing.
  */
 const GameBoard = () => {
-  const { state, dispatch } = useGridState()
-  const { backgroundImage, zoomLevel } = state as GridState
-  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const { engine, attachBoard, detachBoard, resizeViewport, dropToken } =
+    useBoard()
 
-  const lastPosition = useRef({ x: 0, y: 0 })
-  const dragging = useRef(false)
-
-  const gridSectionRef = useRef<HTMLDivElement>(null)
-  const gridContainerRef = useRef<HTMLDivElement>(null)
-  const isFullyPannedRef = useRef({
-    right: false,
-    down: false,
-    left: false,
-    up: false,
-  })
-
-  const { current: gridSection } = gridSectionRef
-  const { current: gridContainer } = gridContainerRef
-  const { current: isFullyPanned } = isFullyPannedRef
-
-  const viewportWidth = gridSection?.offsetWidth || 0
-  const viewportHeight = gridSection?.offsetHeight || 0
-
-  const gridWidth = gridContainer?.offsetWidth || 0
-  const gridHeight = gridContainer?.offsetHeight || 0
-
-  const effectiveWidth = gridWidth * zoomLevel
-  const effectiveHeight = gridHeight * zoomLevel
-
-  const updatePanPosition = (
-    dx: number,
-    dy: number,
-    isInverted = false,
-  ) => {
-    const newX = isInverted ? position.x + dx : position.x - dx
-    const newY = isInverted ? position.y + dy : position.y - dy
-
-    const shouldCenterHorizontally = effectiveWidth <= viewportWidth
-    const shouldCenterVertically = effectiveHeight <= viewportHeight
-
-    const adjustedX = shouldCenterHorizontally
-      ? (viewportWidth - effectiveWidth) / 2
-      : clamp(newX, viewportWidth - effectiveWidth, 0)
-
-    const adjustedY = shouldCenterVertically
-      ? (viewportHeight - effectiveHeight) / 2
-      : clamp(newY, viewportHeight - effectiveHeight, 0)
-
-    setPosition({ x: adjustedX, y: adjustedY })
-  }
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const isLeftClick = e.button === 0
-    const isOnGrid = (e.target as HTMLElement).dataset.isgrid === "true"
-
-    if (!isLeftClick || !isOnGrid) return
-
-    dragging.current = true
-    lastPosition.current = { x: e.clientX, y: e.clientY }
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!dragging.current) return
-
-    const dx = e.clientX - lastPosition.current.x
-    const dy = e.clientY - lastPosition.current.y
-
-    updatePanPosition(dx, dy, true)
-    lastPosition.current = { x: e.clientX, y: e.clientY }
-  }
-
-  const handleMouseUp = () => {
-    dragging.current = false
-  }
-
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!gridSection || !gridContainer) return
-
-    const { ctrlKey, metaKey, deltaX, deltaY } = e
-    const isZooming = ctrlKey || metaKey
-
-    if (isZooming) handleZoom(deltaY)
-    else updatePanPosition(deltaX, deltaY)
-  }
-
-  const handleZoom = (deltaY: number) => {
-    const zoomDelta = -deltaY * 0.01
-    const newZoom = clamp(zoomLevel + zoomDelta, 0.1, 5)
-
-    const scale = newZoom / zoomLevel
-
-    const newX = position.x * scale + ((1 - scale) * viewportWidth) / 2
-    const newY = position.y * scale + ((1 - scale) * viewportHeight) / 2
-
-    dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: newZoom })
-    setPosition({ x: newX, y: newY })
-  }
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const hostRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      updatePanPosition(0, 0)
-    }, 250)
+    const host = hostRef.current
+    if (!host) return undefined
 
-    return () => clearTimeout(timeoutId)
-  }, [zoomLevel])
+    void attachBoard(host)
+    return detachBoard
+  }, [attachBoard, detachBoard])
 
+  // Forward sizing and input events to the engine (they bubble up from the
+  // stage's canvas to the host element).
   useEffect(() => {
-    const preventDefaultZoom = (e: WheelEvent) => {
-      if (e.ctrlKey) e.preventDefault()
+    const section = sectionRef.current
+    const canvas = hostRef.current
+    if (!engine || !section || !canvas) return undefined
+
+    const resize = () =>
+      resizeViewport(section.clientWidth, section.clientHeight)
+    resize()
+    const resizeObserver = new ResizeObserver(resize)
+    resizeObserver.observe(section)
+
+    const positionOf = (event: { clientX: number; clientY: number }) => {
+      const rect = canvas.getBoundingClientRect()
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top }
     }
 
-    window.addEventListener("wheel", preventDefaultZoom, { passive: false })
+    const onPointerDown = (event: PointerEvent) => {
+      canvas.setPointerCapture(event.pointerId)
+      const { x, y } = positionOf(event)
+      engine.pointerDown(x, y, event.button)
+    }
+    const onPointerMove = (event: PointerEvent) => {
+      const { x, y } = positionOf(event)
+      engine.pointerMove(x, y)
+    }
+    const onPointerUp = (event: PointerEvent) => {
+      const { x, y } = positionOf(event)
+      engine.pointerUp(x, y)
+    }
+    const onPointerLeave = () => engine.pointerLeave()
+
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault()
+      const { x, y } = positionOf(event)
+      const zooming = event.ctrlKey || event.metaKey
+      engine.wheel(event.deltaX, event.deltaY, zooming, x, y)
+    }
+
+    // New tokens arrive from the token panel via HTML5 drag and drop.
+    const onDragOver = (event: DragEvent) => event.preventDefault()
+    const onDrop = (event: DragEvent) => {
+      event.preventDefault()
+      const data = event.dataTransfer?.getData('application/json')
+      if (!data) return
+
+      const { token } = JSON.parse(data) as { token?: Partial<TokenType> }
+      if (!token?.type) return
+
+      const { x, y } = positionOf(event)
+      dropToken(x, y, token.type as TokenKind)
+    }
+
+    canvas.addEventListener('pointerdown', onPointerDown)
+    canvas.addEventListener('pointermove', onPointerMove)
+    canvas.addEventListener('pointerup', onPointerUp)
+    canvas.addEventListener('pointerleave', onPointerLeave)
+    canvas.addEventListener('wheel', onWheel, { passive: false })
+    canvas.addEventListener('dragover', onDragOver)
+    canvas.addEventListener('drop', onDrop)
 
     return () => {
-      window.removeEventListener("wheel", preventDefaultZoom)
+      resizeObserver.disconnect()
+      canvas.removeEventListener('pointerdown', onPointerDown)
+      canvas.removeEventListener('pointermove', onPointerMove)
+      canvas.removeEventListener('pointerup', onPointerUp)
+      canvas.removeEventListener('pointerleave', onPointerLeave)
+      canvas.removeEventListener('wheel', onWheel)
+      canvas.removeEventListener('dragover', onDragOver)
+      canvas.removeEventListener('drop', onDrop)
     }
+  }, [engine, dropToken, resizeViewport])
+
+  // Keep the browser from zooming the page on ctrl/cmd + wheel.
+  useEffect(() => {
+    const preventBrowserZoom = (event: WheelEvent) => {
+      if (event.ctrlKey) event.preventDefault()
+    }
+    window.addEventListener('wheel', preventBrowserZoom, { passive: false })
+    return () => window.removeEventListener('wheel', preventBrowserZoom)
   }, [])
 
-  useEffect(() => {
-    if (!gridSection || !gridContainer) return
-
-    const gridSectionRect = gridSection?.getBoundingClientRect()
-    const gridContainerRect = gridContainer?.getBoundingClientRect()
-
-    isFullyPanned.right = gridContainerRect.right - 1 <= gridSectionRect.right
-    isFullyPanned.down = gridContainerRect.bottom <= gridSectionRect.bottom
-    isFullyPanned.left = gridContainerRect.left >= gridSectionRect.left
-    isFullyPanned.up = gridContainerRect.top >= gridSectionRect.top
-  }, [gridSection, gridContainer, gridWidth, gridHeight, position, zoomLevel])
+  useExecuteOnKeyPress('Escape', () => engine?.escape())
+  useExecuteOnKeyHold(
+    'Shift',
+    () => engine?.setHoverEnabled(false),
+    () => engine?.setHoverEnabled(true),
+  )
 
   return (
     <section
       data-testid="game-board-section"
-      ref={gridSectionRef}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onWheel={handleWheel}
+      ref={sectionRef}
       css={[tw`relative w-full h-screen overflow-hidden`]}
     >
-      <div
-        data-testid="game-board-container"
-        ref={gridContainerRef}
-        css={[
-          tw`w-fit transition-transform duration-[25ms] ease-linear cursor-grab origin-[0% 0%]`,
-          tw`active:cursor-grabbing`,
-          `transform: translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
-          !backgroundImage && tw`w-[3000px] h-[3000px] bg-white`,
-        ]}
-      >
-        {backgroundImage && (
-          <img
-            src={backgroundImage}
-            alt="Background"
-            onLoad={() => dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel: 1 })}
-            css={[tw`max-w-none w-auto h-auto`]}
-          />
-        )}
-        <Canvas
-          gridWidth={gridWidth}
-          gridHeight={gridHeight}
-          viewportWidth={viewportWidth}
-          viewportHeight={viewportHeight}
-          isFullyPanned={isFullyPanned}
-          updatePanPosition={updatePanPosition}
-        />
-        <Grid />
-      </div>
-      <ZoomMenu
-        viewportWidth={viewportWidth}
-        viewportHeight={viewportHeight}
-        originalWidth={gridWidth}
-        originalHeight={gridHeight}
-        position={position}
-        setPosition={setPosition}
-      />
+      <div data-testid="game-board-host" ref={hostRef} />
+      <ZoomMenu />
     </section>
   )
 }

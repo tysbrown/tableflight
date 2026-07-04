@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>board render harness</title>
+    <style>
+      body { margin: 0; background: #131316; }
+      canvas { display: block; }
+      #board { width: fit-content; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Dev-only harness for the full board stack (wasm engine + PixiStage),
+      served by the Vite dev server without the app/API/auth in the way.
+      Used by apps/ui-e2e/src/board-render.test.ts; not part of the build.
+    -->
+    <div id="board"></div>
+    <script type="module" src="/src/board/harness.ts"></script>
+  </body>
+</html>

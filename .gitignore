@@ -42,3 +42,5 @@ Thumbs.db
 .nx/workspace-data
 
 .env
+# Rust / WebAssembly (board-engine)
+libs/board-engine/target

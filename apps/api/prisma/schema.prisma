@@ -36,17 +36,11 @@ model Game {
 }
 
 model GridState {
-  gameSessionID   Int     @id
-  grid            Json
-  rows            Int
-  cols            Int
-  cellSize        Int
-  dimensions      Json
-  backgroundImage String?
-  lineWidth       Float?
-  zoomLevel       Float?
-  position        Json
-  game            Game    @relation(fields: [gameSessionID], references: [id], onDelete: Cascade)
+  gameSessionID Int      @id
+  /// Board snapshot JSON produced by the board engine (libs/board-engine).
+  state         Json
+  updatedAt     DateTime @updatedAt
+  game          Game     @relation(fields: [gameSessionID], references: [id], onDelete: Cascade)
 }
 
 model CharacterSheet {

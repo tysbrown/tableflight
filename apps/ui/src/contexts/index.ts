@@ -1,3 +1,3 @@
 export * from './GlobalStateProvider'
-export * from './GridStateProvider'
+export * from './BoardProvider'
 export * from './URQLProvider'

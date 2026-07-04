@@ -47,6 +47,7 @@
       "profile": ["libs/profile/src/index.ts"],
       "video": ["libs/video/src/index.ts"],
       "~api/*": ["apps/api/src/*"],
+      "~board-engine": ["libs/board-engine/pkg/board_engine"],
       "~common": ["libs/common/src/index.ts"],
       "~ui/*": ["apps/ui/src/*"]
     }

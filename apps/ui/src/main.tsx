@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import { GlobalStateProvider } from './contexts/GlobalStateProvider'
-import { GridStateProvider } from './contexts/GridStateProvider'
+import { BoardProvider } from './contexts/BoardProvider'
 import URQLProvider from './contexts/URQLProvider'
 import GlobalStyles from './styles/GlobalStyles'
 
@@ -10,12 +10,12 @@ import GlobalStyles from './styles/GlobalStyles'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <GlobalStateProvider>
-      <GridStateProvider>
+      <BoardProvider>
         <URQLProvider>
           <GlobalStyles />
           <App />
         </URQLProvider>
-      </GridStateProvider>
+      </BoardProvider>
     </GlobalStateProvider>
   </React.StrictMode>,
 )

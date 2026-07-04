@@ -11,34 +11,15 @@ type Game {
   gridState: GridState
 }
 
+"""
+The saved board for a game session. \`state\` is the JSON snapshot produced by
+the board engine (libs/board-engine): grid settings, tokens, drawn lines,
+map image, and camera.
+"""
 type GridState {
   gameSessionID: ID!
-  grid: [[Token]]
-  rows: Int
-  cols: Int
-  cellSize: Int
-  dimensions: Dimensions
-  backgroundImage: String
-  lineWidth: Float
-  zoomLevel: Float
-  position: Position
-}
-
-type Token {
-  id: ID!
-  type: String!
-  createdById: ID!
-  ownedById: ID!
-}
-
-type Dimensions {
-  width: Int!
-  height: Int!
-}
-
-type Position {
-  x: Int!
-  y: Int!
+  state: String!
+  updatedAt: String!
 }
 
 type CharacterSheet {
@@ -50,11 +31,13 @@ type Mutation {
   createGame(name: String!, description: String): Game!
   editGame(id: ID!, name: String, description: String): Game!
   deleteGame(id: ID!): Game!
+  saveGridState(gameSessionId: ID!, state: String!): GridState!
 }
 
 type Query {
   allGames: [Game]
   userGameList: [Game]
+  gridState(gameSessionId: ID!): GridState
   test: String
 }
 `

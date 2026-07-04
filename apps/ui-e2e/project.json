@@ -4,7 +4,20 @@
   "projectType": "application",
   "sourceRoot": "apps/ui-e2e/src",
   "tags": [],
-  "implicitDependencies": ["ui"],
+  "implicitDependencies": [
+    "ui"
+  ],
   "// targets": "to see all targets run: nx show project ui-e2e --web",
-  "targets": {}
+  "targets": {
+    "e2e": {
+      "dependsOn": [
+        "board-engine:build"
+      ]
+    },
+    "e2e-ci--**/*": {
+      "dependsOn": [
+        "board-engine:build"
+      ]
+    }
+  }
 }

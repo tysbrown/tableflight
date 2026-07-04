@@ -5,8 +5,7 @@ import tw from 'twin.macro'
 import type { Game } from '~common'
 import { Button, List, ListItem, Modal, TextInput } from '@/atoms'
 import { HeadlineSmall, BodyMedium } from '@/typography'
-import { useGridState } from '@/hooks'
-import { GridState } from '@/contexts'
+import { useBoard } from '@/hooks'
 
 const createGameMutation = gql`
   mutation CreateGame($name: String!, $description: String) {
@@ -30,8 +29,7 @@ type CreateGameFields = {
 
 const GameSelectModal = ({ games }: GameSelectModalProps) => {
   const [selected, setSelected] = useState<string>('')
-  const { state, dispatch } = useGridState()
-  const { gameSessionId } = state as GridState
+  const { gameSessionId, setGameSessionId } = useBoard()
 
   const [{ fetching }, createGame] = useMutation(createGameMutation)
   const {
@@ -40,8 +38,7 @@ const GameSelectModal = ({ games }: GameSelectModalProps) => {
     formState: { errors },
   } = useForm()
 
-  const enterSession = (id: string) =>
-    dispatch({ type: 'SET_GAME_SESSION_ID', gameSessionId: id })
+  const enterSession = (id: string) => setGameSessionId(id)
 
   const onCreate = async ({ name, description }: Partial<CreateGameFields>) => {
     const result = await createGame({ name, description })

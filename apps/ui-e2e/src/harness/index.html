@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>board-engine harness</title>
+    <style>
+      body { margin: 0; background: #131316; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Test harness for the (headless) wasm board engine: loads the real built
+      pkg and exposes the engine on `window` so playwright specs can drive it
+      directly, without the app/renderer/API in the way. Served by the static
+      web server defined in playwright.config.ts (repo root on :4301).
+    -->
+    <script type="module">
+      import init, { Engine } from '/libs/board-engine/pkg/board_engine.js'
+
+      window.engineReady = init().then(() => {
+        const engine = new Engine()
+        engine.setViewport(800, 600)
+        window.engine = engine
+        return engine
+      })
+    </script>
+  </body>
+</html>

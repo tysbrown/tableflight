@@ -1,5 +1,6 @@
 export * from './useGlobalState'
-export * from './useGridState'
+export * from './useBoard'
+export * from './useBoardSync'
 export * from './useInitializeAuth'
 export * from './useRefreshToken'
 export * from './useDisableScroll'

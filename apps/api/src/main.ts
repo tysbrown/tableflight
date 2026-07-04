@@ -34,7 +34,9 @@ app.use(
   }),
 )
 app.use(cookieParser())
-app.use(bodyParser.json())
+// Board snapshots embed map images as data URLs until dedicated asset
+// storage lands, so saveGridState payloads run well past the 100kb default.
+app.use(bodyParser.json({ limit: '50mb' }))
 
 apiRouter.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 

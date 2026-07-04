@@ -1,54 +1,13 @@
 import React, { useRef, useState } from 'react'
 import tw from 'twin.macro'
 import { Menu, MenuItem, SliderInput, Button } from '@/atoms'
-import { useGridState } from '@/hooks'
-import { GridState } from '@/contexts'
+import { useBoard } from '@/hooks'
 
-type ZoomMenuProps = {
-  viewportWidth: number
-  viewportHeight: number
-  originalWidth: number
-  originalHeight: number
-  position: { x: number; y: number }
-  setPosition: React.Dispatch<
-    React.SetStateAction<{
-      x: number
-      y: number
-    }>
-  >
-}
-
-const ZoomMenu = ({
-  viewportWidth,
-  viewportHeight,
-  originalWidth,
-  originalHeight,
-  position,
-  setPosition,
-}: ZoomMenuProps) => {
-  const { state, dispatch } = useGridState()
-  const { zoomLevel } = state as GridState
+const ZoomMenu = () => {
+  const { zoomLevel, setZoomLevel, zoomToFit } = useBoard()
 
   const [zoomMenuIsOpen, setZoomMenuIsOpen] = useState<boolean>(false)
   const zoomMenuRef = useRef<HTMLButtonElement | null>(null)
-
-  const zoomToFitContainer = () => {
-    const widthRatio = viewportWidth / originalWidth
-    const heightRatio = viewportHeight / originalHeight
-    const newZoom = Math.min(widthRatio, heightRatio)
-
-    dispatch({ type: 'SET_ZOOM_LEVEL', zoomLevel: newZoom })
-  }
-
-  const setZoomLevel = (newZoom: number) => {
-    const scale = newZoom / zoomLevel
-
-    const newX = position.x * scale + ((1 - scale) * viewportWidth) / 2
-    const newY = position.y * scale + ((1 - scale) * viewportHeight) / 2
-
-    setPosition({ x: newX, y: newY })
-    dispatch({ type: 'SET_ZOOM_LEVEL', zoomLevel: newZoom })
-  }
 
   return (
     <>
@@ -139,10 +98,10 @@ const ZoomMenu = ({
           <Button
             style="text"
             type="button"
-            onClick={zoomToFitContainer}
+            onClick={zoomToFit}
             css={[tw`w-full text-left py-2 px-3`]}
           >
-            Fit to screen
+            Zoom to content
           </Button>
         </MenuItem>
       </Menu>

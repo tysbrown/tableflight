@@ -4,7 +4,7 @@ import { Provider, type Client } from 'urql'
 import { fromValue } from 'wonka'
 import { describe, expect, it, vi } from 'vitest'
 import type { Game } from '~common'
-import { GridStateProvider } from '@/contexts'
+import { BoardProvider } from '@/contexts'
 import GameSelectModal from './GameSelectModal'
 
 /**
@@ -50,9 +50,9 @@ const makeClient = (
 const renderModal = (client: Client, gameList: Game[] | undefined = games) =>
   render(
     <Provider value={client}>
-      <GridStateProvider>
+      <BoardProvider>
         <GameSelectModal games={gameList} />
-      </GridStateProvider>
+      </BoardProvider>
     </Provider>,
   )
 

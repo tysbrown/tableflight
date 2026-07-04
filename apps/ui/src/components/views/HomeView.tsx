@@ -9,8 +9,7 @@ import {
 } from '@/molecules'
 import { GameBoard } from '@/organisms'
 import { LoadingView } from '@/views'
-import { useGridState } from '@/hooks'
-import { GridState } from '@/contexts'
+import { useBoard, useBoardSync } from '@/hooks'
 import { Game } from '~common'
 
 const gameListQuery = gql`
@@ -34,12 +33,10 @@ const HomeView = () => {
     query: gameListQuery,
   })
 
-  const { state, dispatch } = useGridState()
-  const { cellSize, mode } = state as GridState
+  const { cellSize, setCellSize, mode, setMode } = useBoard()
 
-  const setCellSize = (cellSize: number) => {
-    dispatch({ type: 'SET_CELL_SIZE', cellSize })
-  }
+  // Load the saved board when a session is entered; autosave board changes.
+  useBoardSync()
 
   if (fetching) return <LoadingView />
   if (error) return <p>Oh no... {error.message}</p>
@@ -57,12 +54,7 @@ const HomeView = () => {
           min={10}
           max={100}
           step={0.001}
-          onChange={(e) =>
-            dispatch({
-              type: 'SET_CELL_SIZE',
-              cellSize: parseInt(e.target.value),
-            })
-          }
+          onChange={(e) => setCellSize(parseInt(e.target.value))}
         />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <NewTokenPanel />
@@ -74,18 +66,10 @@ const HomeView = () => {
           Current Mode: <b>{mode.toUpperCase()}</b>
         </p>
         <section css={[tw`flex flex-wrap gap-3`]}>
-          <Button
-            type="button"
-            style="primary"
-            onClick={() => dispatch({ type: 'SET_MODE', mode: 'draw' })}
-          >
+          <Button type="button" style="primary" onClick={() => setMode('draw')}>
             Draw
           </Button>
-          <Button
-            type="button"
-            style="primary"
-            onClick={() => dispatch({ type: 'SET_MODE', mode: 'pan' })}
-          >
+          <Button type="button" style="primary" onClick={() => setMode('pan')}>
             Pan
           </Button>
         </section>
