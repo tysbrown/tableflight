@@ -5,7 +5,7 @@ import {
   createAccessToken,
   createRefreshToken,
   setRefreshTokenCookie,
-} from '~api/auth'
+} from 'auth'
 
 export default {
   Mutation: {

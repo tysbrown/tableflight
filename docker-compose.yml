@@ -9,7 +9,6 @@ services:
     environment:
       - NODE_ENV=development
       - VITE_API_URL=tableflight-api:1337/api/graphql
-      - VITE_REFRESH_TOKEN_URL=tableflight-api:1337/refresh-token
 
   api:
     build:

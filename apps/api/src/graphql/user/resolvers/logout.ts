@@ -1,5 +1,5 @@
 import type { Context } from '~common'
-import { clearRefreshTokenCookie } from '~api/auth'
+import { clearRefreshTokenCookie } from 'auth'
 
 export default {
   Mutation: {

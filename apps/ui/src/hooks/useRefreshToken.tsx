@@ -8,14 +8,17 @@ export const useRefreshToken = () => {
   return async () => {
     try {
       const { data } = await axios.post(
-        import.meta.env.VITE_REFRESH_TOKEN_URL,
-        {},
+        import.meta.env.VITE_API_URL,
+        {
+          query: REFRESH_TOKEN_MUTATION,
+        },
         {
           withCredentials: true,
         },
       )
 
-      const { accessToken, user, ok } = data as RefreshTokenResponse
+      const { accessToken, user, ok } = data.data
+        .refreshToken as RefreshTokenResponse
 
       if (!ok) {
         setState({ ...state, isLoggedIn: false })
@@ -30,6 +33,22 @@ export const useRefreshToken = () => {
     }
   }
 }
+
+const REFRESH_TOKEN_MUTATION = `
+  mutation RefreshToken {
+    refreshToken {
+      ok
+      accessToken
+      user {
+        id
+        tokenVersion
+        firstName
+        lastName
+        email
+      }
+    }
+  }
+`
 
 type RefreshTokenResponse = {
   accessToken: string

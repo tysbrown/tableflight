@@ -30,6 +30,12 @@ type SignUp {
   email: String
 }
 
+type RefreshToken {
+  ok: Boolean!
+  accessToken: String!
+  user: User
+}
+
 type Mutation {
   signUp(
     email: String!
@@ -41,6 +47,7 @@ type Mutation {
   logout: Logout
   changePassword(currentPassword: String!, newPassword: String!): User!
   revokeRefreshTokens(id: ID!): revokeRefreshTokens
+  refreshToken: RefreshToken!
 }
 `
 
