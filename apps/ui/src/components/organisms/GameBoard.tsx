@@ -14,8 +14,14 @@ import type { TokenKind } from '@/contexts'
  * frame loop and drawing.
  */
 const GameBoard = () => {
-  const { engine, attachBoard, detachBoard, resizeViewport, dropToken } =
-    useBoard()
+  const {
+    engine,
+    attachBoard,
+    detachBoard,
+    resizeViewport,
+    dropAsset,
+    dropToken,
+  } = useBoard()
 
   const sectionRef = useRef<HTMLDivElement>(null)
   const hostRef = useRef<HTMLDivElement>(null)
@@ -60,6 +66,8 @@ const GameBoard = () => {
       engine.pointerUp(x, y)
     }
     const onPointerLeave = () => engine.pointerLeave()
+    // A cancelled gesture (touch takeover, OS interrupt) sends no pointerup.
+    const onPointerCancel = () => engine.pointerLeave()
 
     const onWheel = (event: WheelEvent) => {
       event.preventDefault()
@@ -68,24 +76,50 @@ const GameBoard = () => {
       engine.wheel(event.deltaX, event.deltaY, zooming, x, y)
     }
 
-    // New tokens arrive from the token panel via HTML5 drag and drop.
+    // Tokens and assets both arrive via drag-and-drop; the payload shape
+    // says which is which.
     const onDragOver = (event: DragEvent) => event.preventDefault()
     const onDrop = (event: DragEvent) => {
       event.preventDefault()
       const data = event.dataTransfer?.getData('application/json')
       if (!data) return
 
-      const { token } = JSON.parse(data) as { token?: Partial<TokenType> }
-      if (!token?.type) return
-
+      // Anything can be dragged in, so validate before trusting the payload.
+      let payload: {
+        token?: Partial<TokenType>
+        asset?: { url?: unknown; width?: unknown; height?: unknown }
+      }
+      try {
+        payload = JSON.parse(data)
+      } catch {
+        return
+      }
       const { x, y } = positionOf(event)
-      dropToken(x, y, token.type as TokenKind)
+
+      const size = (value: unknown): value is number =>
+        typeof value === 'number' && Number.isFinite(value) && value > 0
+      const { asset, token } = payload
+
+      if (
+        typeof asset?.url === 'string' &&
+        size(asset.width) &&
+        size(asset.height)
+      ) {
+        dropAsset(x, y, {
+          url: asset.url,
+          width: asset.width,
+          height: asset.height,
+        })
+      } else if (token?.type) {
+        dropToken(x, y, token.type as TokenKind)
+      }
     }
 
     canvas.addEventListener('pointerdown', onPointerDown)
     canvas.addEventListener('pointermove', onPointerMove)
     canvas.addEventListener('pointerup', onPointerUp)
     canvas.addEventListener('pointerleave', onPointerLeave)
+    canvas.addEventListener('pointercancel', onPointerCancel)
     canvas.addEventListener('wheel', onWheel, { passive: false })
     canvas.addEventListener('dragover', onDragOver)
     canvas.addEventListener('drop', onDrop)
@@ -96,11 +130,12 @@ const GameBoard = () => {
       canvas.removeEventListener('pointermove', onPointerMove)
       canvas.removeEventListener('pointerup', onPointerUp)
       canvas.removeEventListener('pointerleave', onPointerLeave)
+      canvas.removeEventListener('pointercancel', onPointerCancel)
       canvas.removeEventListener('wheel', onWheel)
       canvas.removeEventListener('dragover', onDragOver)
       canvas.removeEventListener('drop', onDrop)
     }
-  }, [engine, dropToken, resizeViewport])
+  }, [engine, dropAsset, dropToken, resizeViewport])
 
   // Keep the browser from zooming the page on ctrl/cmd + wheel.
   useEffect(() => {
@@ -117,6 +152,15 @@ const GameBoard = () => {
     () => engine?.setHoverEnabled(false),
     () => engine?.setHoverEnabled(true),
   )
+
+  // Delete/Backspace remove the selected asset, unless a form field is focused.
+  const deleteSelectedAsset = () => {
+    const focused = document.activeElement?.tagName
+    if (focused === 'INPUT' || focused === 'TEXTAREA') return
+    engine?.deleteSelected()
+  }
+  useExecuteOnKeyPress('Delete', deleteSelectedAsset)
+  useExecuteOnKeyPress('Backspace', deleteSelectedAsset)
 
   return (
     <section

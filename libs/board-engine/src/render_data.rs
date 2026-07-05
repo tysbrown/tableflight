@@ -28,10 +28,34 @@ pub fn kind_index(kind: TokenKind) -> f32 {
     }
 }
 
+/// maps buffer: `[x, y, width, height]` per placed asset, parallel to `mapsJson` order.
+pub const MAP_STRIDE: usize = 4;
+
 /// `[x, y, zoom]` — f64 because camera coordinates span the whole world.
 pub fn camera(board: &Board) -> Vec<f64> {
     let cam = board.state.camera;
     vec![cam.x, cam.y, cam.zoom]
+}
+
+pub fn maps(board: &Board) -> Vec<f32> {
+    let mut out = Vec::with_capacity(board.state.maps.len() * MAP_STRIDE);
+    for map in &board.state.maps {
+        out.extend([
+            map.x as f32,
+            map.y as f32,
+            map.width as f32,
+            map.height as f32,
+        ]);
+    }
+    out
+}
+
+/// `[x, y, width, height]` of the selected asset, or empty.
+pub fn selection(board: &Board) -> Vec<f32> {
+    match board.selection_rect() {
+        Some(rect) => rect.iter().map(|v| *v as f32).collect(),
+        None => Vec::new(),
+    }
 }
 
 pub fn tokens(board: &Board) -> Vec<f32> {
@@ -163,6 +187,22 @@ mod tests {
             in_progress[5] as u32,
             LINE_FLAG_IN_PROGRESS | LINE_FLAG_STRAIGHT_HINT,
         );
+    }
+
+    #[test]
+    fn maps_and_selection_buffers_expose_live_geometry() {
+        let mut b = board();
+        assert!(selection(&b).is_empty());
+
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        assert_eq!(maps(&b), vec![400.0, 350.0, 200.0, 100.0]);
+        assert_eq!(selection(&b), vec![400.0, 350.0, 200.0, 100.0]);
+
+        // buffers track the drag before persistence
+        b.pointer_down(Point::new(500.0, 400.0), 0);
+        b.pointer_move(Point::new(550.0, 400.0));
+        assert_eq!(maps(&b)[0], 450.0);
+        assert_eq!(selection(&b)[0], 450.0);
     }
 
     #[test]

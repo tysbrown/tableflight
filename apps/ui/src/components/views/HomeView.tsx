@@ -5,7 +5,7 @@ import {
   ControlPanel,
   NewTokenPanel,
   GameSelectModal,
-  UploadMapPanel,
+  AssetPanel,
 } from '@/molecules'
 import { GameBoard } from '@/organisms'
 import { LoadingView } from '@/views'
@@ -59,7 +59,7 @@ const HomeView = () => {
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <NewTokenPanel />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
-        <UploadMapPanel />
+        <AssetPanel />
         <hr css={[tw`border-outlineVariant mt-12 mb-8`]} />
         <h2 css={[tw`mb-3`]}>Set Mode</h2>
         <p css={[tw`mb-3`]}>

@@ -20,6 +20,23 @@ model User {
   gamesCreated       Game[]
   gamesParticipating Game[]           @relation("GamesParticipating")
   characterSheets    CharacterSheet[]
+  assets             Asset[]
+}
+
+/// A user's uploaded image (map, token art, prop), staged in their asset
+/// library and placeable on any of their boards. Served by GET /api/assets/:id.
+model Asset {
+  id        String   @id @default(uuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  mime      String
+  data      Bytes
+  width     Int
+  height    Int
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Game {

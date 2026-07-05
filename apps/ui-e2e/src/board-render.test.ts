@@ -111,6 +111,123 @@ test('tokens buffer tracks a drag: ghost follows the cursor, drop snaps to a cel
   ])
 })
 
+/**
+ * 2x2 PNG data URL — a deterministic texture for asset specs. Deliberately
+ * NOT 1x1: the sprite placeholder is a 1x1 texture, so a 1x1 test image
+ * would mask stale-scale bugs when the real texture swaps in.
+ */
+const PIXEL_PNG =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR4nGMQW+wFRAwQCgAbkgQNWsY1fwAAAABJRU5ErkJggg=='
+
+test('dropped asset lands selected; move, resize, deselect, re-select, delete', async ({
+  page,
+}) => {
+  const state = await page.evaluate((url) => {
+    const { engine } = (window as unknown as HarnessWindow).__board
+
+    // 200x100 dropped at (500,350) → centered world rect (400,300)
+    engine.dropAsset(500, 350, url, 200, 100)
+    const dropped = {
+      selection: Array.from(engine.selectionBuffer() as Float32Array),
+      id: engine.selectedMapId(),
+    }
+
+    // drag the body: grab (500,350) → release (560,390)
+    engine.pointerDown(500, 350, 0)
+    engine.pointerMove(560, 390)
+    engine.pointerUp(560, 390)
+    const moved = Array.from(engine.selectionBuffer() as Float32Array)
+
+    // resize from the SE corner (now 660,440), NW anchored
+    engine.pointerDown(660, 440, 0)
+    engine.pointerMove(760, 490)
+    engine.pointerUp(760, 490)
+    const resized = Array.from(engine.selectionBuffer() as Float32Array)
+
+    engine.pointerDown(50, 50, 0) // click empty space: deselect
+    engine.pointerUp(50, 50)
+    const deselected = Array.from(engine.selectionBuffer() as Float32Array)
+
+    engine.pointerDown(500, 400, 0) // re-select, then delete
+    engine.pointerUp(500, 400)
+    const reselected = engine.selectedMapId()
+    const deleted = engine.deleteSelected()
+
+    return {
+      dropped,
+      moved,
+      resized,
+      deselected,
+      reselected,
+      deleted,
+      maps: JSON.parse(engine.mapsJson()),
+    }
+  }, PIXEL_PNG)
+
+  expect(state.dropped.selection).toEqual([400, 300, 200, 100])
+  expect(state.dropped.id).toBeTruthy()
+  expect(state.moved).toEqual([460, 340, 200, 100])
+  expect(state.resized).toEqual([460, 340, 300, 150])
+  expect(state.deselected).toEqual([])
+  expect(state.reselected).toBeTruthy()
+  expect(state.deleted).toBe(true)
+  expect(state.maps).toEqual([])
+})
+
+test('a placed asset renders without further interaction, with selection chrome', async ({
+  page,
+}) => {
+  test.skip(
+    process.platform !== 'darwin',
+    'screenshot baseline exists for macOS only',
+  )
+  await page.evaluate((url) => {
+    const { engine } = (window as unknown as HarnessWindow).__board
+    engine.dropAsset(500, 350, url, 200, 100)
+  }, PIXEL_PNG)
+
+  // No input, no camera motion: the texture must appear on its own once
+  // loaded (the original "nothing renders until I draw a line" bug).
+  await page.waitForTimeout(400)
+
+  await expect(page.locator('#board')).toHaveScreenshot(
+    'asset-selected.png',
+    { maxDiffPixelRatio: 0.02 },
+  )
+})
+
+test('loads extension-less asset URLs (like /api/assets/:id)', async ({
+  page,
+}) => {
+  test.skip(
+    process.platform !== 'darwin',
+    'screenshot baseline exists for macOS only',
+  )
+
+  // Serve the 2x2 PNG from an extension-less URL — the shape of /api/assets/:id.
+  const pngBytes = Buffer.from(PIXEL_PNG.split(',')[1] ?? '', 'base64')
+  await page.route('**/fake-assets/**', (route) =>
+    route.fulfill({ contentType: 'image/png', body: pngBytes }),
+  )
+
+  const warnings: string[] = []
+  page.on('console', (message) => {
+    if (message.text().includes('[Assets]')) warnings.push(message.text())
+  })
+
+  await page.evaluate(() => {
+    const { engine } = (window as unknown as HarnessWindow).__board
+    engine.dropAsset(500, 350, '/fake-assets/2a5857d6-uuid-shaped', 200, 100)
+  })
+  await page.waitForTimeout(400)
+
+  expect(warnings).toEqual([])
+  // Same texture/point/size as the data-URL spec, so it shares that baseline.
+  await expect(page.locator('#board')).toHaveScreenshot('asset-selected.png', {
+    maxDiffPixelRatio: 0.02,
+  })
+})
+
 test('overscroll scrollbars appear, shrink with distance, and drag-pan', async ({
   page,
 }) => {

@@ -3,6 +3,7 @@ import type { Engine } from '~board-engine'
 import { WORLD_FILL } from './constants'
 import { Scrollbars } from './Scrollbars'
 import { DrawingsLayer } from './layers/DrawingsLayer'
+import { SelectionLayer } from './layers/SelectionLayer'
 import { GridLayer } from './layers/GridLayer'
 import { MapsLayer, type MapData } from './layers/MapsLayer'
 import { TokensLayer } from './layers/TokensLayer'
@@ -39,10 +40,15 @@ export class PixiStage {
   private app = new Application()
   private canvas = document.createElement('canvas')
   private world = new Container()
-  private maps = new MapsLayer()
+  // A texture arriving after its asset was first drawn needs one more render.
+  private renderPending = false
+  private maps = new MapsLayer(() => {
+    this.renderPending = true
+  })
   private grid = new GridLayer()
   private drawings = new DrawingsLayer()
   private tokens = new TokensLayer()
+  private selection = new SelectionLayer()
   private scrollbars: Scrollbars | null = null
 
   private frameId = 0
@@ -81,6 +87,7 @@ export class PixiStage {
       stage.grid.graphics,
       stage.drawings.graphics,
       stage.tokens.container,
+      stage.selection.graphics,
     )
     stage.app.stage.addChild(stage.world)
 
@@ -129,7 +136,8 @@ export class PixiStage {
     if (
       structure === this.lastStructure &&
       frame === this.lastFrame &&
-      camera === this.lastCamera
+      camera === this.lastCamera &&
+      !this.renderPending
     ) {
       return
     }
@@ -149,14 +157,17 @@ export class PixiStage {
 
     if (frame !== this.lastFrame || structure !== this.lastStructure) {
       this.tokens.update(engine.tokensBuffer(), engine.cellSize())
+      this.maps.update(engine.mapsBuffer())
     }
-    // Handle dots are sized in screen pixels, so drawings also depend on zoom.
+    // Selection chrome and handle dots are sized in screen pixels, so they
+    // also depend on zoom.
     if (
       frame !== this.lastFrame ||
       structure !== this.lastStructure ||
       zoom !== this.lastZoom
     ) {
       this.drawings.update(engine.linesBuffer(), zoom)
+      this.selection.update(engine.selectionBuffer(), zoom)
       this.lastZoom = zoom
     }
 
@@ -171,6 +182,7 @@ export class PixiStage {
     this.lastStructure = structure
     this.lastFrame = frame
     this.lastCamera = camera
+    this.renderPending = false
     this.app.render()
   }
 }

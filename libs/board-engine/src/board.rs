@@ -26,6 +26,9 @@ const STRAIGHT_TOLERANCE: f64 = 0.5;
 const AUTOPAN_EDGE: f64 = 50.0;
 const AUTOPAN_MAX_SPEED: f64 = 600.0; // screen px / second
 
+const HANDLE_HIT: f64 = 8.0; // screen-px radius for grabbing resize handles
+const MIN_ASSET_SIZE: f64 = 16.0; // world px
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
     Pan,
@@ -38,6 +41,23 @@ pub enum LineEnd {
     End,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Corner {
+    Nw,
+    Ne,
+    Sw,
+    Se,
+}
+
+impl Corner {
+    fn cursor(self) -> &'static str {
+        match self {
+            Corner::Nw | Corner::Se => "nwse-resize",
+            Corner::Ne | Corner::Sw => "nesw-resize",
+        }
+    }
+}
+
 #[derive(Debug)]
 enum Drag {
     None,
@@ -45,6 +65,11 @@ enum Drag {
     Pan { last: Point },
     /// Dragging the token at `tokens[index]`; `at` is the cursor in world coords.
     Token { index: usize, at: Point },
+    /// `grab`: cursor's world offset from the asset origin. `original`: rect
+    /// at grab time, restored if the drag turned out to be a click.
+    MoveMap { id: String, grab: Point, original: [f64; 4] },
+    /// `anchor`: the fixed opposite corner, in world coordinates.
+    ResizeMap { id: String, corner: Corner, anchor: Point, original: [f64; 4] },
 }
 
 /// A line being drawn or edited. It is not part of `BoardState.lines` until
@@ -65,6 +90,8 @@ pub struct Board {
     mode: Mode,
     drag: Drag,
     draw: Option<DrawInProgress>,
+    /// Transient view state, not part of the snapshot.
+    selected_map: Option<String>,
     hovered_line: Option<String>,
     hover_enabled: bool,
     /// Last known pointer position in screen coordinates.
@@ -97,6 +124,7 @@ impl Board {
             mode: Mode::Pan,
             drag: Drag::None,
             draw: None,
+            selected_map: None,
             hovered_line: None,
             hover_enabled: true,
             cursor: None,
@@ -266,6 +294,7 @@ impl Board {
 
     pub fn set_mode(&mut self, mode: Mode) {
         self.cancel_draw();
+        self.deselect();
         self.hovered_line = None;
         self.drag = Drag::None;
         self.mode = mode;
@@ -301,9 +330,151 @@ impl Board {
         let before = self.state.maps.len();
         self.state.maps.retain(|map| map.id != id);
         if self.state.maps.len() != before {
+            if self.selected_map.as_deref() == Some(id) {
+                self.selected_map = None;
+            }
             self.mark_structure();
             self.bump_revision();
         }
+    }
+
+    /// Places an asset centered on the drop point; it lands selected.
+    pub fn drop_map(
+        &mut self,
+        screen: Point,
+        url: String,
+        width: f64,
+        height: f64,
+    ) -> String {
+        // NaN/zero geometry would poison the snapshot (serde writes NaN as null).
+        let width = if width.is_finite() { width.max(MIN_ASSET_SIZE) } else { MIN_ASSET_SIZE };
+        let height = if height.is_finite() { height.max(MIN_ASSET_SIZE) } else { MIN_ASSET_SIZE };
+        let center = self.to_world(screen);
+        let id = self.state.mint_id("map");
+        self.state.maps.push(MapImage {
+            id: id.clone(),
+            url,
+            x: center.x - width / 2.0,
+            y: center.y - height / 2.0,
+            width,
+            height,
+        });
+        self.selected_map = Some(id.clone());
+        self.mark_structure();
+        self.bump_revision();
+        id
+    }
+
+    pub fn selected_map_id(&self) -> Option<&str> {
+        self.selected_map.as_deref()
+    }
+
+    /// `[x, y, width, height]` of the selected asset, if any.
+    pub fn selection_rect(&self) -> Option<[f64; 4]> {
+        let index = self.selected_map_index()?;
+        let map = &self.state.maps[index];
+        Some([map.x, map.y, map.width, map.height])
+    }
+
+    pub fn delete_selected(&mut self) -> bool {
+        let Some(id) = self.selected_map.take() else {
+            return false;
+        };
+        let before = self.state.maps.len();
+        self.state.maps.retain(|map| map.id != id);
+        let removed = self.state.maps.len() != before;
+        if removed {
+            self.mark_structure();
+            self.bump_revision();
+        } else {
+            self.mark_frame();
+        }
+        removed
+    }
+
+    fn deselect(&mut self) {
+        if self.selected_map.take().is_some() {
+            self.mark_frame();
+        }
+    }
+
+    fn selected_map_index(&self) -> Option<usize> {
+        let id = self.selected_map.as_deref()?;
+        self.state.maps.iter().position(|map| map.id == id)
+    }
+
+    /// Topmost asset under a world point (last in the list draws on top).
+    fn map_index_at(&self, world: Point) -> Option<usize> {
+        self.state.maps.iter().rposition(|map| {
+            world.x >= map.x
+                && world.x <= map.x + map.width
+                && world.y >= map.y
+                && world.y <= map.y + map.height
+        })
+    }
+
+    fn corner_at(&self, map: &MapImage, world: Point) -> Option<Corner> {
+        let threshold = HANDLE_HIT / self.zoom();
+        [
+            (Corner::Nw, Point::new(map.x, map.y)),
+            (Corner::Ne, Point::new(map.x + map.width, map.y)),
+            (Corner::Sw, Point::new(map.x, map.y + map.height)),
+            (Corner::Se, Point::new(map.x + map.width, map.y + map.height)),
+        ]
+        .into_iter()
+        .find(|(_, point)| world.distance_to(*point) <= threshold)
+        .map(|(corner, _)| corner)
+    }
+
+    /// Grab the selected asset: a corner handle starts a resize, the body a move.
+    fn selected_map_grab(&self, world: Point) -> Option<Drag> {
+        let index = self.selected_map_index()?;
+        let map = &self.state.maps[index];
+        let original = [map.x, map.y, map.width, map.height];
+
+        if let Some(corner) = self.corner_at(map, world) {
+            let anchor = match corner {
+                Corner::Nw => Point::new(map.x + map.width, map.y + map.height),
+                Corner::Ne => Point::new(map.x, map.y + map.height),
+                Corner::Sw => Point::new(map.x + map.width, map.y),
+                Corner::Se => Point::new(map.x, map.y),
+            };
+            return Some(Drag::ResizeMap {
+                id: map.id.clone(),
+                corner,
+                anchor,
+                original,
+            });
+        }
+
+        if self.map_index_at(world) == Some(index) {
+            return Some(Drag::MoveMap {
+                id: map.id.clone(),
+                grab: Point::new(world.x - map.x, world.y - map.y),
+                original,
+            });
+        }
+        None
+    }
+
+    fn restore_map_geometry(&mut self, id: &str, [x, y, width, height]: [f64; 4]) {
+        if let Some(map) = self.state.maps.iter_mut().find(|m| m.id == id) {
+            map.x = x;
+            map.y = y;
+            map.width = width;
+            map.height = height;
+        }
+    }
+
+    /// A real drag persists; sub-slop jitter (a click) rolls back to `original`,
+    /// so the screen never diverges from what autosave writes.
+    fn settle_map_drag(&mut self, id: &str, original: [f64; 4], dragged: bool) {
+        if dragged {
+            self.bump_revision();
+        } else {
+            self.restore_map_geometry(id, original);
+        }
+        self.mark_frame();
     }
 
     pub fn set_hover_enabled(&mut self, enabled: bool) {
@@ -364,9 +535,14 @@ impl Board {
 
         if self.mode == Mode::Pan {
             let world = self.to_world(screen);
-            self.drag = match self.token_index_at(world) {
-                Some(index) => Drag::Token { index, at: world },
-                None => Drag::Pan { last: screen },
+            // Tokens, then the selected asset's handles/body, grab first;
+            // anything else pans (a click without a drag selects on release).
+            self.drag = if let Some(index) = self.token_index_at(world) {
+                Drag::Token { index, at: world }
+            } else if let Some(grab) = self.selected_map_grab(world) {
+                grab
+            } else {
+                Drag::Pan { last: screen }
             };
             self.mark_frame();
         }
@@ -391,6 +567,29 @@ impl Board {
                 let world = self.to_world(screen);
                 if let Drag::Token { at, .. } = &mut self.drag {
                     *at = world;
+                }
+                self.mark_frame();
+            }
+            Drag::MoveMap { id, grab, .. } => {
+                let (id, grab) = (id.clone(), *grab);
+                let world = self.to_world(screen);
+                if let Some(map) = self.state.maps.iter_mut().find(|m| m.id == id) {
+                    map.x = world.x - grab.x;
+                    map.y = world.y - grab.y;
+                }
+                self.mark_frame();
+            }
+            Drag::ResizeMap { id, anchor, .. } => {
+                let (id, anchor) = (id.clone(), *anchor);
+                let world = self.to_world(screen);
+                if let Some(map) = self.state.maps.iter_mut().find(|m| m.id == id) {
+                    // Crossing the anchor flips the rect rather than inverting it.
+                    let width = (world.x - anchor.x).abs().max(MIN_ASSET_SIZE);
+                    let height = (world.y - anchor.y).abs().max(MIN_ASSET_SIZE);
+                    map.x = if world.x < anchor.x { anchor.x - width } else { anchor.x };
+                    map.y = if world.y < anchor.y { anchor.y - height } else { anchor.y };
+                    map.width = width;
+                    map.height = height;
                 }
                 self.mark_frame();
             }
@@ -422,7 +621,23 @@ impl Board {
                 }
                 self.mark_frame();
             }
-            Drag::Pan { .. } => self.mark_frame(),
+            Drag::MoveMap { id, original, .. }
+            | Drag::ResizeMap { id, original, .. } => {
+                self.settle_map_drag(&id, original, !was_click);
+            }
+            Drag::Pan { .. } => {
+                if was_click {
+                    // A click selects the topmost asset, or deselects on empty space.
+                    let world = self.to_world(screen);
+                    let next = self
+                        .map_index_at(world)
+                        .map(|index| self.state.maps[index].id.clone());
+                    if next != self.selected_map {
+                        self.selected_map = next;
+                    }
+                }
+                self.mark_frame();
+            }
             Drag::None => {
                 if self.mode == Mode::Draw && was_click {
                     self.handle_draw_click(self.to_world(screen));
@@ -431,10 +646,23 @@ impl Board {
         }
     }
 
+    /// No pointer-up is coming, so settle any in-flight drag rather than
+    /// strand one that would keep following a hovering cursor.
     pub fn pointer_leave(&mut self) {
         self.cursor = None;
-        if matches!(self.drag, Drag::Pan { .. }) {
-            self.drag = Drag::None;
+        let dragged = self.dragged_since_down;
+        self.pointer_down = None;
+        self.dragged_since_down = false;
+
+        match std::mem::replace(&mut self.drag, Drag::None) {
+            Drag::MoveMap { id, original, .. }
+            | Drag::ResizeMap { id, original, .. } => {
+                self.settle_map_drag(&id, original, dragged);
+            }
+            // Token drags mutate only on pointer-up (dropping reverts the ghost);
+            // pans have nothing to settle.
+            Drag::Token { .. } | Drag::Pan { .. } => self.mark_frame(),
+            Drag::None => {}
         }
     }
 
@@ -446,9 +674,10 @@ impl Board {
         }
     }
 
-    /// Cancel the in-progress draw/edit (Escape).
+    /// Cancel the in-progress draw/edit and clear the selection (Escape).
     pub fn escape(&mut self) {
         self.cancel_draw();
+        self.deselect();
     }
 
     fn cancel_draw(&mut self) {
@@ -616,7 +845,23 @@ impl Board {
     pub fn cursor_style(&self) -> &'static str {
         match (&self.drag, self.mode) {
             (Drag::Pan { .. } | Drag::Token { .. }, _) => "grabbing",
-            (_, Mode::Pan) => "grab",
+            (Drag::MoveMap { .. }, _) => "move",
+            (Drag::ResizeMap { corner, .. }, _) => corner.cursor(),
+            (_, Mode::Pan) => {
+                if let (Some(index), Some(cursor)) =
+                    (self.selected_map_index(), self.cursor)
+                {
+                    let world = self.to_world(cursor);
+                    let map = &self.state.maps[index];
+                    if let Some(corner) = self.corner_at(map, world) {
+                        return corner.cursor();
+                    }
+                    if self.map_index_at(world) == Some(index) {
+                        return "move";
+                    }
+                }
+                "grab"
+            }
             (_, Mode::Draw) => {
                 let over_handle = self.draw.is_none()
                     && self
@@ -690,6 +935,7 @@ impl Board {
 
         self.state = state;
         self.draw = None;
+        self.selected_map = None;
         self.hovered_line = None;
         self.drag = Drag::None;
         self.clamp_camera();
@@ -1096,6 +1342,182 @@ mod tests {
         let center = b.to_world(Point::new(500.0, 400.0));
         assert!((center.x - 200.0).abs() < 1e-9);
         assert!((center.y - 200.0).abs() < 1e-9);
+    }
+
+    fn click(b: &mut Board, at: Point) {
+        b.pointer_down(at, 0);
+        b.pointer_up(at);
+    }
+
+    #[test]
+    fn dropped_asset_lands_selected_and_centered_on_the_drop_point() {
+        let mut b = board();
+        let revision = b.revision();
+        let id = b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+
+        assert_eq!(b.selected_map_id(), Some(id.as_str()));
+        assert_eq!(b.selection_rect(), Some([400.0, 350.0, 200.0, 100.0]));
+        assert!(b.revision() > revision);
+    }
+
+    #[test]
+    fn click_selects_topmost_asset_and_click_away_deselects() {
+        let mut b = board();
+        b.add_map("under".into(), 400.0, 300.0); // centered on view: (300,250)
+        let top = b.drop_map(Point::new(500.0, 400.0), "over".into(), 200.0, 100.0);
+
+        click(&mut b, Point::new(50.0, 50.0));
+        assert_eq!(b.selected_map_id(), None);
+
+        // both overlap here; the later-placed asset wins
+        click(&mut b, Point::new(500.0, 400.0));
+        assert_eq!(b.selected_map_id(), Some(top.as_str()));
+    }
+
+    #[test]
+    fn dragging_an_unselected_asset_pans_instead_of_moving_it() {
+        let mut b = board();
+        b.add_map("a".into(), 400.0, 300.0);
+        click(&mut b, Point::new(50.0, 50.0)); // deselect
+
+        let camera = b.state.camera;
+        b.pointer_down(Point::new(500.0, 400.0), 0);
+        b.pointer_move(Point::new(560.0, 430.0));
+        b.pointer_up(Point::new(560.0, 430.0));
+
+        assert_eq!(b.state.maps[0].x, 300.0, "asset did not move");
+        assert_eq!(b.state.camera.x, camera.x + 60.0, "the view panned");
+        assert_eq!(b.selected_map_id(), None, "a drag is not a click-select");
+    }
+
+    #[test]
+    fn dragging_the_selected_asset_moves_it_and_persists_on_release() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        let revision = b.revision();
+        let camera = b.state.camera;
+
+        b.pointer_down(Point::new(450.0, 380.0), 0); // grab offset (50, 30)
+        b.pointer_move(Point::new(480.0, 420.0));
+        assert_eq!((b.state.maps[0].x, b.state.maps[0].y), (430.0, 390.0));
+        assert_eq!(b.revision(), revision, "not persisted mid-drag");
+
+        b.pointer_up(Point::new(480.0, 420.0));
+        assert!(b.revision() > revision, "persisted on release");
+        assert_eq!(b.state.camera, camera, "the view did not pan");
+        assert!(b.selected_map_id().is_some(), "stays selected");
+    }
+
+    #[test]
+    fn corner_drag_resizes_with_the_opposite_corner_anchored() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        // rect (400,350)–(600,450); grab SE corner
+        b.pointer_down(Point::new(600.0, 450.0), 0);
+        b.pointer_move(Point::new(700.0, 500.0));
+
+        let map = &b.state.maps[0];
+        assert_eq!((map.x, map.y), (400.0, 350.0), "NW anchor fixed");
+        assert_eq!((map.width, map.height), (300.0, 150.0));
+
+        // crossing the anchor flips the rect
+        b.pointer_move(Point::new(350.0, 300.0));
+        let map = &b.state.maps[0];
+        assert_eq!((map.x, map.y), (350.0, 300.0));
+        assert_eq!((map.width, map.height), (50.0, 50.0));
+
+        let revision = b.revision();
+        b.pointer_up(Point::new(350.0, 300.0));
+        assert!(b.revision() > revision, "persisted on release");
+    }
+
+    #[test]
+    fn click_slop_jitter_on_a_selected_asset_is_rolled_back() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        let revision = b.revision();
+
+        // 2px jitter is a click, not a move: nudged live, rolled back on release
+        b.pointer_down(Point::new(450.0, 380.0), 0);
+        b.pointer_move(Point::new(452.0, 381.0));
+        assert_eq!(b.state.maps[0].x, 402.0, "nudged live during the jitter");
+        b.pointer_up(Point::new(452.0, 381.0));
+
+        assert_eq!(b.selection_rect(), Some([400.0, 350.0, 200.0, 100.0]));
+        assert_eq!(b.revision(), revision);
+
+        // micro-click near a handle: the first move snaps the corner
+        b.pointer_down(Point::new(597.0, 448.0), 0); // within handle radius
+        b.pointer_move(Point::new(598.0, 449.0));
+        b.pointer_up(Point::new(598.0, 449.0));
+
+        assert_eq!(b.selection_rect(), Some([400.0, 350.0, 200.0, 100.0]));
+        assert_eq!(b.revision(), revision);
+    }
+
+    #[test]
+    fn interrupted_map_drag_settles_on_pointer_leave() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        let revision = b.revision();
+
+        // drag, then the browser cancels (no pointer-up)
+        b.pointer_down(Point::new(450.0, 380.0), 0);
+        b.pointer_move(Point::new(480.0, 420.0));
+        b.pointer_leave();
+
+        assert_eq!((b.state.maps[0].x, b.state.maps[0].y), (430.0, 390.0));
+        assert!(b.revision() > revision);
+        b.pointer_move(Point::new(600.0, 600.0));
+        assert_eq!(b.state.maps[0].x, 430.0, "no ghost drag after re-entry");
+    }
+
+    #[test]
+    fn drop_map_sanitizes_hostile_geometry() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), f64::NAN, -25.0);
+
+        let map = &b.state.maps[0];
+        assert_eq!((map.width, map.height), (16.0, 16.0));
+        assert!(map.x.is_finite() && map.y.is_finite());
+
+        let snapshot = b.snapshot();
+        let mut restored = board();
+        restored.load_snapshot(&snapshot).unwrap();
+    }
+
+    #[test]
+    fn resize_clamps_to_a_minimum_size() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        b.pointer_down(Point::new(600.0, 450.0), 0); // SE corner
+        b.pointer_move(Point::new(401.0, 351.0)); // collapse to nearly nothing
+
+        let map = &b.state.maps[0];
+        assert_eq!((map.width, map.height), (16.0, 16.0));
+    }
+
+    #[test]
+    fn escape_and_mode_switches_deselect() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        b.escape();
+        assert_eq!(b.selected_map_id(), None);
+
+        click(&mut b, Point::new(500.0, 400.0));
+        assert!(b.selected_map_id().is_some());
+        b.set_mode(Mode::Draw);
+        assert_eq!(b.selected_map_id(), None);
+    }
+
+    #[test]
+    fn delete_selected_removes_the_asset() {
+        let mut b = board();
+        b.drop_map(Point::new(500.0, 400.0), "a".into(), 200.0, 100.0);
+        assert!(b.delete_selected());
+        assert!(b.state.maps.is_empty());
+        assert_eq!(b.selected_map_id(), None);
+        assert!(!b.delete_selected(), "nothing left to delete");
     }
 
     #[test]

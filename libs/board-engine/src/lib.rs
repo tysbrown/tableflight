@@ -165,6 +165,29 @@ impl Engine {
             .expect("maps are always serializable")
     }
 
+    /// Places an asset centered on the drop point; it lands selected. Returns its id.
+    #[wasm_bindgen(js_name = dropAsset)]
+    pub fn drop_asset(
+        &mut self,
+        x: f64,
+        y: f64,
+        url: String,
+        width: f64,
+        height: f64,
+    ) -> String {
+        self.board.drop_map(Point::new(x, y), url, width, height)
+    }
+
+    #[wasm_bindgen(js_name = deleteSelected)]
+    pub fn delete_selected(&mut self) -> bool {
+        self.board.delete_selected()
+    }
+
+    #[wasm_bindgen(js_name = selectedMapId)]
+    pub fn selected_map_id(&self) -> Option<String> {
+        self.board.selected_map_id().map(str::to_string)
+    }
+
     /// Drop a new token (from the token panel) at a screen position.
     /// `kind` is one of "player" | "enemy" | "npc" | "item".
     #[wasm_bindgen(js_name = dropToken)]
@@ -210,6 +233,18 @@ impl Engine {
             .iter()
             .map(|v| *v as f32)
             .collect()
+    }
+
+    /// Per placed asset `[x, y, width, height]`, parallel to `mapsJson` order.
+    #[wasm_bindgen(js_name = mapsBuffer)]
+    pub fn maps_buffer(&self) -> Vec<f32> {
+        render_data::maps(&self.board)
+    }
+
+    /// `[x, y, width, height]` of the selected asset, or empty.
+    #[wasm_bindgen(js_name = selectionBuffer)]
+    pub fn selection_buffer(&self) -> Vec<f32> {
+        render_data::selection(&self.board)
     }
 
     /// Per token: `[worldCenterX, worldCenterY, kind, flags]`.

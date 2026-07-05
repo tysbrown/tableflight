@@ -1,5 +1,5 @@
 import { Assets, Container, Sprite, Texture } from 'pixi.js'
-import { MAP_PLACEHOLDER_TINT } from '../constants'
+import { MAP_PLACEHOLDER_TINT, MAP_STRIDE } from '../constants'
 
 export type MapData = {
   id: string
@@ -11,70 +11,82 @@ export type MapData = {
 }
 
 /**
- * One sprite per placed map image. Textures load asynchronously — a gray
- * placeholder holds the map's footprint until then — and are released from
- * the Assets cache when the last map using them goes away (map URLs are
- * multi-megabyte data URLs today, so leaking them adds up fast).
+ * One sprite per placed asset, in the engine's map order. Textures load
+ * asynchronously behind a gray placeholder and are released from the Assets
+ * cache when their last user goes away.
  */
 export class MapsLayer {
   readonly container = new Container()
-  private entries = new Map<string, { sprite: Sprite; url: string }>()
+  /** Parallel to the engine's map order. */
+  private sprites: { id: string; url: string; sprite: Sprite }[] = []
 
-  /** Sync sprites with the engine's map list (on structure change). */
+  constructor(private onTextureLoaded: () => void) {}
+
+  /** Sync the sprite set with the engine's map list (on structure change). */
   sync(maps: MapData[]) {
-    const seen = new Set<string>()
+    const previous = new Map(this.sprites.map((entry) => [entry.id, entry]))
 
-    for (const map of maps) {
-      seen.add(map.id)
-      let entry = this.entries.get(map.id)
-      if (!entry) {
-        const sprite = new Sprite(Texture.WHITE)
-        sprite.tint = MAP_PLACEHOLDER_TINT
-        sprite.cullable = true
-        entry = { sprite, url: map.url }
-        this.entries.set(map.id, entry)
-        this.container.addChild(sprite)
-
-        void Assets.load<Texture>(map.url)
-          .then((texture) => {
-            if (!sprite.destroyed) {
-              sprite.texture = texture
-              sprite.tint = 0xffffff
-            }
-          })
-          .catch((error: unknown) => {
-            // The placeholder stays; the board remains usable.
-            console.error('Failed to load a map image:', error)
-          })
+    this.sprites = maps.map((map) => {
+      const existing = previous.get(map.id)
+      if (existing) {
+        previous.delete(map.id)
+        return existing
       }
-      entry.sprite.position.set(map.x, map.y)
-      entry.sprite.setSize(map.width, map.height)
+
+      const sprite = new Sprite(Texture.WHITE)
+      sprite.tint = MAP_PLACEHOLDER_TINT
+      sprite.cullable = true
+      // Asset URLs (/api/assets/:id) have no extension, so name Pixi's parser.
+      void Assets.load<Texture>({ src: map.url, parser: 'loadTextures' })
+        .then((texture) => {
+          if (texture && !sprite.destroyed) {
+            // setSize stores scale, not size, so swapping out the 1x1
+            // placeholder would rescale by the texture's pixel dimensions.
+            const { width, height } = sprite
+            sprite.texture = texture
+            sprite.setSize(width, height)
+            sprite.tint = 0xffffff
+            this.onTextureLoaded()
+          }
+        })
+        .catch((error: unknown) => {
+          console.error('Failed to load an asset image:', error)
+        })
+      return { id: map.id, url: map.url, sprite }
+    })
+
+    for (const [, removed] of previous) {
+      removed.sprite.destroy()
+      this.unloadIfUnused(removed.url)
     }
 
-    for (const [id, entry] of this.entries) {
-      if (seen.has(id)) continue
-      entry.sprite.destroy()
-      this.entries.delete(id)
-      this.unloadIfUnused(entry.url)
-    }
+    // Re-attach in map order so stacking matches the engine's draw order.
+    this.container.removeChildren()
+    for (const { sprite } of this.sprites) this.container.addChild(sprite)
   }
 
-  /** Release all textures (stage teardown; sprites die with the app). */
+  /** Apply live geometry from the maps buffer (every content frame). */
+  update(buffer: Float32Array) {
+    const at = (i: number) => buffer[i] ?? 0
+    this.sprites.forEach(({ sprite }, index) => {
+      const base = index * MAP_STRIDE
+      sprite.position.set(at(base), at(base + 1))
+      sprite.setSize(at(base + 2), at(base + 3))
+    })
+  }
+
+  /** Release all textures; the sprites die with the app. */
   destroy() {
-    const urls = new Set(
-      [...this.entries.values()].map((entry) => entry.url),
-    )
-    this.entries.clear()
+    const urls = new Set(this.sprites.map((entry) => entry.url))
+    this.sprites = []
     for (const url of urls) {
       void Assets.unload(url).catch(() => undefined)
     }
   }
 
-  /** Two maps can share one image; only unload when the last user is gone. */
+  /** Two assets can share one image; unload only when the last one is gone. */
   private unloadIfUnused(url: string) {
-    for (const entry of this.entries.values()) {
-      if (entry.url === url) return
-    }
+    if (this.sprites.some((entry) => entry.url === url)) return
     void Assets.unload(url).catch(() => undefined)
   }
 }

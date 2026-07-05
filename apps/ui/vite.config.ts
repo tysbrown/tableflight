@@ -15,6 +15,10 @@ export default defineConfig({
       // fetched at runtime, so the dev server must be allowed to serve it.
       allow: [__dirname, '../../libs/board-engine/pkg'],
     },
+    // Asset URLs (/api/assets/:id) are same-origin in prod; proxy in dev.
+    proxy: {
+      '/api': 'http://localhost:1337',
+    },
   },
 
   preview: {

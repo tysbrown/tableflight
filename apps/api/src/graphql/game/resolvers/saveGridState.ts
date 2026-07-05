@@ -1,6 +1,7 @@
 import { Context } from '~common'
 import { GraphQLError } from 'graphql'
 import { type Prisma } from '@prisma/client'
+import { blobPrisma } from '../../../db'
 import { requireSessionPlayer, toGridStateResponse } from './gridStateAccess'
 
 export default {
@@ -10,7 +11,6 @@ export default {
       { gameSessionId, state }: { gameSessionId: string; state: string },
       context: Context,
     ) => {
-      const { prisma } = context || {}
       const gameId = await requireSessionPlayer(context, gameSessionId)
 
       let snapshot: Prisma.InputJsonValue
@@ -43,7 +43,8 @@ export default {
           },
         })
 
-      const gridState = await prisma.gridState.upsert({
+      // Snapshots can exceed Accelerate's 5MB response cap — write direct.
+      const gridState = await blobPrisma.gridState.upsert({
         where: { gameSessionID: gameId },
         create: { gameSessionID: gameId, state: snapshot },
         update: { state: snapshot },

@@ -5,13 +5,12 @@ import {
   useRef,
   useState,
 } from 'react'
-import { Assets, type Texture } from 'pixi.js'
 import init, { Engine } from '~board-engine'
 import { PixiStage } from '../board/PixiStage'
+import type { DroppedAssetData } from '../hooks/useAssets'
 
 export type BoardMode = 'pan' | 'draw'
 export type TokenKind = 'player' | 'enemy' | 'npc' | 'item'
-export type BoardMap = { id: string; url: string }
 
 export type BoardContextType = {
   /** The wasm board engine. Null until a board host is attached. */
@@ -28,10 +27,7 @@ export type BoardContextType = {
   zoomLevel: number
   setZoomLevel: (zoom: number) => void
   zoomToFit: () => void
-  /** Map images placed on the board. */
-  maps: BoardMap[]
-  addMap: (dataUrl: string) => Promise<void>
-  removeMap: (id: string) => void
+  dropAsset: (x: number, y: number, asset: DroppedAssetData) => void
   dropToken: (x: number, y: number, kind: TokenKind) => void
   loadSnapshot: (json: string) => void
 
@@ -55,7 +51,7 @@ const initWasm = () =>
 /**
  * Owns the wasm board engine (headless: state + interactions) and its GPU
  * renderer (PixiStage), and mirrors the few engine values that React
- * components render (mode, cell size, zoom, placed maps). All board content
+ * components render (mode, cell size, zoom). All board content
  * lives inside the engine; components mutate it through the functions
  * exposed here.
  */
@@ -69,13 +65,7 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
   const [mode, setModeState] = useState<BoardMode>('pan')
   const [cellSize, setCellSizeState] = useState(50)
   const [zoomLevel, setZoomLevelState] = useState(1)
-  const [maps, setMaps] = useState<BoardMap[]>([])
   const [gameSessionId, setGameSessionId] = useState<string | null>(null)
-
-  const mirrorMaps = useCallback((fromEngine: Engine) => {
-    const placed = JSON.parse(fromEngine.mapsJson()) as BoardMap[]
-    setMaps(placed.map(({ id, url }) => ({ id, url })))
-  }, [])
 
   const attachBoard = useCallback((host: HTMLElement) => {
     const attach = attachSerial.current.then(async () => {
@@ -149,28 +139,11 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
     setZoomLevelState(engine.zoom())
   }, [engine])
 
-  const addMap = useCallback(
-    async (dataUrl: string) => {
-      if (!engine) return
-      try {
-        // The renderer measures the image; the engine just needs dimensions.
-        const texture = await Assets.load<Texture>(dataUrl)
-        engine.addMap(dataUrl, texture.width, texture.height)
-        mirrorMaps(engine)
-      } catch (error) {
-        console.error('Failed to add the map image:', error)
-      }
+  const dropAsset = useCallback(
+    (x: number, y: number, asset: DroppedAssetData) => {
+      engine?.dropAsset(x, y, asset.url, asset.width, asset.height)
     },
-    [engine, mirrorMaps],
-  )
-
-  const removeMap = useCallback(
-    (id: string) => {
-      if (!engine) return
-      engine.removeMap(id)
-      mirrorMaps(engine)
-    },
-    [engine, mirrorMaps],
+    [engine],
   )
 
   const dropToken = useCallback(
@@ -184,12 +157,11 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
     (json: string) => {
       if (!engine) return
       engine.loadSnapshot(json)
-      mirrorMaps(engine)
       setCellSizeState(engine.cellSize())
       setZoomLevelState(engine.zoom())
       setModeState(engine.mode() as BoardMode)
     },
-    [engine, mirrorMaps],
+    [engine],
   )
 
   const value = useMemo(
@@ -205,9 +177,7 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
       zoomLevel,
       setZoomLevel,
       zoomToFit,
-      maps,
-      addMap,
-      removeMap,
+      dropAsset,
       dropToken,
       loadSnapshot,
       gameSessionId,
@@ -225,9 +195,7 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
       zoomLevel,
       setZoomLevel,
       zoomToFit,
-      maps,
-      addMap,
-      removeMap,
+      dropAsset,
       dropToken,
       loadSnapshot,
       gameSessionId,

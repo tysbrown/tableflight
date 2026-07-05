@@ -1,4 +1,5 @@
 import { Context } from '~common'
+import { blobPrisma } from '../../../db'
 import { requireSessionPlayer, toGridStateResponse } from './gridStateAccess'
 
 export default {
@@ -8,10 +9,10 @@ export default {
       { gameSessionId }: { gameSessionId: string },
       context: Context,
     ) => {
-      const { prisma } = context || {}
       await requireSessionPlayer(context, gameSessionId)
 
-      const gridState = await prisma.gridState.findUnique({
+      // Snapshots can exceed Accelerate's 5MB response cap — read direct.
+      const gridState = await blobPrisma.gridState.findUnique({
         where: { gameSessionID: parseInt(gameSessionId, 10) },
       })
 

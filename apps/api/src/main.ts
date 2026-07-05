@@ -7,6 +7,7 @@ import bodyParser from 'body-parser'
 import { generateContext } from './context'
 import cookieParser from 'cookie-parser'
 import { resolvers, typeDefs } from './graphql'
+import { serveAsset } from './assets'
 
 const app = express()
 const apiRouter = express.Router()
@@ -38,6 +39,7 @@ app.use(cookieParser())
 // storage lands, so saveGridState payloads run well past the 100kb default.
 app.use(bodyParser.json({ limit: '50mb' }))
 
+apiRouter.get('/assets/:id', serveAsset as RequestHandler)
 apiRouter.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 
 app.use('/api', apiRouter)
