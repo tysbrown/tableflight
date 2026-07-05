@@ -38,7 +38,8 @@ test('renders a seeded board (smoke screenshot)', async ({ page }) => {
   })
   // Two frames so the stage has rendered the seeded content.
   await page.evaluate(
-    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+    () =>
+      new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
   )
 
   await expect(page.locator('#board')).toHaveScreenshot('seeded-board.png', {
@@ -61,7 +62,8 @@ test('survives a destroy/re-create cycle on the same host (StrictMode remount)',
     __board.seed(20, 100)
   })
   await page.evaluate(
-    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+    () =>
+      new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
   )
 
   // Same baseline as the first-mount test: the remounted board must render
@@ -107,6 +109,71 @@ test('tokens buffer tracks a drag: ghost follows the cursor, drop snaps to a cel
   expect(result.tokens).toEqual([
     { id: 'drag-me', kind: 'enemy', col: 13, row: 9 },
   ])
+})
+
+test('overscroll scrollbars appear, shrink with distance, and drag-pan', async ({
+  page,
+}) => {
+  const thumbWidth = () =>
+    page.locator('[data-testid="board-scrollbar-h"]').evaluate((el) => ({
+      width: el.getBoundingClientRect().width,
+      opacity: getComputedStyle(el).opacity,
+    }))
+
+  const pan = (dx: number, dy: number) =>
+    page.evaluate(
+      ([x, y]) => {
+        const { engine } = (window as unknown as HarnessWindow).__board
+        engine.panBy(x, y)
+      },
+      [dx, dy],
+    )
+
+  // Content in view (token under the camera): no scrollbars.
+  await page.evaluate(() => {
+    const { engine } = (window as unknown as HarnessWindow).__board
+    engine.dropToken(500, 350, 'anchor', 'player')
+  })
+  await page.waitForTimeout(300) // let any opacity transition settle
+  expect((await thumbWidth()).opacity).toBe('0')
+
+  // Pan past the content: the horizontal thumb appears...
+  await pan(-3000, 0)
+  await page.waitForTimeout(50)
+  const near = await thumbWidth()
+  expect(parseFloat(near.opacity)).toBeGreaterThan(0) // fading in
+  expect(near.width).toBeLessThan(1000)
+
+  // ...and shrinks the further away you pan.
+  await pan(-6000, 0)
+  await page.waitForTimeout(50)
+  const far = await thumbWidth()
+  expect(far.width).toBeLessThan(near.width)
+
+  // Dragging the thumb left pans the view back toward the content.
+  const cameraX = () =>
+    page.evaluate(
+      () =>
+        JSON.parse(
+          (window as unknown as HarnessWindow).__board.engine.snapshot(),
+        ).camera.x,
+    )
+  const before = await cameraX()
+  const thumb = page.locator('[data-testid="board-scrollbar-h"]')
+  const box = (await thumb.boundingBox())!
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(box.x + box.width / 2 - 200, box.y + box.height / 2)
+  await page.mouse.up()
+  expect(await cameraX()).toBeGreaterThan(before)
+
+  // Back over the content, the bars hide again.
+  await page.evaluate(() => {
+    const { engine } = (window as unknown as HarnessWindow).__board
+    engine.zoomToFit()
+  })
+  await page.waitForTimeout(300) // fade-out transition
+  expect((await thumbWidth()).opacity).toBe('0')
 })
 
 test('pans a heavy board (100 tokens, 5k lines) at 55+ fps', async ({
