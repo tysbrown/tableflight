@@ -124,7 +124,11 @@ const GameBoard = () => {
       ref={sectionRef}
       css={[tw`relative w-full h-screen overflow-hidden`]}
     >
-      <div data-testid="game-board-host" ref={hostRef} />
+      <div
+        data-testid="game-board-host"
+        ref={hostRef}
+        css={[tw`absolute inset-0`]}
+      />
       <ZoomMenu />
     </section>
   )

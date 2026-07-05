@@ -162,7 +162,10 @@ impl Board {
             return;
         }
 
-        let (min, max) = self.content_bounds();
+        // An empty board frames a default region centered on the origin.
+        let (min, max) = self
+            .content_bounds()
+            .unwrap_or((Point::new(-1500.0, -1500.0), Point::new(1500.0, 1500.0)));
         // Degenerate spans (a single axis-aligned line, one point) still
         // get framed rather than silently ignoring the request.
         let w = (max.x - min.x).max(1.0);
@@ -179,9 +182,9 @@ impl Board {
         self.mark_camera();
     }
 
-    /// World-space bounding box of everything placed on the board. An empty
-    /// board fits a default region centered on the origin.
-    fn content_bounds(&self) -> (Point, Point) {
+    /// World-space bounding box of everything placed on the board, or None
+    /// when the board is empty.
+    fn content_bounds(&self) -> Option<(Point, Point)> {
         let cell = self.state.cell_size;
         let mut min = Point::new(f64::INFINITY, f64::INFINITY);
         let mut max = Point::new(f64::NEG_INFINITY, f64::NEG_INFINITY);
@@ -206,10 +209,39 @@ impl Board {
         }
 
         if min.x > max.x {
-            (Point::new(-1500.0, -1500.0), Point::new(1500.0, 1500.0))
+            None
         } else {
-            (min, max)
+            Some((min, max))
         }
+    }
+
+    /// Overscroll scrollbar geometry, `[hStart, hSize, vStart, vSize]` as
+    /// fractions of each track. The scroll range is the union of the content
+    /// bounds and the viewport, so panning away from the content grows the
+    /// range and shrinks the thumb. A size of 1.0 means everything on that
+    /// axis is in view (hide the bar); an empty board has no scrollbars.
+    pub fn scrollbar_metrics(&self) -> [f64; 4] {
+        let (vw, vh) = self.viewport;
+        let (Some((min, max)), true) = (self.content_bounds(), vw > 0.0 && vh > 0.0)
+        else {
+            return [0.0, 1.0, 0.0, 1.0];
+        };
+
+        let cam = self.state.camera;
+        let sx0 = min.x * cam.zoom + cam.x;
+        let sx1 = max.x * cam.zoom + cam.x;
+        let sy0 = min.y * cam.zoom + cam.y;
+        let sy1 = max.y * cam.zoom + cam.y;
+
+        // One axis: the content span in screen space vs the viewport [0, view].
+        let fractions = |content_start: f64, content_end: f64, view: f64| {
+            let range_start = content_start.min(0.0);
+            let range_len = content_end.max(view) - range_start;
+            [-range_start / range_len, view / range_len]
+        };
+        let [h_start, h_size] = fractions(sx0, sx1, vw);
+        let [v_start, v_size] = fractions(sy0, sy1, vh);
+        [h_start, h_size, v_start, v_size]
     }
 
     /// The world is open: the camera roams freely, clamped only so its
@@ -1064,6 +1096,66 @@ mod tests {
         let center = b.to_world(Point::new(500.0, 400.0));
         assert!((center.x - 200.0).abs() < 1e-9);
         assert!((center.y - 200.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn scrollbars_hidden_on_an_empty_board() {
+        let b = board();
+        assert_eq!(b.scrollbar_metrics(), [0.0, 1.0, 0.0, 1.0]);
+    }
+
+    #[test]
+    fn scrollbars_hidden_while_all_content_is_in_view() {
+        let mut b = board();
+        b.drop_token(Point::new(500.0, 400.0), "t1".into(), TokenKind::Player);
+        let [_, h_size, _, v_size] = b.scrollbar_metrics();
+        assert_eq!(h_size, 1.0);
+        assert_eq!(v_size, 1.0);
+    }
+
+    #[test]
+    fn thumb_appears_and_shrinks_the_further_you_pan_from_content() {
+        let mut b = board();
+        b.drop_token(Point::new(500.0, 400.0), "t1".into(), TokenKind::Player);
+
+        // Pan right, past the content: a horizontal thumb appears...
+        b.pan_by(-3_000.0, 0.0);
+        let [h_start_1, h_size_1, _, v_size] = b.scrollbar_metrics();
+        assert!(h_size_1 < 1.0);
+        assert_eq!(v_size, 1.0, "no vertical overscroll yet");
+        // ...sitting at the far (right) end of the track.
+        assert!((h_start_1 + h_size_1 - 1.0).abs() < 1e-9);
+
+        // Panning further shrinks it more.
+        b.pan_by(-3_000.0, 0.0);
+        let [_, h_size_2, _, _] = b.scrollbar_metrics();
+        assert!(h_size_2 < h_size_1);
+
+        // Diagonal overscroll shows the vertical thumb too.
+        b.pan_by(0.0, -2_000.0);
+        let [_, _, _, v_size_2] = b.scrollbar_metrics();
+        assert!(v_size_2 < 1.0);
+
+        // Panning back over the content hides them again.
+        b.pan_by(6_000.0, 2_000.0);
+        let [_, h_size_3, _, v_size_3] = b.scrollbar_metrics();
+        assert_eq!(h_size_3, 1.0);
+        assert_eq!(v_size_3, 1.0);
+    }
+
+    #[test]
+    fn thumb_fractions_describe_viewport_within_the_scroll_range() {
+        let mut b = board();
+        // Content: one token cell at (0,0)..(50,50); pan so it sits exactly
+        // one viewport-width to the left of the view.
+        b.drop_token(Point::new(25.0, 25.0), "t1".into(), TokenKind::Player);
+        b.pan_by(-1050.0, 0.0);
+
+        // Screen range: content [-1050, -1000], viewport [0, 1000]
+        // → range [-1050, 1000], len 2050.
+        let [h_start, h_size, _, _] = b.scrollbar_metrics();
+        assert!((h_size - 1000.0 / 2050.0).abs() < 1e-9);
+        assert!((h_start - 1050.0 / 2050.0).abs() < 1e-9);
     }
 
     #[test]

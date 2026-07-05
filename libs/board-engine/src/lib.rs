@@ -74,6 +74,12 @@ impl Engine {
         self.board.wheel(dx, dy, zooming, Point::new(x, y));
     }
 
+    /// Pan by a screen-space delta (used by the scrollbar thumbs).
+    #[wasm_bindgen(js_name = panBy)]
+    pub fn pan_by(&mut self, dx: f64, dy: f64) {
+        self.board.pan_by(dx, dy);
+    }
+
     /// Cancel the in-progress line draw/edit.
     pub fn escape(&mut self) {
         self.board.escape();
@@ -194,6 +200,16 @@ impl Engine {
     #[wasm_bindgen(js_name = cameraBuffer)]
     pub fn camera_buffer(&self) -> Vec<f64> {
         render_data::camera(&self.board)
+    }
+
+    /// Overscroll scrollbar thumbs, `[hStart, hSize, vStart, vSize]` as
+    /// track fractions. Size 1 means everything is in view — hide the bar.
+    pub fn scrollbars(&self) -> Vec<f32> {
+        self.board
+            .scrollbar_metrics()
+            .iter()
+            .map(|v| *v as f32)
+            .collect()
     }
 
     /// Per token: `[worldCenterX, worldCenterY, kind, flags]`.

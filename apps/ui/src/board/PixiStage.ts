@@ -1,6 +1,7 @@
 import { Application, Container } from 'pixi.js'
 import type { Engine } from '~board-engine'
 import { WORLD_FILL } from './constants'
+import { Scrollbars } from './Scrollbars'
 import { DrawingsLayer } from './layers/DrawingsLayer'
 import { GridLayer } from './layers/GridLayer'
 import { MapsLayer, type MapData } from './layers/MapsLayer'
@@ -42,6 +43,7 @@ export class PixiStage {
   private grid = new GridLayer()
   private drawings = new DrawingsLayer()
   private tokens = new TokensLayer()
+  private scrollbars: Scrollbars | null = null
 
   private frameId = 0
   private lastTime = 0
@@ -72,6 +74,7 @@ export class PixiStage {
       resolution: window.devicePixelRatio || 1,
     })
     host.appendChild(stage.canvas)
+    stage.scrollbars = new Scrollbars(engine, host)
 
     stage.world.addChild(
       stage.maps.container,
@@ -101,6 +104,7 @@ export class PixiStage {
     cancelAnimationFrame(this.frameId)
     this.app.destroy(undefined, { children: true })
     this.maps.destroy()
+    this.scrollbars?.destroy()
     this.canvas.remove()
   }
 
@@ -162,6 +166,7 @@ export class PixiStage {
       this.app.screen.height,
       engine.cellSize(),
     )
+    this.scrollbars?.update(this.app.screen.width, this.app.screen.height)
 
     this.lastStructure = structure
     this.lastFrame = frame
