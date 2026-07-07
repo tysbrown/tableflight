@@ -25,7 +25,7 @@ const games = [
  * `executeMutation` returns a wonka source so `useMutation` resolves with it.
  */
 const makeClient = (
-  executeMutation = vi.fn(() =>
+  executeMutation = vi.fn((..._args: unknown[]) =>
     fromValue({
       data: {
         createGame: {
@@ -76,7 +76,7 @@ describe('GameSelectModal', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Create New' }))
 
     expect(executeMutation).toHaveBeenCalledTimes(1)
-    expect(executeMutation.mock.calls[0][0]).toMatchObject({
+    expect(executeMutation.mock.calls[0]?.[0]).toMatchObject({
       variables: { name: 'Brand New Game' },
     })
 

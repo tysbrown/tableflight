@@ -19,6 +19,7 @@ import {
   deleteGame,
   gridState,
   saveGridState,
+  test,
 } from './game/resolvers'
 
 export const typeDefs = mergeTypeDefs([
@@ -43,4 +44,5 @@ export const resolvers = mergeResolvers([
   myAssets,
   uploadAsset,
   deleteAsset,
+  test,
 ])

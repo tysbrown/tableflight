@@ -44,13 +44,18 @@ apiRouter.use(yoga.graphqlEndpoint, yoga as RequestHandler)
 
 app.use('/api', apiRouter)
 
-app.listen(1337, () => {
-  if (process.env.NODE_ENV === 'dev') {
-    const icon = '\x1b[32m➜\x1b[0m'
-    console.log(`  ${icon}  UI: http://localhost:5137`)
-    console.log(`  ${icon}  GraphiQL: http://localhost:1337/api/graphql`)
-    console.log(`  ${icon}  Prisma Studio: http://localhost:5555`)
-  }
-})
+// Skip binding the port when the app is imported into tests (the api-e2e
+// suite drives it in-process via supertest, which binds its own ephemeral
+// port). Jest sets NODE_ENV=test.
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(1337, () => {
+    if (process.env.NODE_ENV === 'dev') {
+      const icon = '\x1b[32m➜\x1b[0m'
+      console.log(`  ${icon}  UI: http://localhost:5137`)
+      console.log(`  ${icon}  GraphiQL: http://localhost:1337/api/graphql`)
+      console.log(`  ${icon}  Prisma Studio: http://localhost:5555`)
+    }
+  })
+}
 
 export default app

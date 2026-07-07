@@ -27,7 +27,7 @@ const makeClient = () => {
   const executeQuery = vi.fn(() =>
     fromValue({ data: { myAssets: stagedAssets } }),
   )
-  const executeMutation = vi.fn(() =>
+  const executeMutation = vi.fn((..._args: unknown[]) =>
     fromValue({
       data: {
         uploadAsset: {
